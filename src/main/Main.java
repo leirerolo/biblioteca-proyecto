@@ -1,6 +1,8 @@
 package main;
 import domain.*;
 import gui.*;
+
+import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -31,7 +33,11 @@ public class Main {
 				System.out.println(linea);
 				
 				String[] campos = linea.split(";");
-				ImageIcon portada = null; // cuando tengamos las fotos cargadas será: new ImageIcon("images/"+campos[2]);
+				
+				ImageIcon original = new ImageIcon(campos[2]);
+				Image img = original.getImage().getScaledInstance(120, 160, java.awt.Image.SCALE_SMOOTH);
+				ImageIcon portada = new ImageIcon(img);
+				
 				Libro libro = new Libro(campos[0], campos[1], portada, Double.parseDouble(campos[3]));
 				listaLibros.add(libro);
 			}

@@ -95,8 +95,9 @@ public class JFramePrincipal extends JFrame {
 	            libroPanel.setBackground(Color.WHITE);
 
 	            // Portada
-	            JLabel portada = new JLabel();
-	            //convertir espacios del título en "_" y "ñ" en "n", y quitar tildes
+	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);
+	            
+	            /*//convertir espacios del título en "_" y "ñ" en "n", y quitar tildes
 	            String tit2 = libro.getTitulo().toString().toLowerCase();
 	            tit2.replace("ñ", "n");
 	            tit2.replace("á", "a");
@@ -105,7 +106,8 @@ public class JFramePrincipal extends JFrame {
 	            tit2.replace("í", "i");
 	            tit2.replace("ú", "u");
 	            tit2.replace(" ", "_");
-	            portada.setIcon(new ImageIcon(tit2+".jpg"));
+	            portada.setIcon(new ImageIcon(tit2+".jpg"));*/
+	            
 	            libroPanel.add(portada, BorderLayout.CENTER);
 
 	            // Título
@@ -131,8 +133,6 @@ public class JFramePrincipal extends JFrame {
 	    add(mainPanel, BorderLayout.CENTER);
 	}
 
-
-	
 
 }
 
