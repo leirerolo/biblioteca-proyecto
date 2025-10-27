@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -94,10 +95,17 @@ public class JFramePrincipal extends JFrame {
 	            libroPanel.setBackground(Color.WHITE);
 
 	            // Portada
-	            JLabel portada = new JLabel("Portada", JLabel.CENTER);
-	            portada.setForeground(Color.GRAY);
-	            portada.setOpaque(true);
-	            portada.setBackground(new Color(245, 245, 245));
+	            JLabel portada = new JLabel();
+	            //convertir espacios del título en "_" y "ñ" en "n", y quitar tildes
+	            String tit2 = libro.getTitulo().toString().toLowerCase();
+	            tit2.replace("ñ", "n");
+	            tit2.replace("á", "a");
+	            tit2.replace("é", "e");
+	            tit2.replace("ó", "o");
+	            tit2.replace("í", "i");
+	            tit2.replace("ú", "u");
+	            tit2.replace(" ", "_");
+	            portada.setIcon(new ImageIcon(tit2+".jpg"));
 	            libroPanel.add(portada, BorderLayout.CENTER);
 
 	            // Título
