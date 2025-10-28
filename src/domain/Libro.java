@@ -1,11 +1,12 @@
 package domain;
 
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import javax.swing.ImageIcon;
 
-public class Libro {
+public class Libro implements Comparator<Libro>{
 	private String titulo;
 	private String autor;
 	private ImageIcon portada;
@@ -74,6 +75,13 @@ public class Libro {
 		return Objects.equals(autor, other.autor) && Objects.equals(portada, other.portada)
 				&& Objects.equals(titulo, other.titulo)
 				&& Double.doubleToLongBits(valoracion) == Double.doubleToLongBits(other.valoracion);
+	}
+
+	//COMPARAR POR AUTOR
+	@Override
+	public int compare(Libro o1, Libro o2) {
+		// TODO Auto-generated method stub
+		return o1.getAutor().compareTo(o2.getAutor());
 	}
 	
 	

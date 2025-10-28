@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -36,7 +39,7 @@ public class JFramePrincipal extends JFrame {
 		this.setLocationRelativeTo(null);
 	}
 	
-	private void inicializarPanelSuperior() {		
+	protected void inicializarPanelSuperior() {		
 		JPanel upperPanel = new JPanel(new BorderLayout());
 		// Cabecera: nombre de la biblioteca, y botón para el perfil
 		JPanel header = new JPanel(new BorderLayout());
@@ -68,8 +71,18 @@ public class JFramePrincipal extends JFrame {
 		upperPanel.add(menu, BorderLayout.CENTER);
 		upperPanel.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 		add(upperPanel, BorderLayout.NORTH);
+		
+		// ************** CLICK EN "EXPLORAR" *****************
+		MouseAdapter mouseAdapter = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFrameExplorar jframeExplorar = new JFrameExplorar(libros);
+				jframeExplorar.setVisible(true);
+			}
+		};
+		explorar.addMouseListener(mouseAdapter);
 	}
-	
+
 	private void inicializarPanelCentral() {
 	    JPanel mainPanel = new JPanel(new BorderLayout());
 	    mainPanel.setBackground(Color.WHITE);
@@ -83,7 +96,7 @@ public class JFramePrincipal extends JFrame {
 	    mainPanel.add(lblPopulares, BorderLayout.NORTH);
 	    
 	    // --- Cuadrícula de libros ---
-	    JPanel gridPanel = new JPanel(new GridLayout(2, 2, 15, 15)); //creará las filas que se necesiten, con dos columnas en cada una
+	    JPanel gridPanel = new JPanel(new GridLayout(0, 2, 15, 15)); //creará las filas que se necesiten, con dos columnas en cada una
 	    gridPanel.setBackground(Color.WHITE);
 	    gridPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -95,25 +108,12 @@ public class JFramePrincipal extends JFrame {
 	            libroPanel.setBackground(Color.WHITE);
 
 	            // Portada
-	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);
-	            
-	            /*//convertir espacios del título en "_" y "ñ" en "n", y quitar tildes
-	            String tit2 = libro.getTitulo().toString().toLowerCase();
-	            tit2.replace("ñ", "n");
-	            tit2.replace("á", "a");
-	            tit2.replace("é", "e");
-	            tit2.replace("ó", "o");
-	            tit2.replace("í", "i");
-	            tit2.replace("ú", "u");
-	            tit2.replace(" ", "_");
-	            portada.setIcon(new ImageIcon(tit2+".jpg"));*/
-	            
+	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);          
 	            libroPanel.add(portada, BorderLayout.CENTER);
 
 	            // Título
 	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
 	            libroPanel.add(titulo, BorderLayout.SOUTH);
-
 	            gridPanel.add(libroPanel);
 	        }
 	    } else {

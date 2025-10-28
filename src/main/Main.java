@@ -30,7 +30,6 @@ public class Main {
 			Scanner sc = new Scanner(f);
 			while(sc.hasNextLine()) {
 				String linea = sc.nextLine();
-				System.out.println(linea);
 				
 				String[] campos = linea.split(";");
 				
