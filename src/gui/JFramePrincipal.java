@@ -39,6 +39,9 @@ public class JFramePrincipal extends JFrame {
 		this.setSize(600, 800);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
+		
+		
+		
 	}
 	
 	protected void inicializarPanelSuperior() {		
@@ -74,16 +77,28 @@ public class JFramePrincipal extends JFrame {
 		upperPanel.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 		add(upperPanel, BorderLayout.NORTH);
 		
-		// ************** CLICK EN "EXPLORAR" *****************
-		MouseAdapter mouseAdapter = new MouseAdapter() {
+		// ************** CLICK EN "labels de menu" *****************
+		
+		MouseAdapter mouseAdapterExplore = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				JFrameExplorar jframeExplorar = new JFrameExplorar(libros);
 				jframeExplorar.setVisible(true);
 			}
 		};
-		explorar.addMouseListener(mouseAdapter);
+		explorar.addMouseListener(mouseAdapterExplore);
+		
+		MouseAdapter mouseAdapterReservas = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFrameReservas jframeReservas = new JFrameReservas(libros);
+				jframeReservas.setVisible(true);
+			}
+		};
+		reservas.addMouseListener(mouseAdapterReservas);
 	}
+	
+	
 
 	private void inicializarPanelCentral() {
 	    JPanel mainPanel = new JPanel(new BorderLayout());
