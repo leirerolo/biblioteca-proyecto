@@ -22,10 +22,10 @@ import domain.*;
 
 public class JFramePrincipal extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private List<Libro> libros;
+	protected List<Libro> libros;
 	//predefinir las fuentes
-	private Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
-	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
+	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
+	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
 	
 	public JFramePrincipal(List<Libro> libros) {
 		this.libros = libros;

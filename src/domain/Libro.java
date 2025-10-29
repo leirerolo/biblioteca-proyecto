@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import javax.swing.ImageIcon;
 
-public class Libro implements Comparator<Libro>{
+public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private String titulo;
 	private String autor;
 	private ImageIcon portada;
@@ -18,6 +18,9 @@ public class Libro implements Comparator<Libro>{
 		this.autor = autor;
 		this.portada = portada;
 		this.valoracion = valoracion;
+	}
+	public Libro() {
+		
 	}
 
 	public String getTitulo() {
@@ -79,9 +82,13 @@ public class Libro implements Comparator<Libro>{
 
 	//COMPARAR POR AUTOR
 	@Override
+	public int compareTo(Libro o) {
+		return this.getAutor().compareTo(o.getAutor());
+	}
+
+	@Override
 	public int compare(Libro o1, Libro o2) {
-		// TODO Auto-generated method stub
-		return o1.getAutor().compareTo(o2.getAutor());
+		return Double.compare(o2.getValoracion(), o1.getValoracion());
 	}
 	
 	
