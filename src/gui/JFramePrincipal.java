@@ -8,10 +8,12 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -102,6 +104,7 @@ public class JFramePrincipal extends JFrame {
 
 	    // Si hay libros, los mostramos
 	    if (libros != null && !libros.isEmpty()) {
+	    	Collections.sort(libros, new Libro()); //ordenar por valoración
 	        for (Libro libro : libros) {
 	            JPanel libroPanel = new JPanel(new BorderLayout());
 	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
@@ -114,7 +117,18 @@ public class JFramePrincipal extends JFrame {
 	            // Título
 	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
 	            libroPanel.add(titulo, BorderLayout.SOUTH);
-	            gridPanel.add(libroPanel);
+	            
+	            
+	            // ********* CLICK EN UN LIBRO *****************************
+	            MouseAdapter mouseAdapter = new MouseAdapter() {
+	    			@Override
+	    			public void mouseClicked(MouseEvent e) {
+	    				JDialogLibro infoLibro = new JDialogLibro(JFramePrincipal.this, libro);
+	    				infoLibro.setVisible(true);
+	    			}
+	    		};
+	    		libroPanel.addMouseListener(mouseAdapter);
+	    		gridPanel.add(libroPanel);
 	        }
 	    } else {
 	        gridPanel.add(new JLabel("No hay libros disponibles", JLabel.CENTER));

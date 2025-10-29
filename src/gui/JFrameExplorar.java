@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -115,20 +117,26 @@ public class JFrameExplorar extends JFramePrincipal {
 			tit = ""; //vaciar filtro para poder escribir
 		}
 		ArrayList<Libro> filtrados = new ArrayList<>();
+		String op = (String) opciones.getSelectedItem();
 		
 		if (tit.isEmpty()) {
-			filtrados.addAll(libros);
+			if (!op.equals("Ordenar")) {
+				for (Libro libro : libros) {
+					filtrados.add(libro);
+				}
+				ordenarLista(filtrados);
+			}
 		} else {
 			for (Libro libro : libros) {
 				if (libro.getTitulo().toLowerCase().startsWith(tit)) {
 	    			filtrados.add(libro);
 	    		}
 			}
+			if (!op.equals("Ordenar")) {
+				ordenarLista(filtrados);
+			}
 		}
-		String op = (String) opciones.getSelectedItem();
-		if (op!=null && !op.equals("Ordenar")) {
-			ordenarLista(filtrados);
-		}
+		
 		if (filtrados.isEmpty()) {
 			JLabel mensaje = new JLabel("No hay coincidencias");
 			mensaje.setHorizontalAlignment(JLabel.CENTER);
@@ -162,6 +170,16 @@ public class JFrameExplorar extends JFramePrincipal {
 		    	panelInfo.add(valoracion);
 		    	
 		    	panelLibro.add(panelInfo, BorderLayout.CENTER);
+		    	
+		    	// *************** CLICK EN UN LIBRO *******************
+		    	MouseAdapter mouseAdapter = new MouseAdapter() {
+	    			@Override
+	    			public void mouseClicked(MouseEvent e) {
+	    				JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
+	    				infoLibro.setVisible(true);
+	    			}
+	    		};
+	    		panelLibro.addMouseListener(mouseAdapter);
 		    	panelLibros.add(panelLibro);
 		    }
 		}
@@ -184,7 +202,6 @@ public class JFrameExplorar extends JFramePrincipal {
 		if (!texto.equals("Buscar por título...") && !texto.isEmpty()) {
 			txtFiltro.setForeground(Color.BLACK);
 		} else if (texto.isEmpty()) {
-			txtFiltro.setText("Buscar por título...");
 	        txtFiltro.setForeground(Color.GRAY);
 		}
 		
