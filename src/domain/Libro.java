@@ -52,7 +52,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 				return new ImageIcon(img);
 			}
 			}else {
-				System.err.println("Error");
+				System.err.println("Error al cargar la imagen");
 			}
 		} catch (Exception e) {
 			System.err.println("Error al cargar la imagen:  " + path);
