@@ -1,46 +1,46 @@
+// domain/User.java
 package domain;
 
 public class User {
-	private int id;
-	private String nombre;
-	private String apellido;
-	private String email;
-	private String fotoPath; // ruta al imagen del perfil
-	
-	//constructor para los objetos que estan en la BD
-	public User(int id, String nombre, String apellido) {
-		this.id=id;
-		this.nombre=nombre;
-		this.apellido=apellido;
-		this.email="";
-		this.fotoPath="";
-	}
-	
-	//constructor para los objetos nuevos
-	public User(String nombre, String apellido) {
-		this.nombre=nombre;
-		this.apellido=apellido;
-		this.email="";
-		this.fotoPath="";
-	}
-	
-	//constructor para login simulado
-	public User(String nombre, String apellido, String email, String fotoPath) {
-		this.nombre=nombre;
-		this.apellido=apellido;
-		this.email=email;
-		this.fotoPath=fotoPath;
-	}
-	
-	public int getId() {return id;}
-	public String getNombre() {return nombre;}
-	public String getApellido() {return apellido;}
-	public String getEmail() {return email;}
-	public String getFotoPath() {return fotoPath;}
-	
-	public void setId(int id) { this.id = id; }
-	public void setNombre(String nombre) { this.nombre = nombre; }
-	public void setApellido(String apellido) { this.apellido = apellido; }
-	public void setEmail(String email) { this.email = email; }
-	public void setFotoPath(String fotoPath) { this.fotoPath = fotoPath; }
+    private int id;
+    private String nombre;
+    private String apellido;
+    private String email;        // NUEVO
+    private String avatarPath;   // NUEVO (p.ej. "/images/avatar.png" o ruta de archivo)
+
+    // ya existente
+    public User(int id, String nombre, String apellido) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+    }
+
+    // útil para login demo (sin id)
+    public User(String nombre, String apellido) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+    }
+
+    // OPCIONAL: constructor completo
+    public User(int id, String nombre, String apellido, String email, String avatarPath) {
+        this(id, nombre, apellido);
+        this.email = email;
+        this.avatarPath = avatarPath;
+    }
+
+    // getters/setters
+    public int getID() { return id; }
+    public void setID(int id) { this.id = id; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getApellido() { return apellido; }
+    public void setApellido(String apellido) { this.apellido = apellido; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getAvatarPath() { return avatarPath; }
+    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
 }
