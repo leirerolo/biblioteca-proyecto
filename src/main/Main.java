@@ -43,6 +43,17 @@ public class Main {
 		if(!librosFinales.isEmpty()) {
 			SwingUtilities.invokeLater(() -> {
 				JFramePrincipal ventana = new  JFramePrincipal(librosFinales);
+				
+				//Lanzar el login
+				JDialogLogin dlg = new JDialogLogin(ventana);
+				dlg.setVisible(true);
+				
+				//Usuario logueado
+				User logged = dlg.getLoggedUser();
+				if (logged !=null) {
+					ventana.setCurrentUser(logged);
+				}
+				
 				ventana.setVisible(true);
             });
 		} else {

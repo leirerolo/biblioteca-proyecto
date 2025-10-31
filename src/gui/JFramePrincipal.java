@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -12,13 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.MatteBorder;
@@ -27,6 +26,8 @@ import domain.*;
 
 public class JFramePrincipal extends JFrame {
 	private domain.User currentUser;
+	public void setCurrentUser(domain.User u){ this.currentUser = u; }
+
 	private static final long serialVersionUID = 1L;
 	protected List<Libro> libros;
 	//predefinir las fuentes
@@ -57,39 +58,25 @@ public class JFramePrincipal extends JFrame {
 		JLabel biblio = new JLabel("Biblio.O");
 		biblio.setFont(fuenteTitulo);
 		biblio.setForeground(Color.WHITE);
-		
-        // --- Login modal al inicio (respetando Main) ---
-        JDialogLogin login = new JDialogLogin(this);
-        login.setVisible(true);
-        currentUser = login.getLoggedUser();
-        if (currentUser == null) {
-            // Cancelado: salir de la app
-            dispose();
-            System.exit(0);
-        }
-
-        // --- Barra de menú: Usuario -> Perfil ---
-        JMenuBar menuBar = getJMenuBar();
-        if (menuBar == null) {
-            menuBar = new JMenuBar();
-            setJMenuBar(menuBar);
-        }
-        JMenu mUsuario = new JMenu("Usuario");
-        JMenuItem miPerfil = new JMenuItem("Perfil");
-        miPerfil.addActionListener(e -> {
-            JFramePerfil perfil = new JFramePerfil(currentUser);
-            perfil.setVisible(true);
-        });
-        mUsuario.add(miPerfil);
-        menuBar.add(mUsuario);
-
-        add(biblio, BorderLayout.WEST);
+		header.add(biblio, BorderLayout.WEST);
 		
 		JLabel perfil = new JLabel("Mi perfil");
 		perfil.setFont(fuenteTitulo);
 		perfil.setForeground(Color.white);
 		header.add(perfil, BorderLayout.EAST);
-		upperPanel.add(header, BorderLayout.NORTH);
+		
+perfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+perfil.addMouseListener(new MouseAdapter() {
+	@Override public void mouseClicked(MouseEvent e) {
+		if (currentUser == null) {
+			JOptionPane.showMessageDialog(JFramePrincipal.this, "Inicia sesión para ver tu perfil.", "Perfil", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		JFramePerfil perfilWin = new JFramePerfil(currentUser);
+		perfilWin.setVisible(true);
+	}
+});
+upperPanel.add(header, BorderLayout.NORTH);
 
 		// Menú de navegación: inicio, explorar, reservas
 		JPanel menu = new JPanel(new GridLayout(1,3));
@@ -194,4 +181,3 @@ public class JFramePrincipal extends JFrame {
 
 
 }
-
