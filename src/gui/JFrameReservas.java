@@ -126,6 +126,7 @@ public class JFrameReservas extends JFramePrincipal{
             lblLibro.setBackground(new Color(245, 245, 245));
             lblLibro.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
             panelLibros.add(lblLibro); 
+            System.out.println(libro.getTitulo());
         }	
 	    
 	    
@@ -182,7 +183,7 @@ public class JFrameReservas extends JFramePrincipal{
 			ordenarLista(filtrados);
 		}
 		if (filtrados.isEmpty()) {
-			JLabel mensaje = new JLabel("No hay coincidencias");
+			JLabel mensaje = new JLabel("No hay reservas...");
 			mensaje.setHorizontalAlignment(JLabel.CENTER);
 			panelLibros.add(mensaje);
 			

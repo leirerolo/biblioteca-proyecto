@@ -1,19 +1,35 @@
 package gui;
 
 import javax.swing.*;
+
+import domain.Libro;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.List;
 
-public class JFrameInicio extends JFrame {
+public class JFrameInicio extends JFramePrincipal {
 
     private static final long serialVersionUID = 1L;
 
-    public JFrameInicio() {
-        super("Biblioteca - Inicio");
+    public JFrameInicio(List<Libro> libros) {
+    	super(libros);
+        this.libros = libros;
+        
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(900, 600);
+        //setSize(900, 600);
         setLocationRelativeTo(null);
+        
+        this.inicializarPanelSuperior();
+		this.inicializarPanelCentral();
+    }
 
+    private void inicializarPanelCentral(){
+    	JPanel mainPanel = new JPanel(new BorderLayout());
+    	
         // --- Barra superior con buscador y botón para ejemplo ---
         JPanel top = new JPanel(new BorderLayout(8, 8));
         top.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -29,50 +45,84 @@ public class JFrameInicio extends JFrame {
             // new JFrameExplorador().setVisible(true);
             // dispose(); // si quieres cerrar Inicio al ir al explorador
             JOptionPane.showMessageDialog(this, "Aquí abrirías tu JFrameExplorador");
+            Navigator.showExplorar();
         });
 
         top.add(search, BorderLayout.CENTER);
         top.add(btnExplorador, BorderLayout.EAST);
+        
+        mainPanel.add(top);
 
         // --- Área central "Populares" (placeholder) ---
-        JPanel center = new JPanel();
-        center.setLayout(new BorderLayout());
-        JLabel lbTitulo = new JLabel("Populares", SwingConstants.LEFT);
-        lbTitulo.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        lbTitulo.setFont(lbTitulo.getFont().deriveFont(Font.BOLD, 18f));
+        JPanel center = new JPanel(new BorderLayout());
+        center.setBackground(Color.white);
+
+        JLabel lbTitulo = new JLabel("Populares");
+        lbTitulo.setFont(fuenteTitulo);
+        lbTitulo.setForeground(new Color(0, 102, 204));
+        lbTitulo.setHorizontalAlignment(JLabel.LEFT);
+		lbTitulo.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         center.add(lbTitulo, BorderLayout.NORTH);
 
         // Grid de tarjetas de libros (placeholder visual)
-        JPanel grid = new JPanel(new GridLayout(2, 4, 12, 12));
+        JPanel grid = new JPanel(new GridLayout(0, 2, 12, 12));
+        grid.setBackground(Color.white);
         grid.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
-        for (int i = 1; i <= 8; i++) {
-            JPanel card = new JPanel(new BorderLayout());
-            card.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(220, 220, 220)),
-                    BorderFactory.createEmptyBorder(8, 8, 8, 8)
-            ));
-            card.add(new JLabel("Libro " + i, SwingConstants.CENTER), BorderLayout.CENTER);
-            grid.add(card);
-        }
-        center.add(new JScrollPane(grid), BorderLayout.CENTER);
+        
+        // Si hay libros, los mostramos
+	    if (libros != null && !libros.isEmpty()) {
+	        Collections.sort(libros, new Libro());//ordenar por valoracion
+	        for (Libro libro : libros) {
+	        	JPanel libroPanel = new JPanel(new BorderLayout());
+	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	            libroPanel.setBackground(Color.WHITE);
+	
+	            // Portada
+	            JLabel portada = new JLabel("Portada", JLabel.CENTER);
+	            portada.setForeground(Color.GRAY);
+	            portada.setOpaque(true);
+	            portada.setBackground(new Color(245, 245, 245));
+	            libroPanel.add(portada, BorderLayout.CENTER);
+	
+	            // Título
+	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
+	            libroPanel.add(titulo, BorderLayout.SOUTH);
+	
+	            grid.add(libroPanel);
+	            
+	            // ********* CLICK EN UN LIBRO *****************************
+	            MouseAdapter mouseAdapter = new MouseAdapter() {
+	    			@Override
+	    			public void mouseClicked(MouseEvent e) {
+	    				JDialogLibro infoLibro = new JDialogLibro(JFrameInicio.this, libro);
+	    				infoLibro.setVisible(true);
+	    			}
+	    		};
+	    		libroPanel.addMouseListener(mouseAdapter);
+	    		grid.add(libroPanel);
+	        }
+	    }else {
+	    	grid.add(new JLabel("No hay libros disponibles", JLabel.CENTER));
+	    }
+	        
+        JScrollPane scrollPane = new JScrollPane(grid);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        center.add(scrollPane, BorderLayout.CENTER);
 
-        // --- Menú con "Inicio" (por si abres este frame desde otros y quieres unificar) ---
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Navegación");
-        JMenuItem miInicio = new JMenuItem("Inicio");
-        miInicio.addActionListener(a -> Navigator.irAInicio(this));
-        menu.add(miInicio);
-        menuBar.add(menu);
-        setJMenuBar(menuBar);
 
         // Montaje
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(top, BorderLayout.NORTH);
-        getContentPane().add(center, BorderLayout.CENTER);
-    }
+        JPanel panelCentralInicio = new JPanel(new BorderLayout());
+        panelCentralInicio.add(top, BorderLayout.NORTH);
+        panelCentralInicio.add(center, BorderLayout.CENTER);
+        getContentPane().remove(1); 
+        getContentPane().add(panelCentralInicio, BorderLayout.CENTER);
 
-    /** Atajo cómodo para abrir el inicio en el EDT */
-    public static void open() {
-        SwingUtilities.invokeLater(() -> new JFrameInicio().setVisible(true));
-    }
+    
+        revalidate();
+        repaint();
+        
+        
+    } 
+        
+ 
 }

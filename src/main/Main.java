@@ -4,7 +4,7 @@ import gui.*;
 
 import db.DBManager;
 import db.BookDAO;
-import domain.Libro;
+
 import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +34,6 @@ public class Main {
 			}
 			System.out.println("Se han cargado todos los libros");
 	
-		
 			libros = BookDAO.getAllBooks();
 	
 		}
@@ -42,20 +41,25 @@ public class Main {
 		
 		if(!librosFinales.isEmpty()) {
 			SwingUtilities.invokeLater(() -> {
-				JFramePrincipal ventana = new  JFramePrincipal(librosFinales);
-				
-				//Lanzar el login
-				JDialogLogin dlg = new JDialogLogin(ventana);
-				dlg.setVisible(true);
-				
-				//Usuario logueado
-				User logged = dlg.getLoggedUser();
-				if (logged !=null) {
-					ventana.setCurrentUser(logged);
-				}
-				
-				ventana.setVisible(true);
-            });
+	            JFrameInicio ventana = new JFrameInicio(librosFinales);
+	
+	            // Mostrar login
+	            JDialogLogin dlg = new JDialogLogin(ventana);
+	            dlg.setVisible(true);
+	
+	            User logged = dlg.getLoggedUser();
+	            if (logged != null) {
+	                ventana.setCurrentUser(logged);
+	
+	                // Inicializar navegador con ventana principal
+	                Navigator.init(librosFinales);
+	
+	                ventana.setVisible(true);
+	            } else {
+	                System.out.println("Login cancelado. Cerrando aplicación.");
+	                ventana.dispose();
+	            }
+			});
 		} else {
 			System.out.println("No se han encontrado ningún libro para mostrar");
 		}

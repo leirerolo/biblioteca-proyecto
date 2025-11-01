@@ -85,15 +85,6 @@ upperPanel.add(header, BorderLayout.NORTH);
 		inicio.setFont(fuenteMenu);
 		menu.add(inicio);
 
-		// Hacer "Inicio" clicable y que recargue el propio JFramePrincipal
-		inicio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		inicio.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        volverAInicioEnEsteMismoFrame();
-		    }
-		});
-
 		JLabel explorar = new JLabel("Explorar", JLabel.CENTER);
 		explorar.setFont(fuenteMenu);
 		menu.add(explorar);
@@ -109,8 +100,7 @@ upperPanel.add(header, BorderLayout.NORTH);
 		MouseAdapter mouseAdapterExplore = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFrameExplorar jframeExplorar = new JFrameExplorar(libros);
-				jframeExplorar.setVisible(true);
+				Navigator.showExplorar();
 			}
 		};
 		explorar.addMouseListener(mouseAdapterExplore);
@@ -118,11 +108,18 @@ upperPanel.add(header, BorderLayout.NORTH);
 		MouseAdapter mouseAdapterReservas = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFrameReservas jframeReservas = new JFrameReservas(libros);
-				jframeReservas.setVisible(true);
+				Navigator.showReservas();
 			}
 		};
 		reservas.addMouseListener(mouseAdapterReservas);
+		
+		MouseAdapter mouseAdapterInicio = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Navigator.showInicio();
+			}
+		};
+		inicio.addMouseListener(mouseAdapterInicio);
 	}
 	
 	
@@ -189,17 +186,5 @@ upperPanel.add(header, BorderLayout.NORTH);
 	    add(mainPanel, BorderLayout.CENTER);
 	}
 	
-	/** Vuelve a la pantalla inicial sin abrir nuevas ventanas. */
-	private void volverAInicioEnEsteMismoFrame() {
-	    // Quita todo lo que haya dentro del frame
-	    getContentPane().removeAll();
-	    // Vuelve a construir cabecera + menú + centro "Populares"
-	    inicializarPanelSuperior();
-	    inicializarPanelCentral();
-	    // Refresca el UI
-	    revalidate();
-	    repaint();
-	}
-
 
 }
