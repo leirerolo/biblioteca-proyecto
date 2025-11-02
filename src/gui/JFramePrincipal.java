@@ -37,7 +37,7 @@ public class JFramePrincipal extends JFrame {
 	public JFramePrincipal(List<Libro> libros) {
 		this.libros = libros;
 		this.inicializarPanelSuperior();
-		this.inicializarPanelCentral();
+		//this.inicializarPanelCentral();
 		
 		this.setTitle("Biblioteca");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -94,6 +94,9 @@ upperPanel.add(header, BorderLayout.NORTH);
 		upperPanel.add(menu, BorderLayout.CENTER);
 		upperPanel.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 		add(upperPanel, BorderLayout.NORTH);
+		JPanel mainPanel = new JPanel(new BorderLayout());
+	    mainPanel.setBackground(Color.WHITE);
+	    add(mainPanel, BorderLayout.CENTER);
 		
 		// ************** CLICK EN "labels de menu" *****************
 		
@@ -101,6 +104,7 @@ upperPanel.add(header, BorderLayout.NORTH);
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Navigator.showExplorar();
+				JFramePrincipal.this.dispose();
 			}
 		};
 		explorar.addMouseListener(mouseAdapterExplore);
@@ -109,6 +113,7 @@ upperPanel.add(header, BorderLayout.NORTH);
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Navigator.showReservas();
+				JFramePrincipal.this.dispose();
 			}
 		};
 		reservas.addMouseListener(mouseAdapterReservas);
@@ -117,6 +122,7 @@ upperPanel.add(header, BorderLayout.NORTH);
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Navigator.showInicio();
+				JFramePrincipal.this.dispose();
 			}
 		};
 		inicio.addMouseListener(mouseAdapterInicio);
@@ -124,67 +130,67 @@ upperPanel.add(header, BorderLayout.NORTH);
 	
 	
 
-	private void inicializarPanelCentral() {
-	    JPanel mainPanel = new JPanel(new BorderLayout());
-	    mainPanel.setBackground(Color.WHITE);
-
-	    // --- Cabecera ---
-	    JLabel lblPopulares = new JLabel("Populares");
-	    lblPopulares.setFont(fuenteTitulo);
-	    lblPopulares.setForeground(new Color(0, 102, 204));
-	    lblPopulares.setHorizontalAlignment(JLabel.LEFT);
-	    lblPopulares.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	    mainPanel.add(lblPopulares, BorderLayout.NORTH);
-	    
-	    // --- Cuadrícula de libros ---
-	    JPanel gridPanel = new JPanel(new GridLayout(0, 2, 15, 15)); //creará las filas que se necesiten, con dos columnas en cada una
-	    gridPanel.setBackground(Color.WHITE);
-	    gridPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-	    // Si hay libros, los mostramos
-	    if (libros != null && !libros.isEmpty()) {
-	    	Collections.sort(libros, new Libro()); //ordenar por valoración
-	        for (Libro libro : libros) {
-	            JPanel libroPanel = new JPanel(new BorderLayout());
-	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-	            libroPanel.setBackground(Color.WHITE);
-
-	            // Portada
-	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);          
-	            libroPanel.add(portada, BorderLayout.CENTER);
-
-	            // Título
-	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
-	            libroPanel.add(titulo, BorderLayout.SOUTH);
-	            
-	            
-	            // ********* CLICK EN UN LIBRO *****************************
-	            MouseAdapter mouseAdapter = new MouseAdapter() {
-	    			@Override
-	    			public void mouseClicked(MouseEvent e) {
-	    				JDialogLibro infoLibro = new JDialogLibro(JFramePrincipal.this, libro);
-	    				infoLibro.setVisible(true);
-	    			}
-	    		};
-	    		libroPanel.addMouseListener(mouseAdapter);
-	    		gridPanel.add(libroPanel);
-	        }
-	    } else {
-	        gridPanel.add(new JLabel("No hay libros disponibles", JLabel.CENTER));
-	    }
-
-	    // Añadimos todo al contentPanel
-	    JPanel scrollable = new JPanel(new BorderLayout());
-	    javax.swing.JScrollPane scrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	    scrollPane.setBorder(null);
-	    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-	    scrollable.add(scrollPane, BorderLayout.CENTER);
-
-	    mainPanel.add(scrollable, BorderLayout.CENTER);
-
-	    // Añadir al panel central
-	    add(mainPanel, BorderLayout.CENTER);
-	}
+//	private void inicializarPanelCentral() {
+//	    JPanel mainPanel = new JPanel(new BorderLayout());
+//	    mainPanel.setBackground(Color.WHITE);
+//
+//	    // --- Cabecera ---
+//	    JLabel lblPopulares = new JLabel("Populares");
+//	    lblPopulares.setFont(fuenteTitulo);
+//	    lblPopulares.setForeground(new Color(0, 102, 204));
+//	    lblPopulares.setHorizontalAlignment(JLabel.LEFT);
+//	    lblPopulares.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//	    mainPanel.add(lblPopulares, BorderLayout.NORTH);
+//	    
+//	    // --- Cuadrícula de libros ---
+//	    JPanel gridPanel = new JPanel(new GridLayout(0, 2, 15, 15)); //creará las filas que se necesiten, con dos columnas en cada una
+//	    gridPanel.setBackground(Color.WHITE);
+//	    gridPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//
+//	    // Si hay libros, los mostramos
+//	    if (libros != null && !libros.isEmpty()) {
+//	    	Collections.sort(libros, new Libro()); //ordenar por valoración
+//	        for (Libro libro : libros) {
+//	            JPanel libroPanel = new JPanel(new BorderLayout());
+//	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+//	            libroPanel.setBackground(Color.WHITE);
+//
+//	            // Portada
+//	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);          
+//	            libroPanel.add(portada, BorderLayout.CENTER);
+//
+//	            // Título
+//	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
+//	            libroPanel.add(titulo, BorderLayout.SOUTH);
+//	            
+//	            
+//	            // ********* CLICK EN UN LIBRO *****************************
+//	            MouseAdapter mouseAdapter = new MouseAdapter() {
+//	    			@Override
+//	    			public void mouseClicked(MouseEvent e) {
+//	    				JDialogLibro infoLibro = new JDialogLibro(JFramePrincipal.this, libro);
+//	    				infoLibro.setVisible(true);
+//	    			}
+//	    		};
+//	    		libroPanel.addMouseListener(mouseAdapter);
+//	    		gridPanel.add(libroPanel);
+//	        }
+//	    } else {
+//	        gridPanel.add(new JLabel("No hay libros disponibles", JLabel.CENTER));
+//	    }
+//
+//	    // Añadimos todo al contentPanel
+//	    JPanel scrollable = new JPanel(new BorderLayout());
+//	    javax.swing.JScrollPane scrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//	    scrollPane.setBorder(null);
+//	    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+//	    scrollable.add(scrollPane, BorderLayout.CENTER);
+//
+//	    mainPanel.add(scrollable, BorderLayout.CENTER);
+//
+//	     Añadir al panel central
+//	    add(mainPanel, BorderLayout.CENTER);
+//	}
 	
 
 }

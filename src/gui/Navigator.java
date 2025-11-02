@@ -10,6 +10,7 @@ public class Navigator {
 	private static JFrameInicio inicio;
 	private static JFrameExplorar explorar;
 	private static JFrameReservas reservas;
+	private static JFramePrincipal principal;
 	
 	public static void init(List<Libro> libros) {
         inicio = new JFrameInicio(libros);
@@ -36,6 +37,7 @@ public class Navigator {
 		if (inicio != null) inicio.setVisible(false);
         if (explorar != null) explorar.setVisible(false);
         if (reservas != null) reservas.setVisible(false);
+        if (principal != null) principal.setVisible(false);
 	}
 
 }
