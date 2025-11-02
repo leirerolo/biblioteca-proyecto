@@ -19,13 +19,15 @@ import javax.swing.SwingUtilities;
 public class Main {
 
 	public static void main(String[] args) {
-		
-		DBManager.createTables();
+		//COMENTADOS: para cuando funcione la BD
+		//DBManager.createTables();
 	
-		List<Libro> libros = BookDAO.getAllBooks();
+		//List<Libro> libros = BookDAO.getAllBooks();
 		
 		// verificar si la BD está vacía 
-		if (libros.isEmpty()) {
+		List<Libro> libros = cargarLibrosCSV("libros.csv");
+		
+		/*if (libros.isEmpty()) {
 			System.out.println("La BD está vacía, cargando desde el csv...");
 			List<Libro> librosCSV = cargarLibrosCSV("libros.csv");
 			
@@ -36,7 +38,9 @@ public class Main {
 	
 			libros = BookDAO.getAllBooks();
 	
-		}
+		}*/
+		
+		//HACER LOGIN NADA MÁS ENTRAR A LA APP
 		final List<Libro> librosFinales = libros;
 		
 		if(!librosFinales.isEmpty()) {
@@ -75,7 +79,7 @@ public class Main {
 				String[] campos = linea.split(";");
 				
 				String pathImagenCSV = campos[2].trim();
-				String pathImagenCompleto= "resources images/" + pathImagenCSV;
+				String pathImagenCompleto= "images/" + pathImagenCSV;
 				double valoracion = Double.parseDouble(campos[3].trim().replace(",", "."));
 				ImageIcon portada = null;
 				

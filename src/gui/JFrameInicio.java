@@ -29,7 +29,7 @@ public class JFrameInicio extends JFramePrincipal {
 
     private void inicializarPanelCentral(){
     	JPanel mainPanel = new JPanel(new BorderLayout());
-    	
+    	/* YA TENEMOS BUSCADOR Y EXPLORAR
         // --- Barra superior con buscador y botón para ejemplo ---
         JPanel top = new JPanel(new BorderLayout(8, 8));
         top.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -39,6 +39,7 @@ public class JFrameInicio extends JFramePrincipal {
         search.add(tfBuscar, BorderLayout.CENTER);
         search.add(btnBuscar, BorderLayout.EAST);
 
+        
         JButton btnExplorador = new JButton("Explorador (demo)");
         btnExplorador.addActionListener((ActionEvent e) -> {
             // Abre cualquier otra ventana de tu app (ejemplo)
@@ -51,7 +52,7 @@ public class JFrameInicio extends JFramePrincipal {
         top.add(search, BorderLayout.CENTER);
         top.add(btnExplorador, BorderLayout.EAST);
         
-        mainPanel.add(top);
+        mainPanel.add(top);*/
 
         // --- Área central "Populares" (placeholder) ---
         JPanel center = new JPanel(new BorderLayout());
@@ -74,11 +75,11 @@ public class JFrameInicio extends JFramePrincipal {
 	        Collections.sort(libros, new Libro());//ordenar por valoracion
 	        for (Libro libro : libros) {
 	        	JPanel libroPanel = new JPanel(new BorderLayout());
-	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	            libroPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 	            libroPanel.setBackground(Color.WHITE);
 	
 	            // Portada
-	            JLabel portada = new JLabel("Portada", JLabel.CENTER);
+	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);
 	            portada.setForeground(Color.GRAY);
 	            portada.setOpaque(true);
 	            portada.setBackground(new Color(245, 245, 245));
@@ -112,7 +113,7 @@ public class JFrameInicio extends JFramePrincipal {
 
         // Montaje
         JPanel panelCentralInicio = new JPanel(new BorderLayout());
-        panelCentralInicio.add(top, BorderLayout.NORTH);
+        //panelCentralInicio.add(top, BorderLayout.NORTH);
         panelCentralInicio.add(center, BorderLayout.CENTER);
         getContentPane().remove(1); 
         getContentPane().add(panelCentralInicio, BorderLayout.CENTER);
