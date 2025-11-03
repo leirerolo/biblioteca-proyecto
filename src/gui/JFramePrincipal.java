@@ -37,17 +37,20 @@ public class JFramePrincipal extends JFrame {
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
 	
 	public JFramePrincipal(List<Libro> libros) {
-		this.libros = libros;
-		this.inicializarPanelSuperior();
+        this.libros = libros;
 
-		//this.inicializarPanelCentral();
-		
-		this.setTitle("Biblioteca");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(600, 800);
-		this.setResizable(false);
-		this.setLocationRelativeTo(null);
-	}
+        if (this.currentUser == null) {
+            this.currentUser = domain.User.getLoggedIn();
+        }
+
+        this.inicializarPanelSuperior();
+        
+        this.setTitle("Biblioteca");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(600, 800);
+        this.setResizable(false);
+        this.setLocationRelativeTo(null);
+    }
 	
 	protected void inicializarPanelSuperior() {		
 		JPanel upperPanel = new JPanel(new BorderLayout());
@@ -68,16 +71,27 @@ public class JFramePrincipal extends JFrame {
 		perfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		perfil.addMouseListener(new MouseAdapter() {
 			@Override 
-			public void mouseClicked(MouseEvent e) {
-				if (currentUser == null) {
-					JOptionPane.showMessageDialog(JFramePrincipal.this, "Inicia sesión para ver tu perfil.", "Perfil", JOptionPane.INFORMATION_MESSAGE);
-					return;
-				}
-				JFramePerfil perfilWin = new JFramePerfil(currentUser);
-				perfilWin.setVisible(true);
-			}
-		});
-		upperPanel.add(header, BorderLayout.NORTH);
+            public void mouseClicked(MouseEvent e) {
+
+                // CAMBIO: no dependas solo de currentUser; usa sesión como respaldo.
+                domain.User u = (currentUser != null) ? currentUser : domain.User.getLoggedIn();
+
+                if (u == null) {
+                    JOptionPane.showMessageDialog(
+                        JFramePrincipal.this,
+                        "Inicia sesión para ver tu perfil.",
+                        "Perfil",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    return;
+                }
+
+                // Abrir perfil con el usuario efectivo (injetado o de sesión)
+                JFramePerfil perfilWin = new JFramePerfil(u);
+                perfilWin.setVisible(true);
+            }
+        });
+        upperPanel.add(header, BorderLayout.NORTH);
 
 		// Menú de navegación: inicio, explorar, reservas
 		JPanel menu = new JPanel(new GridLayout(1,3));

@@ -10,6 +10,7 @@ public class User {
     private String email;        // NUEVO
     private String avatarPath;   // NUEVO (p.ej. "/images/avatar.png" o ruta de archivo)
     private List<Reserva> reservas;
+    private static User LOGGED_IN = null;
 
     // ya existente
     public User(int id, String nombre, String apellido) {
@@ -65,5 +66,15 @@ public class User {
     }
     public void setAvatarPath(String avatarPath) { 
     	this.avatarPath = avatarPath; 
+    }
+     
+    public static void setLoggedIn(User u) { 
+    	LOGGED_IN = u; 
+    }
+    public static User getLoggedIn() { 
+    	return LOGGED_IN; 
+    }
+    public static boolean isLoggedIn() { 
+    	return LOGGED_IN != null; 
     }
 }
