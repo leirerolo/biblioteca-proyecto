@@ -23,12 +23,14 @@ public class JFrameInicio extends JFramePrincipal {
         //setSize(900, 600);
         setLocationRelativeTo(null);
         
-        this.inicializarPanelSuperior();
+        this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
     }
 
     private void inicializarPanelCentral(){
     	JPanel mainPanel = new JPanel(new BorderLayout());
+    	mainPanel.setBackground(Color.WHITE);
+    	
     	/* YA TENEMOS BUSCADOR Y EXPLORAR
         // --- Barra superior con buscador y botón para ejemplo ---
         JPanel top = new JPanel(new BorderLayout(8, 8));
@@ -54,42 +56,35 @@ public class JFrameInicio extends JFramePrincipal {
         
         mainPanel.add(top);*/
 
-        // --- Área central "Populares" (placeholder) ---
-        JPanel center = new JPanel(new BorderLayout());
-        center.setBackground(Color.white);
+    	// --- Cabecera ---
+	    JLabel lblPopulares = new JLabel("Populares");
+	    lblPopulares.setFont(fuenteTitulo);
+	    lblPopulares.setForeground(new Color(0, 102, 204));
+	    lblPopulares.setHorizontalAlignment(JLabel.LEFT);
+	    lblPopulares.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	    mainPanel.add(lblPopulares, BorderLayout.NORTH);
+	    
+	    // --- Cuadrícula de libros ---
+	    JPanel gridPanel = new JPanel(new GridLayout(0, 2, 15, 15)); //creará las filas que se necesiten, con dos columnas en cada una
+	    gridPanel.setBackground(Color.WHITE);
+	    gridPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel lbTitulo = new JLabel("Populares");
-        lbTitulo.setFont(fuenteTitulo);
-        lbTitulo.setForeground(new Color(0, 102, 204));
-        lbTitulo.setHorizontalAlignment(JLabel.LEFT);
-		lbTitulo.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        center.add(lbTitulo, BorderLayout.NORTH);
-
-        // Grid de tarjetas de libros (placeholder visual)
-        JPanel grid = new JPanel(new GridLayout(0, 2, 12, 12));
-        grid.setBackground(Color.white);
-        grid.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
-        
-        // Si hay libros, los mostramos
+	    // Si hay libros, los mostramos
 	    if (libros != null && !libros.isEmpty()) {
-	        Collections.sort(libros, new Libro());//ordenar por valoracion
+	    	Collections.sort(libros, new Libro()); //ordenar por valoración
 	        for (Libro libro : libros) {
-	        	JPanel libroPanel = new JPanel(new BorderLayout());
-	            libroPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	            JPanel libroPanel = new JPanel(new BorderLayout());
+	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 	            libroPanel.setBackground(Color.WHITE);
-	
+
 	            // Portada
-	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);
-	            portada.setForeground(Color.GRAY);
-	            portada.setOpaque(true);
-	            portada.setBackground(new Color(245, 245, 245));
+	            JLabel portada = new JLabel(libro.getPortada(), JLabel.CENTER);          
 	            libroPanel.add(portada, BorderLayout.CENTER);
-	
+
 	            // Título
 	            JLabel titulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
 	            libroPanel.add(titulo, BorderLayout.SOUTH);
-	
-	            grid.add(libroPanel);
+	            
 	            
 	            // ********* CLICK EN UN LIBRO *****************************
 	            MouseAdapter mouseAdapter = new MouseAdapter() {
@@ -100,18 +95,27 @@ public class JFrameInicio extends JFramePrincipal {
 	    			}
 	    		};
 	    		libroPanel.addMouseListener(mouseAdapter);
-	    		grid.add(libroPanel);
+	    		gridPanel.add(libroPanel);
 	        }
-	    }else {
-	    	grid.add(new JLabel("No hay libros disponibles", JLabel.CENTER));
+	    } else {
+	        gridPanel.add(new JLabel("No hay libros disponibles", JLabel.CENTER));
 	    }
-	        
-        JScrollPane scrollPane = new JScrollPane(grid);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        center.add(scrollPane, BorderLayout.CENTER);
+
+	    // Añadimos todo al contentPanel
+	    JPanel scrollable = new JPanel(new BorderLayout());
+	    javax.swing.JScrollPane scrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	    scrollPane.setBorder(null);
+	    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+	    scrollable.add(scrollPane, BorderLayout.CENTER);
+
+	    mainPanel.add(scrollable, BorderLayout.CENTER);
+
+	    // Añadir al panel central
+	    add(mainPanel, BorderLayout.CENTER);
 
 
-        // Montaje
+        
+        /*// Montaje
         JPanel panelCentralInicio = new JPanel(new BorderLayout());
         //panelCentralInicio.add(top, BorderLayout.NORTH);
         panelCentralInicio.add(center, BorderLayout.CENTER);
@@ -120,7 +124,7 @@ public class JFrameInicio extends JFramePrincipal {
 
     
         revalidate();
-        repaint();
+        repaint();*/
         
         
     } 

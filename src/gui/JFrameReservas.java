@@ -30,7 +30,7 @@ public class JFrameReservas extends JFramePrincipal{
 	public JFrameReservas(List<Libro> libros) {
 		super(libros);
 		this.libros = libros;
-		this.inicializarPanelSuperior(); 
+		this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
 	}
 	

@@ -15,6 +15,7 @@ import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
+//USO DE IA: para la generación del fichero libros.csv
 
 public class Main {
 
