@@ -1,6 +1,7 @@
 // domain/User.java
 package domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -9,7 +10,7 @@ public class User {
     private String apellido;
     private String email;        // NUEVO
     private String avatarPath;   // NUEVO (p.ej. "/images/avatar.png" o ruta de archivo)
-    private List<Reserva> reservas;
+    private ArrayList<Reserva> reservas;
     private static User LOGGED_IN = null;
     private String password;
 
@@ -18,12 +19,14 @@ public class User {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.reservas= new ArrayList<>();
     }
 
     //CREA NUEVO
     public User(String nombre, String password) {
     	this.nombre=nombre;
     	this.password = password;
+    	this.reservas= new ArrayList<>();
     }
 
     // OPCIONAL: constructor completo
@@ -31,6 +34,7 @@ public class User {
         this(id, nombre, apellido);
         this.email = email;
         this.avatarPath = avatarPath;
+        this.reservas= new ArrayList<>();
     }
 
     // getters/setters
@@ -55,11 +59,11 @@ public class User {
     	this.apellido = apellido; 
     }
 
-    public List<Reserva> getReservas() {
+    public ArrayList<Reserva> getReservas() {
 		return reservas;
 	}
 
-	public void setReservas(List<Reserva> reservas) {
+	public void setReservas(ArrayList<Reserva> reservas) {
 		this.reservas = reservas;
 	}
 

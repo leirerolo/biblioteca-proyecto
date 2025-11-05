@@ -25,8 +25,6 @@ import domain.User;
 
 public class JFrameReservas extends JFramePrincipal{
 	private static final long serialVersionUID = 1L;
-	private JTextField txtFiltro;
-	private JComboBox<String> opciones;
 	private JPanel panelLibros;
 	private User user = User.getLoggedIn(); //la ventana de reservas es del user que ha iniciado sesión
 
@@ -34,78 +32,18 @@ public class JFrameReservas extends JFramePrincipal{
 		super(libros);
 		this.libros = new ArrayList<>();
 		
-		for (Reserva reserva : this.user.getReservas()) {
-			this.libros.add(reserva.getLibro());
+		if (this.user.getReservas()!=null) {
+			for (Reserva reserva : this.user.getReservas()) {
+				this.libros.add(reserva.getLibro());
+			}
 		}
-		
-		
 		this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
 	}
 	
-	private void inicializarPanelCentral() {
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		
+	private void inicializarPanelCentral() {		
 		JPanel contentPanel = new JPanel(new BorderLayout());
 	    contentPanel.setBackground(Color.WHITE);
-		
-		// (filtro texto + opciones filtro)
-		JPanel cabecera = new JPanel(new BorderLayout());
-		txtFiltro = new JTextField("Buscar por título...");
-		txtFiltro.setForeground(Color.GRAY);
-		
-		//editar filtro
-		txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				if(txtFiltro.getText().equals("Buscar por título...")) {
-					txtFiltro.setText("");
-		            txtFiltro.setForeground(Color.BLACK);
-				}
-			}
-
-			@Override
-			public void focusLost(FocusEvent e) {
-				if(txtFiltro.getText().isEmpty()) {
-					txtFiltro.setText("Buscar por título...");
-		            txtFiltro.setForeground(Color.GRAY);
-				}
-			}
-			
-		});
-		
-		//actualizar filtro
-		DocumentListener miTxtListener = new DocumentListener() {
-
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				actualizarFiltro();
-				
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				actualizarFiltro();
-				
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {			
-			}
-			
-		};
-		
-		txtFiltro.getDocument().addDocumentListener(miTxtListener);
-		opciones = new JComboBox<>(new String[]{"Ordenar", "Por autor", "Por valoración"});
-		
-		//listener para la selección
-		opciones.addActionListener((e) -> {
-			filtrarLibros();
-		});
-		cabecera.add(txtFiltro, BorderLayout.CENTER);
-		cabecera.add(opciones, BorderLayout.EAST);
-		mainPanel.add(cabecera, BorderLayout.NORTH);
 		
 		//cabecera
 		JLabel lblReservas = new JLabel("Reservas");
@@ -115,20 +53,13 @@ public class JFrameReservas extends JFramePrincipal{
 		lblReservas.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		contentPanel.add(lblReservas, BorderLayout.NORTH);
 		
-		
 		//Centro: zona de libros
-	    
 		panelLibros = new JPanel();
 		panelLibros.setLayout(new BoxLayout(panelLibros, BoxLayout.Y_AXIS));
 		panelLibros.setBackground(Color.WHITE);
 		panelLibros.setOpaque(true);
 		panelLibros.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	
-		//lista de libros (esto es para probar)
-//	    JPanel librosReserva = new JPanel();
-//	    librosReserva.setBackground(Color.WHITE);
-//	    librosReserva.setLayout(new GridLayout(libros.size(), 1, 5, 5));
-//	    
 	    for (Libro libro : libros) {
             JLabel lblLibro = new JLabel(libro.getTitulo() + " - " + libro.getAutor());
             lblLibro.setOpaque(true);
@@ -138,66 +69,29 @@ public class JFrameReservas extends JFramePrincipal{
             System.out.println(libro.getTitulo());
         }	
 	    
-	    
-
 		//scroll para cuando haya libros
 		JScrollPane scrollPane = new JScrollPane(panelLibros, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
 		contentPanel.add(scrollPane, BorderLayout.CENTER);
-		mainPanel.add(contentPanel, BorderLayout.CENTER);
-		this.add(mainPanel, BorderLayout.CENTER); // añadir al panel central
+		this.add(contentPanel, BorderLayout.CENTER);
 
 		// Mostrar mensaje inicial o todos los libros
 		filtrarLibros();
-		
-
-	    mainPanel.add(contentPanel,BorderLayout.CENTER);
-		
+				
 	}
 	
-	private void actualizarFiltro() {
-			String texto = txtFiltro.getText();
-			
-			if (!texto.equals("Buscar por título...") && !texto.isEmpty()) {
-				txtFiltro.setForeground(Color.BLACK);
-			} else if (texto.isEmpty()) {
-				txtFiltro.setText("Buscar por título...");
-		        txtFiltro.setForeground(Color.GRAY);
-			}
-			
-			filtrarLibros();
-	}
 	
 	private void filtrarLibros() {
-		panelLibros.removeAll(); //vaciar
-		String tit = txtFiltro.getText().toLowerCase();
-		if (tit.equals("Buscar por título...")) {
-			tit = ""; //vaciar filtro para poder escribir
-		}
-		ArrayList<Libro> filtrados = new ArrayList<>();
 		
-		if (tit.isEmpty()) {
-			filtrados.addAll(libros);
-		} else {
-			for (Libro libro : libros) {
-				if (libro.getTitulo().toLowerCase().startsWith(tit)) {
-	    			filtrados.add(libro);
-	    		}
-			}
-		}
-		String op = (String) opciones.getSelectedItem();
-		if (op!=null && !op.equals("Ordenar")) {
-			ordenarLista(filtrados);
-		}
-		if (filtrados.isEmpty()) {
+		if (libros.isEmpty()) {
 			JLabel mensaje = new JLabel("No hay reservas...");
 			mensaje.setHorizontalAlignment(JLabel.CENTER);
 			panelLibros.add(mensaje);
 			
 		} else {
-			for (Libro l : filtrados) {
+			for (Libro l : libros) {
 		    	JPanel panelLibro = new JPanel(new BorderLayout());
 		        panelLibro.setPreferredSize(new Dimension(Integer.MAX_VALUE, 120));
 		        panelLibro.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
@@ -229,15 +123,6 @@ public class JFrameReservas extends JFramePrincipal{
 		}
 		panelLibros.revalidate();
 		panelLibros.repaint();
-	}
-	
-	private void ordenarLista(List<Libro> lista) {
-		String op = (String) opciones.getSelectedItem();
-		if (op.equals("Por autor")) {
-			Collections.sort(lista);
-		}else if (op.equals("Por valoración")) {
-			Collections.sort(lista, new Libro());
-		}
 	}
 	
 }
