@@ -33,7 +33,7 @@ public class JFramePerfil extends JFrame {
         lblNombre = new JLabel("Nombre: " + n(user.getNombre()));
         lblApellido = new JLabel("Apellido: " + n(user.getApellido()));
         lblEmail   = new JLabel("Email: "   + n(user.getEmail()));
-        datos.add(new JLabel("ID: " + user.getID()));
+        datos.add(new JLabel("ID: " + user.getId()));
         datos.add(lblNombre);
         datos.add(lblApellido);
         datos.add(lblEmail);

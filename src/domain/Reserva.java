@@ -7,13 +7,15 @@ public class Reserva {
 	private LocalDate fecha;
 	private int duracion; //en días
 	private int prolongaciones;
+	private User user;
 	
 	//Por defecto se crea la reserva con 14 días (2 semanas) de plazo
-	public Reserva(Libro libro, LocalDate fecha) {
-		this.libro = libro;
-		this.fecha = fecha;
-		this.duracion = 14;
-		this.prolongaciones=0; //nada más reservarlo, no se ha prolongado nunca
+	public Reserva(Libro libro, User user) {
+		this.libro=libro;
+		this.fecha=LocalDate.now();
+		this.duracion=14;
+		this.prolongaciones=0;
+		this.user=user;
 	}
 
 	public Libro getLibro() {
@@ -27,6 +29,12 @@ public class Reserva {
 	}
 	public void setFecha(LocalDate fecha) {
 		this.fecha = fecha;
+	}
+	public User getUser() {
+		return this.user;
+	}
+	public void setUser(User user) {
+		this.user=user;
 	}
 	public int getDuracion() {
 		return duracion;

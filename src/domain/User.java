@@ -11,6 +11,7 @@ public class User {
     private String avatarPath;   // NUEVO (p.ej. "/images/avatar.png" o ruta de archivo)
     private List<Reserva> reservas;
     private static User LOGGED_IN = null;
+    private String password;
 
     // ya existente
     public User(int id, String nombre, String apellido) {
@@ -19,10 +20,10 @@ public class User {
         this.apellido = apellido;
     }
 
-    // útil para login demo (sin id)
-    public User(String nombre, String apellido) {
-        this.nombre = nombre;
-        this.apellido = apellido;
+    //CREA NUEVO
+    public User(String nombre, String password) {
+    	this.nombre=nombre;
+    	this.password = password;
     }
 
     // OPCIONAL: constructor completo
@@ -33,10 +34,10 @@ public class User {
     }
 
     // getters/setters
-    public int getID() { 
+    public int getId() { 
     	return id; 
     }
-    public void setID(int id) { 
+    public void setId(int id) { 
     	this.id = id; 
     }
 
@@ -52,15 +53,28 @@ public class User {
     }
     public void setApellido(String apellido) { 
     	this.apellido = apellido; 
-    	}
+    }
 
-    public String getEmail() { 
+    public List<Reserva> getReservas() {
+		return reservas;
+	}
+
+	public void setReservas(List<Reserva> reservas) {
+		this.reservas = reservas;
+	}
+
+	public String getEmail() { 
     	return email; 
     }
     public void setEmail(String email) { 
     	this.email = email; 
     }
-
+    public String getPassword() {
+    	return password;
+    }
+    public void setPassword(String password) {
+    	this.password=password;
+    }
     public String getAvatarPath() { 
     	return avatarPath; 
     }

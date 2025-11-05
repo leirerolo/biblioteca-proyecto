@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.border.MatteBorder;
 
 import domain.Libro;
+import domain.Reserva;
+import domain.User;
 
 public class JDialogLibro extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -64,6 +66,13 @@ public class JDialogLibro extends JDialog {
 		cerrar.addActionListener((e) -> {
 			this.dispose();
 		});
+		reservar.addActionListener((e) -> {
+			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
+			Reserva nueva = new Reserva(libro, user);
+			user.getReservas().add(nueva);
+			
+		});
+		
 		
 		this.add(panelBotones, BorderLayout.SOUTH);
 		this.setResizable(false);

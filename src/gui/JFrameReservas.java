@@ -20,16 +20,25 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import domain.Libro;
+import domain.Reserva;
+import domain.User;
 
 public class JFrameReservas extends JFramePrincipal{
-	
+	private static final long serialVersionUID = 1L;
 	private JTextField txtFiltro;
 	private JComboBox<String> opciones;
 	private JPanel panelLibros;
+	private User user = User.getLoggedIn(); //la ventana de reservas es del user que ha iniciado sesión
 
 	public JFrameReservas(List<Libro> libros) {
 		super(libros);
-		this.libros = libros;
+		this.libros = new ArrayList<>();
+		
+		for (Reserva reserva : this.user.getReservas()) {
+			this.libros.add(reserva.getLibro());
+		}
+		
+		
 		this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
 	}
@@ -98,7 +107,7 @@ public class JFrameReservas extends JFramePrincipal{
 		cabecera.add(opciones, BorderLayout.EAST);
 		mainPanel.add(cabecera, BorderLayout.NORTH);
 		
-		//cabezera
+		//cabecera
 		JLabel lblReservas = new JLabel("Reservas");
 		lblReservas.setFont(fuenteTitulo);
 		lblReservas.setForeground(new Color(0, 102, 204));
@@ -107,7 +116,7 @@ public class JFrameReservas extends JFramePrincipal{
 		contentPanel.add(lblReservas, BorderLayout.NORTH);
 		
 		
-		//Centro: xona de libros
+		//Centro: zona de libros
 	    
 		panelLibros = new JPanel();
 		panelLibros.setLayout(new BoxLayout(panelLibros, BoxLayout.Y_AXIS));

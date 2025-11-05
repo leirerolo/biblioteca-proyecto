@@ -13,6 +13,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private ImageIcon portada;
 	private double valoracion;
 	private String portadaPath; // para poder acceder a la imagen a traves de la BD
+	private User reservadoPor; //usuario que tiene ahora reservado el libro (si existe)
 	
   // constructor para leer el libro desde la BD
 	public Libro(int id, String titulo, String autor, double valoracion, String portadaPath) {
@@ -106,6 +107,12 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 
 	public void setValoracion(double valoracion) {
 		this.valoracion = valoracion;
+	}
+	public User getReservadoPor() {
+		return reservadoPor;
+	}
+	public void setReservadoPor(User u) {
+		this.reservadoPor=u;
 	}
 
 	@Override
