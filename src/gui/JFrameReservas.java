@@ -75,10 +75,6 @@ public class JFrameReservas extends JFramePrincipal{
   
             JScrollPane scrollPane = new JScrollPane(tablaReservas);
             
-            panelTableContainer = new JPanel(new CardLayout());
-            panelTableContainer.setBackground(Color.WHITE);
-            
-            panelTableContainer.add(scrollPane, "TABLA");
             
             lblNoReservas = new JLabel("NO HAY RESERVAS");
             lblNoReservas.setHorizontalAlignment(JLabel.CENTER);
@@ -87,11 +83,39 @@ public class JFrameReservas extends JFramePrincipal{
             panelMensajevacio.setBackground(Color.WHITE);
             panelMensajevacio.add(lblNoReservas, new GridBagConstraints());
             
+            panelTableContainer= new JPanel(new CardLayout());
+            panelTableContainer.setBackground(Color.WHITE);
+            
+            panelTableContainer.add(scrollPane, "TABLA");
             panelTableContainer.add(panelMensajevacio, "MENSAJE");
             
             contentPanel.add(panelTableContainer, BorderLayout.CENTER);
             this.add(contentPanel, BorderLayout.CENTER);
             
+            tablaReservas.addMouseListener(new java.awt.event.MouseAdapter() {
+            	@Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    if (evt.getClickCount() == 2) { 
+                        int row = tablaReservas.getSelectedRow();
+                        if (row != -1) {
+                            String tituloSeleccionado = (String) tablaReservas.getValueAt(row, 0); 
+                            Reserva reservaSeleccionada = null;
+                            for (Reserva r : user.getReservas()) { 
+                                if (r.getLibro().getTitulo().equals(tituloSeleccionado)) {
+                                    reservaSeleccionada = r;
+                                    break;
+                                }
+                            }
+                            
+                            if (reservaSeleccionada != null) {
+                                JDialogReserva infoReserva = new JDialogReserva(JFrameReservas.this, reservaSeleccionada);
+                                infoReserva.setVisible(true);
+                            }
+                        }
+                    }
+                }
+            });
+         
             actualizarReservas();
 		}
 	
@@ -109,7 +133,7 @@ public class JFrameReservas extends JFramePrincipal{
         				reserva.getLibro().getTitulo(),
         				reserva.getLibro().getAutor(),
         				reserva.getFecha(),
-                        reserva.getDuracion()
+                        reserva.getDiasRestantes()
                     };
                     modeloTabla.addRow(fila);
                 }

@@ -61,16 +61,16 @@ public class Reserva {
 	}
 	
 	//método para obtener el plazo restante
-	public void diasRestantes() {
+	public int getDiasRestantes() {
 		LocalDate ahora = LocalDate.now();
 		LocalDate vencimiento = this.fecha.plusDays(duracion);
 		int diasRestantes = (int)ChronoUnit.DAYS.between(ahora, vencimiento); //CHAT GPT para ChronoUnit.days.between
 		
 		//ya ha vencido: ponemos a -1
 		if (diasRestantes<0) {
-			diasRestantes=0;
+			return 0;
 		}
-		this.setDuracion(diasRestantes);
+		return diasRestantes;
 	}
 
 	@Override
