@@ -29,7 +29,7 @@ public class JFrameReservas extends JFramePrincipal{
 	private User user = User.getLoggedIn(); //la ventana de reservas es del user que ha iniciado sesión
 
 	public JFrameReservas(List<Libro> libros) {
-		super(libros);
+		super(libros,"reservas");
 		this.libros = new ArrayList<>();
 		
 		if (this.user.getReservas()!=null) {

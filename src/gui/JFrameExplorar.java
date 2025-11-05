@@ -32,7 +32,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	private JComboBox<String> opciones;
 	
 	public JFrameExplorar(List<Libro> libros) {
-		super(libros);
+		super(libros, "explorar");
 		this.libros = libros;
 		this.inicializarPanelSuperior(); //hereda la cabecera del frame principal
 		this.inicializarPanelCentral();

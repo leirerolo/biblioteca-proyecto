@@ -16,7 +16,7 @@ public class JFrameInicio extends JFramePrincipal {
     private static final long serialVersionUID = 1L;
 
     public JFrameInicio(List<Libro> libros) {
-    	super(libros);
+    	super(libros, "inicio");
         this.libros = libros;
         
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

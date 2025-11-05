@@ -36,8 +36,11 @@ public class JFramePrincipal extends JFrame {
 	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
 	
-	public JFramePrincipal(List<Libro> libros) {
+	private String ventanaActiva;
+	
+	public JFramePrincipal(List<Libro> libros, String ventanaActiva) {
         this.libros = libros;
+        this.ventanaActiva = ventanaActiva;
 
         if (this.currentUser == null) {
             this.currentUser = domain.User.getLoggedIn();
@@ -115,11 +118,25 @@ public class JFramePrincipal extends JFrame {
 		
 		// ************** CLICK EN "labels de menu" *****************
 		
-		MouseAdapter mouseAdapterExplore = new MouseAdapter() {
+	    //cambia color segun la ventana activa
+	    if ("inicio".equals(ventanaActiva)) {
+	        estaActivo(inicio, explorar, reservas);
+	    } else if ("explorar".equals(ventanaActiva)) {
+	        estaActivo(explorar, inicio, reservas);
+	    } else if ("reservas".equals(ventanaActiva)) {
+	        estaActivo(reservas, inicio, explorar);
+	    }
+	    
+	    //adapters o listeners
+	    MouseAdapter mouseAdapterExplore = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Navigator.showExplorar();
-				JFramePrincipal.this.dispose();
+				if ("explorar".equals(ventanaActiva)) {
+					return;
+				}else {
+					Navigator.showExplorar();
+					JFramePrincipal.this.dispose();//esta linea codigo fue sugerida por copilot
+				}	
 			}
 		};
 		explorar.addMouseListener(mouseAdapterExplore);
@@ -127,8 +144,12 @@ public class JFramePrincipal extends JFrame {
 		MouseAdapter mouseAdapterReservas = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Navigator.showReservas();
-				JFramePrincipal.this.dispose();
+				if ("reservas".equals(ventanaActiva)) {
+					return;
+				}else {
+					Navigator.showReservas();
+					JFramePrincipal.this.dispose();
+				}		
 			}
 		};
 		reservas.addMouseListener(mouseAdapterReservas);
@@ -136,10 +157,31 @@ public class JFramePrincipal extends JFrame {
 		MouseAdapter mouseAdapterInicio = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Navigator.showInicio();
-				JFramePrincipal.this.dispose();
+				if ("inicio".equals(ventanaActiva)) {
+					return;
+				}else {
+					Navigator.showInicio();
+					JFramePrincipal.this.dispose();
+				}
 			}
 		};
 		inicio.addMouseListener(mouseAdapterInicio);
 	}
+	
+	//ventana activa
+	private void estaActivo(JLabel activo, JLabel... otros) { //los parametros de la funcion sugerido por copilot
+		Color colorActivo = new Color(150, 0, 150);
+	    Color colorNormal = Color.BLACK;
+
+	    // Activar el activo
+	    activo.setForeground(colorActivo);
+	    activo.setOpaque(true);
+
+	    // Restaurar color no activos
+	    for (JLabel otro : otros) {
+	        otro.setForeground(colorNormal);
+	        otro.setOpaque(false);
+	    }
+	}
+	
 }
