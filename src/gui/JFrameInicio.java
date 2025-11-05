@@ -72,7 +72,11 @@ public class JFrameInicio extends JFramePrincipal {
 	    // Si hay libros, los mostramos
 	    if (libros != null && !libros.isEmpty()) {
 	    	Collections.sort(libros, new Libro()); //ordenar por valoración
-	        for (Libro libro : libros) {
+	        
+	    	Color noSeleccionado = Color.white;
+	    	Color seleccionado = new Color(245, 245, 245);
+	    	
+	    	for (Libro libro : libros) {
 	            JPanel libroPanel = new JPanel(new BorderLayout());
 	            libroPanel.setBorder(javax.swing.BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 	            libroPanel.setBackground(Color.WHITE);
@@ -94,6 +98,24 @@ public class JFrameInicio extends JFramePrincipal {
 	    				infoLibro.setVisible(true);
 	    			}
 	    		};
+	    		
+	    		//al pasar raton
+	    		libroPanel.addMouseListener(new MouseAdapter() {
+	    			@Override
+	    	        public void mouseEntered(MouseEvent e) {
+	    	            libroPanel.setBackground(seleccionado);
+	    	            libroPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	    	            libroPanel.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+	    	        }
+
+	    	        @Override
+	    	        public void mouseExited(MouseEvent e) {
+	    	            libroPanel.setBackground(noSeleccionado);
+	    	            libroPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	    	            libroPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	    	        }
+	    		});
+	    		
 	    		libroPanel.addMouseListener(mouseAdapter);
 	    		gridPanel.add(libroPanel);
 	        }
