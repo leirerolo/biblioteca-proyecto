@@ -146,11 +146,19 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		return this.getAutor().compareTo(o.getAutor());
 	}
 
+	//comparar por valoracion
 	@Override
 	public int compare(Libro o1, Libro o2) {
 		return Double.compare(o2.getValoracion(), o1.getValoracion());
 	}
 	
+	//comparar por titulo
+	public static final Comparator<Libro> COMPARADOR_TITULO = new Comparator<Libro>() {
+	    @Override
+	    public int compare(Libro l1, Libro l2) {
+	        return l1.getTitulo().compareToIgnoreCase(l2.getTitulo());
+	    }
+	};
 	
 }
 

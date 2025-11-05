@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
@@ -114,73 +115,104 @@ public class JFrameExplorar extends JFramePrincipal {
 		
 	    panelLibros.removeAll(); 
 	    
-	    String tit = txtFiltro.getText().toLowerCase();
+	    String tit = txtFiltro.getText().trim().toLowerCase();
 	    if (tit.equals("buscar por título...")) {
 	        tit = "";
 	    }
-	    String op = (String) opciones.getSelectedItem();
-	    boolean debeMostrarLibros = !tit.isEmpty() || !op.equals("Ordenar");
 	    
-	    if (!debeMostrarLibros) {
+	    String op = (String) opciones.getSelectedItem();
+	    List<Libro> listaLibros = new ArrayList<>();
+	    
+	    // sin filtro - mostrar lista en orden default (fichero csv)
+	    if (tit.isEmpty()) {
+	    	listaLibros.addAll(libros);
+	    } else {
+	        for (Libro libro : libros) {
+	            if (libro.getTitulo().toLowerCase().contains(tit)) {
+	            	listaLibros.add(libro);
+	            }
+	        }
+	    }
+	    
+	    // aplicar orden segun filtro
+	    ordenarLista(listaLibros);
+	    
+	    //si libros coincide mostrar libros, si no hay libros mostrar mensaje "sin resultado"
+	    if (listaLibros.isEmpty()) {
 	        JLabel mensaje = new JLabel("No hay coincidencias");
 	        mensaje.setHorizontalAlignment(JLabel.CENTER);
 	        panelLibros.add(mensaje);
-
 	    } else {
-	        ArrayList<Libro> filtrados = new ArrayList<>();
-	        
-	        for (Libro libro : libros) {
-	            if (tit.isEmpty() || libro.getTitulo().toLowerCase().startsWith(tit)) {
-	                filtrados.add(libro);
-	            }
-	        }
-	        
-	        if (!op.equals("Ordenar")) { 
-	            ordenarLista(filtrados);
-	        }
-	        
-	        if (filtrados.isEmpty()) {
-	            JLabel mensaje = new JLabel("No hay coincidencias");
-	            mensaje.setHorizontalAlignment(JLabel.CENTER);
-	            panelLibros.add(mensaje);
-	        } else {
-	            for (Libro l : filtrados) {
-	                JPanel panelLibro = new JPanel(new BorderLayout());
-	                panelLibro.setPreferredSize(new Dimension(Integer.MAX_VALUE, 120));
-	                panelLibro.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-	                panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	    	
+	    	Color noSeleccionado = Color.white;
+	    	Color seleccionado = new Color(245, 245, 245);
+	    	
+	        for (Libro l : listaLibros) {
+	            JPanel panelLibro = new JPanel(new BorderLayout());
+	            panelLibro.setPreferredSize(new Dimension(800, 160));
+	            panelLibro.setMaximumSize(new Dimension(800, 160));
+	            panelLibro.setAlignmentX(Component.LEFT_ALIGNMENT);
+	            
+	            panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-	                JLabel portada = new JLabel(l.getPortada(), JLabel.CENTER);
-	                panelLibro.add(portada, BorderLayout.WEST);
+	    	    panelLibro.setBackground(noSeleccionado);
+	            panelLibro.setOpaque(true);
+	            
+	            JLabel portada = new JLabel(l.getPortada(), JLabel.CENTER);
+	            panelLibro.add(portada, BorderLayout.WEST);
+
+	            JPanel panelInfo = new JPanel(new GridLayout(3, 1, 0, 10));
+
+	            panelInfo.setBackground(noSeleccionado);
+	            panelInfo.setOpaque(true);
+	            
+	            JLabel titulo = new JLabel(l.getTitulo(), JLabel.LEFT);
+	            titulo.setFont(fuenteTitulo);
+	            titulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	            panelInfo.add(titulo);
+	            
+	            JLabel autor = new JLabel(l.getAutor(), JLabel.LEFT);
+	            autor.setFont(fuenteMenu);
+	            autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	            panelInfo.add(autor);
+
+	            JLabel valoracion = new JLabel(String.valueOf(l.getValoracion()), JLabel.LEFT);
+	            valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	            panelInfo.add(valoracion);
+
+	            panelLibro.add(panelInfo, BorderLayout.CENTER);
+	            
+	            panelLibro.addMouseListener(new MouseAdapter() {
+	            	//info libro + reservas
+	                @Override
+	                public void mouseClicked(MouseEvent e) {
+	                    JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
+	                    infoLibro.setVisible(true);
+	                }
+
+	                //al pasar raton
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						panelLibro.setBackground(seleccionado);
+                        panelInfo.setBackground(seleccionado);
+                        panelLibro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                        panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						panelLibro.setBackground(noSeleccionado);
+                        panelInfo.setBackground(noSeleccionado);
+                        panelLibro.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                        panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+					}
 	                
-	                JPanel panelInfo = new JPanel(new GridLayout(3,1,0,10));
-	                JLabel titulo = new JLabel(l.getTitulo(), JLabel.LEFT);
-	                titulo.setFont(fuenteTitulo);
-	                titulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	                panelInfo.add(titulo);
-	                
-	                JLabel autor = new JLabel(l.getAutor(), JLabel.LEFT);
-	                autor.setFont(fuenteMenu);
-	                autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	                panelInfo.add(autor);
-	                
-	                JLabel valoracion = new JLabel(String.valueOf(l.getValoracion()), JLabel.LEFT);
-	                valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	                panelInfo.add(valoracion);
-	                
-	                panelLibro.add(panelInfo, BorderLayout.CENTER);
-	                
-	                MouseAdapter mouseAdapter = new MouseAdapter() {
-	                    @Override
-	                    public void mouseClicked(MouseEvent e) {
-	                        JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
-	                        infoLibro.setVisible(true);
-	                    }
-	                };
-	                panelLibro.addMouseListener(mouseAdapter);
-	                panelLibros.add(panelLibro);
-	            }
+	            });
+
+	            panelLibros.add(panelLibro);
+	            
 	        }
+	        
 	    }
 	    
 	    panelLibros.revalidate();
@@ -190,7 +222,10 @@ public class JFrameExplorar extends JFramePrincipal {
 	
 	private void ordenarLista(List<Libro> lista) {
 		String op = (String) opciones.getSelectedItem();
-		if (op.equals("Por autor")) {
+		
+		if(op.equals("Ordenar")) {
+			lista.sort(Libro.COMPARADOR_TITULO);
+		}else if (op.equals("Por autor")) {
 			Collections.sort(lista);
 		}else if (op.equals("Por valoración")) {
 			Collections.sort(lista, new Libro());
