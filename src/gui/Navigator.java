@@ -25,7 +25,11 @@ public class Navigator {
 	
 	public static void showReservas() {
 		hideAll();
-		reservas.setVisible(true);
+		
+		if(reservas != null) {
+			reservas.actualizarReservas();
+			reservas.setVisible(true);
+		}
 	}
 	
 	public static void showExplorar() {
