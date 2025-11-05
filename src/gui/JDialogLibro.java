@@ -80,8 +80,8 @@ public class JDialogLibro extends JDialog {
 			} else {
 				JOptionPane.showMessageDialog(
 		                this,
-		                "Reserva rechazada",
 		                "Ya has reservado este libro",
+		                "Reserva rechazada",
 		                JOptionPane.WARNING_MESSAGE
 		            );
 			}
