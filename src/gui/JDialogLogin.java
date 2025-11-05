@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -101,11 +102,11 @@ public class JDialogLogin extends JDialog {
 
             dispose();
         } else {
-            javax.swing.JOptionPane.showMessageDialog(
+            JOptionPane.showMessageDialog(
                 this,
                 "Introduce usuario y contraseña.",
                 "Faltan datos",
-                javax.swing.JOptionPane.WARNING_MESSAGE
+                JOptionPane.WARNING_MESSAGE
             );
         }
     }

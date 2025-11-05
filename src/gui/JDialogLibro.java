@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.MatteBorder;
 
@@ -69,7 +70,21 @@ public class JDialogLibro extends JDialog {
 		reservar.addActionListener((e) -> {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);
-			user.getReservas().add(nueva);
+			if (!user.getReservas().contains(nueva)) {
+				user.getReservas().add(nueva);
+				this.dispose(); //cerrar el diálogo
+				
+				//creo una ventana nueva de reservas para que se actualice
+				JFrameReservas ventanaReservas = new JFrameReservas(null);
+			    ventanaReservas.setVisible(true);
+			} else {
+				JOptionPane.showMessageDialog(
+		                this,
+		                "Reserva rechazada",
+		                "Ya has reservado este libro",
+		                JOptionPane.WARNING_MESSAGE
+		            );
+			}
 			
 		});
 		

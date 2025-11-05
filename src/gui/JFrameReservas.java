@@ -15,9 +15,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 
 import domain.Libro;
 import domain.Reserva;
@@ -25,7 +27,8 @@ import domain.User;
 
 public class JFrameReservas extends JFramePrincipal{
 	private static final long serialVersionUID = 1L;
-	private JPanel panelLibros;
+	private JTable tablaReservas;
+	private DefaultTableModel modeloTabla;
 	private User user = User.getLoggedIn(); //la ventana de reservas es del user que ha iniciado sesión
 
 	public JFrameReservas(List<Libro> libros) {
@@ -54,75 +57,41 @@ public class JFrameReservas extends JFramePrincipal{
 		contentPanel.add(lblReservas, BorderLayout.NORTH);
 		
 		//Centro: zona de libros
-		panelLibros = new JPanel();
-		panelLibros.setLayout(new BoxLayout(panelLibros, BoxLayout.Y_AXIS));
-		panelLibros.setBackground(Color.WHITE);
-		panelLibros.setOpaque(true);
-		panelLibros.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	
-	    for (Libro libro : libros) {
-            JLabel lblLibro = new JLabel(libro.getTitulo() + " - " + libro.getAutor());
-            lblLibro.setOpaque(true);
-            lblLibro.setBackground(new Color(245, 245, 245));
-            lblLibro.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            panelLibros.add(lblLibro); 
-            System.out.println(libro.getTitulo());
-        }	
-	    
-		//scroll para cuando haya libros
-		JScrollPane scrollPane = new JScrollPane(panelLibros, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-
-		contentPanel.add(scrollPane, BorderLayout.CENTER);
+		//Si no hay reservas:
+		if(libros.isEmpty()) {
+			JLabel mensaje = new JLabel("No hay reservas...");
+			mensaje.setHorizontalAlignment(JLabel.CENTER);
+			contentPanel.add(mensaje, BorderLayout.CENTER);
+			
+		//Si hay reservas --> TABLA
+		} else {
+			String[] columnas = {"Título", "Autor", "Fecha reserva", "Días restantes"};
+			//modelo de la tabla: celdas no editables, y filas a 0 (luego añadimos)
+			modeloTabla = new DefaultTableModel(columnas, 0) { 
+				@Override
+				public boolean isCellEditable(int row, int col) {
+					return false;
+				}
+			};
+			
+			for (Reserva reserva : user.getReservas()) {
+				Object[] fila = {reserva.getLibro().getTitulo(), reserva.getLibro().getAutor(), reserva.getFecha(), reserva.getDuracion()};
+				modeloTabla.addRow(fila);
+			}
+			tablaReservas = new JTable(modeloTabla);
+			tablaReservas.setFillsViewportHeight(true); //para que llene el espacio
+			tablaReservas.setRowHeight(25);
+			tablaReservas.setBackground(Color.WHITE);
+			tablaReservas.getTableHeader().setBackground(new Color(230, 230, 250));
+            tablaReservas.getTableHeader().setFont(fuenteMenu);
+            
+            JScrollPane scrollPane = new JScrollPane(tablaReservas);
+            contentPanel.add(scrollPane, BorderLayout.CENTER);
+		}
 		this.add(contentPanel, BorderLayout.CENTER);
 
-		// Mostrar mensaje inicial o todos los libros
-		filtrarLibros();
 				
 	}
 	
-	
-	private void filtrarLibros() {
-		
-		if (libros.isEmpty()) {
-			JLabel mensaje = new JLabel("No hay reservas...");
-			mensaje.setHorizontalAlignment(JLabel.CENTER);
-			panelLibros.add(mensaje);
-			
-		} else {
-			for (Libro l : libros) {
-		    	JPanel panelLibro = new JPanel(new BorderLayout());
-		        panelLibro.setPreferredSize(new Dimension(Integer.MAX_VALUE, 120));
-		        panelLibro.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-		        panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-
-		    	//west: portada
-		    	JLabel portada = new JLabel(l.getPortada(), JLabel.CENTER);
-		    	panelLibro.add(portada, BorderLayout.WEST);
-		    	
-		    	//center: info
-		    	JPanel panelInfo = new JPanel(new GridLayout(3,1,0,10));
-		    	JLabel titulo = new JLabel(l.getTitulo(), JLabel.LEFT);
-		    	titulo.setFont(fuenteTitulo);
-		    	titulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		    	panelInfo.add(titulo);
-		    	
-		    	JLabel autor = new JLabel(l.getAutor(), JLabel.LEFT);
-		    	autor.setFont(fuenteMenu);
-		    	autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		    	panelInfo.add(autor);
-		    	
-		    	JLabel valoracion = new JLabel(String.valueOf(l.getValoracion()), JLabel.LEFT);
-		    	valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		    	panelInfo.add(valoracion);
-		    	
-		    	panelLibro.add(panelInfo, BorderLayout.CENTER);
-		    	panelLibros.add(panelLibro);
-		    }
-		}
-		panelLibros.revalidate();
-		panelLibros.repaint();
-	}
 	
 }

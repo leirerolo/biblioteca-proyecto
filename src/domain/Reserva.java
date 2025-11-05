@@ -1,6 +1,8 @@
 package domain;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class Reserva {
 	private Libro libro;
@@ -57,4 +59,36 @@ public class Reserva {
 			this.setDuracion(this.getDuracion()+7); //se suma una semana al plazo
 		}
 	}
+	
+	//método para obtener el plazo restante
+	public void diasRestantes() {
+		LocalDate ahora = LocalDate.now();
+		LocalDate vencimiento = this.fecha.plusDays(duracion);
+		int diasRestantes = (int)ChronoUnit.DAYS.between(ahora, vencimiento); //CHAT GPT para ChronoUnit.days.between
+		
+		//ya ha vencido: ponemos a -1
+		if (diasRestantes<0) {
+			diasRestantes=0;
+		}
+		this.setDuracion(diasRestantes);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(libro, user);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Reserva other = (Reserva) obj;
+		return Objects.equals(libro, other.libro) && Objects.equals(user, other.user);
+	}
+	
+	
 }
