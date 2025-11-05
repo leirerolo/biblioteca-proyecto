@@ -40,7 +40,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private ImageIcon loadImage(String path) {
 		if(path == null || path.isEmpty()) return null;
 		
-		String resourcePath = path.replaceFirst("resources images/", "");
+		String resourcePath = path.replaceFirst("images/", "");
 		try {
 			
 			java.net.URL imageUrl = getClass().getClassLoader().getResource(resourcePath);
