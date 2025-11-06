@@ -1,10 +1,13 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.io.File;
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 
 import domain.User;
 
@@ -17,30 +20,44 @@ public class JFramePerfil extends JFrame {
     private JLabel lblEmail;
     private JLabel lblAvatar;
 
+    //fuentes para la letra
+	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 15);
+	
     public JFramePerfil(User user) {
         super("Mi perfil");
         this.user = user;
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(460, 300);
+        setSize(360, 250);
         setLocationRelativeTo(null);
         setResizable(false);
 
         JPanel root = new JPanel(new BorderLayout(12, 12));
 
         // Panel datos
-        JPanel datos = new JPanel(new GridLayout(0, 1, 6, 6));
+        JPanel datos = new JPanel(new GridLayout(3, 1, 10, 10));
+        datos.setBackground(Color.WHITE);
+        datos.setOpaque(true);
         lblNombre = new JLabel("Nombre: " + n(user.getNombre()));
+        lblNombre.setFont(fuenteMenu);
+    	lblNombre.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    	lblNombre.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
         lblApellido = new JLabel("Apellido: " + n(user.getApellido()));
+        lblApellido.setFont(fuenteMenu);
+    	lblApellido.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    	lblApellido.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
         lblEmail   = new JLabel("Email: "   + n(user.getEmail()));
-        datos.add(new JLabel("ID: " + user.getId()));
+        lblEmail.setFont(fuenteMenu);
+    	lblEmail.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        //datos.add(new JLabel("ID: " + user.getId()));
         datos.add(lblNombre);
         datos.add(lblApellido);
         datos.add(lblEmail);
 
         // Avatar
         lblAvatar = new JLabel("", SwingConstants.CENTER);
-        lblAvatar.setVerticalAlignment(SwingConstants.TOP);
+        //lblAvatar.setVerticalAlignment(SwingConstants.TOP);
         cargarAvatarEn(lblAvatar, user.getAvatarPath());
 
         // Botón Editar
@@ -49,11 +66,12 @@ public class JFramePerfil extends JFrame {
 
         JPanel right = new JPanel(new BorderLayout(8,8));
         right.add(datos, BorderLayout.CENTER);
-        right.add(btnEditar, BorderLayout.SOUTH);
 
         root.add(lblAvatar, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
-
+        root.add(btnEditar, BorderLayout.SOUTH);
+        root.setBackground(Color.WHITE);
+        root.setOpaque(true);
         setContentPane(root);
     }
 
@@ -79,7 +97,7 @@ public class JFramePerfil extends JFrame {
     }
 
     private void cargarAvatarEn(JLabel target, String avatarPath) {
-        // 1) Si el usuario ya tiene ruta guardada, úsala
+        // 1) Si el usuario ya tiene ruta guardada, la usamos
         if (avatarPath != null && !avatarPath.isEmpty()) {
             File f = new File(avatarPath);
             if (f.exists()) {
@@ -93,7 +111,7 @@ public class JFramePerfil extends JFrame {
 
         // 2) Buscar en la carpeta "user avatar" del proyecto
         File baseDir = new File("user avatar"); // relativo al directorio de ejecución
-        // Ejemplo: intenta "<user avatar>/<nombre>.png", si no, "avatar.png"
+        // Ejemplo: intentamos "<user avatar>/<nombre>.png", si no, "avatar.png"
         File candidate = (user.getNombre() != null && !user.getNombre().isEmpty())
                 ? new File(baseDir, user.getNombre() + ".png")
                 : null;
