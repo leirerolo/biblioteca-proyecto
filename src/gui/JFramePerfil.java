@@ -3,8 +3,12 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -97,45 +101,74 @@ public class JFramePerfil extends JFrame {
     }
 
     private void cargarAvatarEn(JLabel target, String avatarPath) {
+    	Image img = null;
+    	
         // 1) Si el usuario ya tiene ruta guardada, la usamos
         if (avatarPath != null && !avatarPath.isEmpty()) {
             File f = new File(avatarPath);
             if (f.exists()) {
-                ImageIcon icon = new ImageIcon(avatarPath);
-                Image scaled = icon.getImage().getScaledInstance(110, 110, Image.SCALE_SMOOTH);
-                target.setIcon(new ImageIcon(scaled));
-                target.setText("");
-                return;
+            	img = new ImageIcon(avatarPath).getImage();
             }
         }
 
         // 2) Buscar en la carpeta "user avatar" del proyecto
-        File baseDir = new File("user avatar"); // relativo al directorio de ejecución
-        // Ejemplo: intentamos "<user avatar>/<nombre>.png", si no, "avatar.png"
-        File candidate = (user.getNombre() != null && !user.getNombre().isEmpty())
-                ? new File(baseDir, user.getNombre() + ".png")
-                : null;
-
-        if (candidate != null && candidate.exists()) {
-            ImageIcon icon = new ImageIcon(candidate.getAbsolutePath());
-            Image scaled = icon.getImage().getScaledInstance(110, 110, Image.SCALE_SMOOTH);
-            target.setIcon(new ImageIcon(scaled));
-            target.setText("");
-            return;
+        if (img == null) {
+        	File baseDir = new File("user avatar"); // relativo al directorio de ejecución
+	        // Ejemplo: intentamos "<user avatar>/<nombre>.png", si no, "avatar.png"
+	        File candidate = (user.getNombre() != null && !user.getNombre().isEmpty())
+	                ? new File(baseDir, user.getNombre() + ".png")
+	                : null;
+	        
+	        if (candidate != null && candidate.exists()) {
+	        	img = new ImageIcon(candidate.getAbsolutePath()).getImage();
+	        } else {
+	        	File fallback = new File(baseDir, "avatar.png");
+	        	if (fallback.exists()) {
+	        		img = new ImageIcon(fallback.getAbsolutePath()).getImage();
+	        	}
+	        }
         }
-
-        File fallback = new File(baseDir, "avatar.png");
-        if (fallback.exists()) {
-            ImageIcon icon = new ImageIcon(fallback.getAbsolutePath());
-            Image scaled = icon.getImage().getScaledInstance(110, 110, Image.SCALE_SMOOTH);
-            target.setIcon(new ImageIcon(scaled));
-            target.setText("");
-            return;
+        
+        // 3) Si hay imagen, la hacemos circular
+        //AYUDA DE CHAT GPT PARA CONSEGUIR LA IMAGEN EN FORMA CIRCULAR
+        if (img!=null) {
+        	Image scaled = img.getScaledInstance(110, 110, Image.SCALE_SMOOTH);
+        	ImageIcon circularIcon = new ImageIcon(crearImagenCircular(scaled));
+        	target.setIcon(circularIcon);
+        	target.setText("");
+        	return;
         }
-
-        // 3) Último recurso: icono textual
+        // 4) Último recurso: icono textual
         target.setIcon(null);
         target.setText("👤");
+    }
+
+    //USO DE CHAT GPT PARA EL MÉTODO
+    private Image crearImagenCircular(Image img) {
+        // Asegurar que la imagen esté completamente cargada
+        ImageIcon icon = new ImageIcon(img);
+        int width = icon.getIconWidth();
+        int height = icon.getIconHeight();
+
+        // Evitar valores inválidos
+        if (width <= 0 || height <= 0) {
+            width = height = 110; // tamaño por defecto
+        }
+
+        int size = Math.min(width, height);
+        BufferedImage output = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = output.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Círculo de recorte
+        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, size, size));
+
+        // Dibujar imagen recortada
+        g2.drawImage(img, 0, 0, size, size, null);
+        g2.dispose();
+
+        return output;
     }
 
 
