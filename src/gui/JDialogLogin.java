@@ -17,20 +17,33 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import domain.User;
+import persistence.AppState;
+import persistence.AppStateStore;
+import persistence.AuthService;
 
 public class JDialogLogin extends JDialog {
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
+
     private JTextField tfUsuario;
     private JPasswordField pfPassword;
+
     private User loggedUser = null;
+
+    // NUEVO: mantenemos el estado cargado para pasarlo luego al JFrame principal
+    private final AppState state;
+    private final AuthService auth;
 
     public JDialogLogin(java.awt.Frame parent) {
         super(parent, "Iniciar sesión", true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setResizable(false);
-        setSize(360, 200);
+        setSize(360, 220);
         setLocationRelativeTo(parent);
+
+        // Cargar estado persistido y preparar servicio de auth
+        this.state = AppStateStore.load();
+        this.auth  = new AuthService(state);
 
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(14, 14, 14, 14));
@@ -62,6 +75,11 @@ public class JDialogLogin extends JDialog {
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
+        // NUEVO: Botón Registrarme
+        JButton btnRegister = new JButton("Registrarme");
+        btnRegister.addActionListener((ActionEvent e) -> abrirRegistro());
+        buttonPane.add(btnRegister);
+
         JButton okButton = new JButton("Entrar");
         okButton.addActionListener((ActionEvent e) -> intentarLogin());
         buttonPane.add(okButton);
@@ -70,7 +88,6 @@ public class JDialogLogin extends JDialog {
         JButton cancelButton = new JButton("Cancelar");
         cancelButton.addActionListener((ActionEvent e) -> {
             loggedUser = null;
-            // (opcional) limpia sesión global si la hubiera
             User.setLoggedIn(null);
             dispose();
         });
@@ -90,29 +107,51 @@ public class JDialogLogin extends JDialog {
         });
     }
 
-    private void intentarLogin() {
-        String username = tfUsuario.getText().trim();
-        String password = new String(pfPassword.getPassword());
-        if (!username.isEmpty() && !password.isEmpty()) {
-            // Demo: acepta cualquier usuario no vacío
-            loggedUser = new User(username, ""); // usa tu constructor existente sin ID
+    // --- Acciones ---
 
-            // >>> CLAVE: fija la sesión global para que Perfil/Explorador/Reservas la lean
-            User.setLoggedIn(loggedUser);
-            loggedUser.cargarReservasCSV(); // cargo las reservas que puede tener de antes
-            loggedUser.verificarPenalizacion();
-            
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(
-                this,
-                "Introduce usuario y contraseña.",
-                "Faltan datos",
-                JOptionPane.WARNING_MESSAGE
-            );
+    private void abrirRegistro() {
+        // owner de este JDialog es el mismo Frame que le pasaste al constructor
+        java.awt.Window owner = getOwner();
+        java.awt.Frame frameOwner = (owner instanceof java.awt.Frame) ? (java.awt.Frame) owner : null;
+
+        // usa 'state' (sin guion bajo)
+        JDialogRegistro reg = new JDialogRegistro(frameOwner, state);
+        reg.setLocationRelativeTo(this);
+        reg.setVisible(true);
+
+        // Autocompletar usuario si se creó
+        if (reg.getCreatedUser() != null && reg.getCreatedUser().getUsuario() != null) {
+            tfUsuario.setText(reg.getCreatedUser().getUsuario());
+            pfPassword.setText("");
+            pfPassword.requestFocusInWindow();
         }
     }
 
+    private void intentarLogin() {
+        String username = tfUsuario.getText().trim();
+        String password = new String(pfPassword.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Introduce usuario y contraseña.", "Faltan datos", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        auth.login(username, password).ifPresentOrElse(u -> {
+            this.loggedUser = u;
+            User.setLoggedIn(u);
+            u.cargarReservasCSV();
+            u.verificarPenalizacion();
+            dispose(); // <-- MUY IMPORTANTE: dejar que Main continúe
+        }, () -> {
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "No se pudo iniciar sesión", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+    // --- Getters públicos ---
+
     public User getLoggedUser() { return loggedUser; }
+
+    // Pásalo al JFramePrincipal para que pueda persistir otros cambios si hace falta
+    public AppState getAppState() { return state; }
 }
+
 

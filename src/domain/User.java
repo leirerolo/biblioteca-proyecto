@@ -7,6 +7,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,17 +19,23 @@ import javax.swing.JOptionPane;
 
 import main.Main;
 
-public class User {
+public class User implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
     private int id;
     private String nombre;
     private String apellido;
-    private String email;        // NUEVO
-    private String avatarPath;   // NUEVO (p.ej. "/images/avatar.png" o ruta de archivo)
+    private String email;       
+    private String avatarPath;   
     private ArrayList<Reserva> reservas;
     private static User LOGGED_IN = null;
     private String password;
+    private String usuario;
     //atributo para cuando el user esté penalizado por haberse pasado de plazo
     private LocalDate penalizacionHasta;
+    
+ // --- CONFIG: carpeta donde guardamos los CSV de reservas
+    private static final Path DATA_DIR = Paths.get("data");
     
     // ya existente
     public User(int id, String nombre, String apellido) {
@@ -56,6 +66,13 @@ public class User {
     }
     public void setId(int id) { 
     	this.id = id; 
+    }
+    
+    public String getUsuario() { 
+    	return usuario; 
+    }
+    public void setUsuario(String usuario) { 
+    	this.usuario = usuario; 
     }
 
     public String getNombre() { 
@@ -118,6 +135,25 @@ public class User {
     //obtener si el user está penalizado
     public boolean estaPenalizado() {
     	return penalizacionHasta !=null && LocalDate.now().isBefore(penalizacionHasta);
+    }
+    
+ // Helpers de persistencia CSV
+    private String safeBaseForFilename() {
+        String base = (this.getUsuario() != null && !this.getUsuario().isBlank())
+                ? this.getUsuario()
+                : this.getNombre();
+        if (base == null || base.isBlank()) base = "user";
+        // Sanea: solo letras, números, guion y guion_bajo
+        return base.replaceAll("[^\\p{Alnum}_-]", "_");
+    }
+
+    private File reservasFile() {
+        try {
+            if (!Files.exists(DATA_DIR)) Files.createDirectories(DATA_DIR);
+        } catch (IOException e) {
+            e.printStackTrace(); // Si falla, seguimos en el directorio actual
+        }
+        return DATA_DIR.resolve("reservas_" + safeBaseForFilename() + ".csv").toFile();
     }
     
     //GUARDAR RESERVAS EN MEMORIA

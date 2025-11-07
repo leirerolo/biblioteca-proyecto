@@ -1,10 +1,13 @@
 package domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-public class Reserva {
+public class Reserva implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private Libro libro;
 	private LocalDate fecha;
 	private int duracion; //en días
@@ -26,6 +29,7 @@ public class Reserva {
 		this.user=user;
 		this.fecha=fecha;
 		this.duracion=14;
+		this.prolongaciones=0;
 	}
 
 	public Libro getLibro() {
@@ -58,6 +62,15 @@ public class Reserva {
 	public void setProlongaciones(int prolongaciones) {
 		this.prolongaciones=prolongaciones;
 	}
+	/** Devuelve la fecha de vencimiento = fecha + duración */
+    public LocalDate getVencimiento() {
+        return this.fecha.plusDays(this.duracion);
+    }
+	
+	 /** Indica si la reserva ya está vencida (hoy es posterior al vencimiento) */
+    public boolean isVencida() {
+        return LocalDate.now().isAfter(getVencimiento());
+    }
 	
 	//método para prolongar la reserva
 	public void prolongar() {
@@ -97,6 +110,17 @@ public class Reserva {
 		Reserva other = (Reserva) obj;
 		return Objects.equals(libro, other.libro) && Objects.equals(user, other.user);
 	}
+	
+	@Override
+    public String toString() {
+        return "Reserva{" +
+                "libro=" + (libro != null ? libro.getTitulo() : "null") +
+                ", fecha=" + fecha +
+                ", duracion=" + duracion +
+                ", prolongaciones=" + prolongaciones +
+                ", vencimiento=" + getVencimiento() +
+                '}';
+    }
 	
 	
 }
