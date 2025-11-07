@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import main.Main;
 
 public class User {
@@ -22,7 +24,9 @@ public class User {
     private ArrayList<Reserva> reservas;
     private static User LOGGED_IN = null;
     private String password;
-
+    //atributo para cuando el user esté penalizado por haberse pasado de plazo
+    private LocalDate penalizacionHasta;
+    
     // ya existente
     public User(int id, String nombre, String apellido) {
         this.id = id;
@@ -75,7 +79,13 @@ public class User {
 	public void setReservas(ArrayList<Reserva> reservas) {
 		this.reservas = reservas;
 	}
-
+	public LocalDate getPenalizacionHasta() {
+		return penalizacionHasta;
+	}
+	public void setPenalizacionHasta(LocalDate penalizacionHasta) {
+		this.penalizacionHasta = penalizacionHasta;
+	}
+	
 	public String getEmail() { 
     	return email; 
     }
@@ -103,6 +113,11 @@ public class User {
     }
     public static boolean isLoggedIn() { 
     	return LOGGED_IN != null; 
+    }
+    
+    //obtener si el user está penalizado
+    public boolean estaPenalizado() {
+    	return penalizacionHasta !=null && LocalDate.now().isBefore(penalizacionHasta);
     }
     
     //GUARDAR RESERVAS EN MEMORIA
@@ -162,4 +177,39 @@ public class User {
     		e.printStackTrace();
     	}
     }
+    
+    //COMPROBAR SI ESTÁ PENALIZADO
+    public void verificarPenalizacion() {
+    	this.cargarReservasCSV();
+		boolean tieneAtrasos = false;
+		
+		//cargamos sus reservas
+		List<Reserva> reservas = this.getReservas();
+		if (reservas==null || reservas.isEmpty()) return;
+		
+		for (Reserva r : reservas) {
+			if (r.getDiasRestantes() <= 0) {
+				tieneAtrasos=true;
+				break;
+			}
+		}
+		//si se le ha pasado algún plazo, se le penaliza
+		//no podrá reservar durante 21 días
+		if (tieneAtrasos) {
+			LocalDate penalizacionHasta = LocalDate.now().plusDays(21);
+			this.setPenalizacionHasta(penalizacionHasta);
+			
+			//Muestro el mensaje de penalización
+			JOptionPane.showMessageDialog(null, 
+					"Tienes reservas fuera de plazo.\n" + "No podrás reservar nuevos libros hasta el " + penalizacionHasta + ".",
+					"Penalización",
+					JOptionPane.WARNING_MESSAGE);
+			
+		//ya estaba penalizado de antes --> mensaje de recordatorio
+		} else if (this.estaPenalizado()) {
+			JOptionPane.showMessageDialog(null,
+					"Estás penalizad@ hasta el " + this.getPenalizacionHasta() + ". No puedes realizar nuevas reservas hasta esa fecha.", 
+					"Penalización activa", JOptionPane.WARNING_MESSAGE);
+		}
+	}
 }

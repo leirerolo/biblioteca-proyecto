@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class JFramePrincipal extends JFrame {
         this.setSize(600, 800);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+     
     }
 	
 	protected void inicializarPanelSuperior() {		
@@ -183,5 +185,6 @@ public class JFramePrincipal extends JFrame {
 	        otro.setOpaque(false);
 	    }
 	}
+	
 	
 }

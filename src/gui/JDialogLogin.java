@@ -100,7 +100,8 @@ public class JDialogLogin extends JDialog {
             // >>> CLAVE: fija la sesión global para que Perfil/Explorador/Reservas la lean
             User.setLoggedIn(loggedUser);
             loggedUser.cargarReservasCSV(); // cargo las reservas que puede tener de antes
-
+            loggedUser.verificarPenalizacion();
+            
             dispose();
         } else {
             JOptionPane.showMessageDialog(
