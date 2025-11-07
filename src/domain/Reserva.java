@@ -19,6 +19,14 @@ public class Reserva {
 		this.prolongaciones=0;
 		this.user=user;
 	}
+	
+	//para cuando cargamos desde CSV
+	public Reserva(Libro libro, User user, LocalDate fecha) {
+		this.libro=libro;
+		this.user=user;
+		this.fecha=fecha;
+		this.duracion=14;
+	}
 
 	public Libro getLibro() {
 		return libro;
@@ -62,9 +70,9 @@ public class Reserva {
 	
 	//método para obtener el plazo restante
 	public int getDiasRestantes() {
-		LocalDate ahora = LocalDate.now();
+		LocalDate hoy = LocalDate.now();
 		LocalDate vencimiento = this.fecha.plusDays(duracion);
-		int diasRestantes = (int)ChronoUnit.DAYS.between(ahora, vencimiento); //CHAT GPT para ChronoUnit.days.between
+		int diasRestantes = (int)ChronoUnit.DAYS.between(hoy, vencimiento); //CHAT GPT para ChronoUnit.days.between
 		
 		//ya ha vencido: ponemos a -1
 		if (diasRestantes<0) {

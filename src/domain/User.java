@@ -152,8 +152,7 @@ public class User {
     					}
     				}
     				//Crear la reserva con el libro 
-    				Reserva r = new Reserva(libro, this);
-    				r.setFecha(fecha);
+    				Reserva r = new Reserva(libro, this, fecha);
     				r.setDuracion(duracion);
     				r.setProlongaciones(prolongaciones);
     				reservas.add(r);

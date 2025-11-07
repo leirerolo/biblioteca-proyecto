@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,9 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import domain.Libro;
 import domain.Reserva;
@@ -45,6 +48,10 @@ public class JFrameReservas extends JFramePrincipal{
 		//cargo las reservas desde el fichero del user
 		user.cargarReservasCSV();
 		actualizarReservas();
+	}
+	
+	public User getUser() {
+		return user;
 	}
 	
 	private void inicializarPanelCentral() {		
@@ -71,6 +78,48 @@ public class JFrameReservas extends JFramePrincipal{
 			};
 			
 			tablaReservas = new JTable(modeloTabla);
+			
+			//RENDERIZADO DE LA TABLA
+			//pinta la fila de amarillo pastel si quedan 7 días o menos
+			//y de rojo si se ha pasado el plazo
+			TableCellRenderer miCellRenderer = new TableCellRenderer() {
+
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+						boolean hasFocus, int row, int column) {
+					JLabel celda = new JLabel(value.toString());
+					celda.setOpaque(true);
+					celda.setHorizontalAlignment(SwingConstants.CENTER);
+					celda.setFont(table.getFont());
+					
+					//colores por defecto
+					Color fondo = Color.white;
+					Color texto = Color.black;
+					
+					//columna "Días restantes" --> índice 3
+					if (column == 3) {
+						try {
+							int dias = Integer.parseInt(value.toString());
+							if (dias<=0) {
+								fondo = new Color(255, 102, 102); //rojo suave
+							} else if (dias<=7) {
+								fondo = new Color(255, 255, 153); //amarillo suave
+							}
+						} catch(NumberFormatException e) {
+							//excepción por si no es numérico.
+						}
+					}
+					//si está seleccionada la fila, la pintamos con colores de selección
+					if (isSelected) {
+						fondo = table.getSelectionBackground();
+						texto = table.getSelectionForeground();
+					}
+					celda.setBackground(fondo);
+					celda.setForeground(texto);
+					return celda;
+				}
+			};
+			tablaReservas.setDefaultRenderer(Object.class, miCellRenderer);
 			tablaReservas.setFillsViewportHeight(true); //para que llene el espacio
 			tablaReservas.setRowHeight(25);
 			tablaReservas.setBackground(Color.WHITE);
