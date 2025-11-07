@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -27,6 +28,7 @@ import javax.swing.border.MatteBorder;
 
 import domain.*;
 import persistence.AppState;
+import persistence.AppStateStore;
 
 public class JFramePrincipal extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -47,7 +49,7 @@ public class JFramePrincipal extends JFrame {
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva, AppState state) {
         this.libros = libros;
         this.ventanaActiva = ventanaActiva;
-        this.state=state;
+        this.state = (state != null) ? state : AppStateStore.load();
 
         if (this.currentUser == null) {
             this.currentUser = domain.User.getLoggedIn();
@@ -92,28 +94,27 @@ public class JFramePrincipal extends JFrame {
 		
 		perfil.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		perfil.addMouseListener(new MouseAdapter() {
-			@Override
-            public void mouseClicked(MouseEvent e) {
-                // Usa currentUser o sesión global como respaldo
-                User u = (currentUser != null) ? currentUser : User.getLoggedIn();
-                if (u == null) {
-                    JOptionPane.showMessageDialog(
-                            JFramePrincipal.this,
-                            "Inicia sesión para ver tu perfil.",
-                            "Perfil",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    return;
-                }
-                JFramePerfil perfilWin = new JFramePerfil(u);
-                perfilWin.setVisible(true);
-            }
-        });
+			 @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+	                User u = (currentUser != null) ? currentUser : User.getLoggedIn();
+	                if (u == null) {
+	                    JOptionPane.showMessageDialog(
+	                            JFramePrincipal.this,
+	                            "Inicia sesión para ver tu perfil.",
+	                            "Perfil",
+	                            JOptionPane.INFORMATION_MESSAGE
+	                    );
+	                    return;
+	                }
+	                JFramePerfil perfilWin = new JFramePerfil(u);
+	                perfilWin.setVisible(true);
+	            }
+	        });
         upperPanel.add(header, BorderLayout.NORTH);
 
 		// Menú de navegación: inicio, explorar, reservas
 		JPanel menu = new JPanel(new GridLayout(1,3));
 		menu.setBackground(Color.white);
+		
 		JLabel inicio = new JLabel("Inicio", JLabel.CENTER);
 		inicio.setFont(fuenteMenu);
 		menu.add(inicio);
@@ -121,6 +122,7 @@ public class JFramePrincipal extends JFrame {
 		JLabel explorar = new JLabel("Explorar", JLabel.CENTER);
 		explorar.setFont(fuenteMenu);
 		menu.add(explorar);
+		
 		JLabel reservas = new JLabel("Reservas", JLabel.CENTER);
 		reservas.setFont(fuenteMenu);
 		menu.add(reservas);
@@ -133,17 +135,17 @@ public class JFramePrincipal extends JFrame {
 		// ************** CLICK EN "labels de menu" *****************
 		
 	    //cambia color segun la ventana activa
-	    if ("inicio".equals(ventanaActiva)) {
-	        estaActivo(inicio, explorar, reservas);
-	    } else if ("explorar".equals(ventanaActiva)) {
-	        estaActivo(explorar, inicio, reservas);
-	    } else if ("reservas".equals(ventanaActiva)) {
-	        estaActivo(reservas, inicio, explorar);
-	    }
+		if ("inicio".equalsIgnoreCase(ventanaActiva)) {
+            estaActivo(inicio, explorar, reservas);
+        } else if ("explorar".equalsIgnoreCase(ventanaActiva)) {
+            estaActivo(explorar, inicio, reservas);
+        } else if ("reservas".equalsIgnoreCase(ventanaActiva)) {
+            estaActivo(reservas, inicio, explorar);
+        }
 	    
 	 // Navegación (mantengo tus Navigator + dispose)
-        inicio.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
+		inicio.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
                 if (!"inicio".equalsIgnoreCase(ventanaActiva)) {
                     Navigator.showInicio();
                     JFramePrincipal.this.dispose();
@@ -151,8 +153,8 @@ public class JFramePrincipal extends JFrame {
             }
         });
 
-        explorar.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
+        explorar.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
                 if (!"explorar".equalsIgnoreCase(ventanaActiva)) {
                     Navigator.showExplorar();
                     JFramePrincipal.this.dispose();
@@ -160,8 +162,8 @@ public class JFramePrincipal extends JFrame {
             }
         });
 
-        reservas.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
+        reservas.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
                 if (!"reservas".equalsIgnoreCase(ventanaActiva)) {
                     Navigator.showReservas();
                     JFramePrincipal.this.dispose();
@@ -170,8 +172,8 @@ public class JFramePrincipal extends JFrame {
         });
     }
 
-    // ================== CONTENIDO CENTRAL (mínimo para “reservas”) ==================
-    private void inicializarContenidoCentral() {
+	// ================== CONTENIDO CENTRAL ==================
+	private void inicializarContenidoCentral() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
         add(mainPanel, BorderLayout.CENTER);
@@ -179,59 +181,123 @@ public class JFramePrincipal extends JFrame {
         if ("reservas".equalsIgnoreCase(ventanaActiva)) {
             // Lista de reservas del usuario actual
             modeloReservas = new DefaultListModel<>();
-
             JList<String> lista = new JList<>(modeloReservas);
             mainPanel.add(new JScrollPane(lista), BorderLayout.CENTER);
 
-            // Pie con acciones mínimas
             JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton btnGuardar = new JButton("Guardar CSV");
             btnGuardar.addActionListener(ev -> {
                 if (currentUser != null) {
-                    currentUser.guardarReservasCSV(); // usa tu método tal cual
+                    currentUser.guardarReservasCSV();
                     JOptionPane.showMessageDialog(this, "Reservas guardadas.", "OK", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             south.add(btnGuardar);
             mainPanel.add(south, BorderLayout.SOUTH);
 
-            // Cargar al entrar
             cargarReservasUsuarioEnLista();
-        } else {
-            // Para “inicio” y “explorar” mantengo tu flujo (aquí puedes pintar lo que ya tengas)
+        } else if ("inicio".equalsIgnoreCase(ventanaActiva)) {
+            renderInicioTop6(mainPanel);   // top 6 mejor valorados al iniciar
+        } else { // "explorar" u otros
             JPanel placeholder = new JPanel(new BorderLayout());
-            JLabel l = new JLabel("Contenido de " + ventanaActiva, JLabel.CENTER);
+            JLabel l = new JLabel("Explorar", JLabel.CENTER);
             l.setFont(new Font("SansSerif", Font.PLAIN, 16));
             placeholder.add(l, BorderLayout.CENTER);
             mainPanel.add(placeholder, BorderLayout.CENTER);
         }
     }
 
+    private void renderInicioTop6(JPanel mainPanel) {
+        if (libros == null || libros.isEmpty()) {
+            JLabel l = new JLabel("No hay libros para mostrar", JLabel.CENTER);
+            l.setFont(new Font("SansSerif", Font.PLAIN, 16));
+            mainPanel.add(l, BorderLayout.CENTER);
+            return;
+        }
+
+        // Top 6 por valoración (desc) – compatible con JDK 8+
+        List<Libro> top6 = libros.stream()
+                .sorted((a, b) -> Double.compare(b.getValoracion(), a.getValoracion()))
+                .limit(6)
+                .collect(Collectors.toList());
+
+        JPanel grid = new JPanel(new GridLayout(0, 3, 16, 16));
+        grid.setBackground(Color.WHITE);
+        grid.setBorder(new MatteBorder(16, 16, 16, 16, Color.WHITE));
+
+        for (Libro lib : top6) grid.add(buildBookCard(lib));
+
+        JLabel titulo = new JLabel("Mejor valorados", JLabel.LEFT);
+        titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+        titulo.setBorder(new MatteBorder(12, 16, 8, 16, Color.WHITE));
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(Color.WHITE);
+        wrapper.add(titulo, BorderLayout.NORTH);
+        wrapper.add(grid, BorderLayout.CENTER);
+
+        mainPanel.add(new JScrollPane(wrapper), BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private JPanel buildBookCard(Libro lib) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(new MatteBorder(1, 1, 1, 1, new Color(230, 230, 230)));
+
+        // Portada
+        JLabel img = new JLabel();
+        img.setHorizontalAlignment(JLabel.CENTER);
+        if (lib.getPortada() != null) img.setIcon(lib.getPortada());
+        card.add(img, BorderLayout.CENTER);
+
+        // Texto (título + autor + valoración)
+        JPanel info = new JPanel(new GridLayout(0, 1));
+        info.setBackground(Color.WHITE);
+        JLabel t = new JLabel(lib.getTitulo());
+        t.setFont(new Font("SansSerif", Font.BOLD, 12));
+        JLabel a = new JLabel(lib.getAutor());
+        a.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        JLabel r = new JLabel("★ " + String.format("%.1f", lib.getValoracion()));
+        r.setFont(new Font("SansSerif", Font.PLAIN, 11));
+
+        info.add(t);
+        info.add(a);
+        info.add(r);
+        info.setBorder(new MatteBorder(8, 8, 8, 8, Color.WHITE));
+        card.add(info, BorderLayout.SOUTH);
+
+        // (Opcional) click
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                // Ej: Navigator.showExplorar();
+            }
+        });
+
+        return card;
+    }
+
     private void cargarReservasUsuarioEnLista() {
-        if (modeloReservas == null) return;
+        if (modeloReservas == null || currentUser == null) return;
         modeloReservas.clear();
 
-        if (currentUser == null) return;
-
-        // Asegura tener datos frescos del CSV
         currentUser.cargarReservasCSV();
-
         List<Reserva> mias = currentUser.getReservas();
         if (mias == null) return;
 
-        // Muestra: Título — Autor — Fecha — Días restantes
         for (Reserva r : mias) {
-            String titulo   = (r.getLibro() != null) ? r.getLibro().getTitulo() : "(sin libro)";
-            String autor    = (r.getLibro() != null) ? r.getLibro().getAutor()  : "";
-            String fecha    = String.valueOf(r.getFecha());
-            String restantes= String.valueOf(r.getDiasRestantes());
-            modeloReservas.addElement(
-                String.format("%s — %s | %s | %s días restantes", titulo, autor, fecha, restantes)
-            );
+            String titulo    = (r.getLibro() != null) ? r.getLibro().getTitulo() : "(sin libro)";
+            String autor     = (r.getLibro() != null) ? r.getLibro().getAutor()  : "";
+            String fecha     = String.valueOf(r.getFecha());
+            String restantes = String.valueOf(r.getDiasRestantes());
+            modeloReservas.addElement(String.format("%s — %s | %s | %s días restantes",
+                    titulo, autor, fecha, restantes));
         }
     }
 
-    // ventana activa (tu helper)
+    // ventana activa (helper)
     private void estaActivo(JLabel activo, JLabel... otros) {
         Color colorActivo = new Color(150, 0, 150);
         Color colorNormal = Color.BLACK;
