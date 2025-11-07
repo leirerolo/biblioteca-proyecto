@@ -41,6 +41,10 @@ public class JFrameReservas extends JFramePrincipal{
 		this.libros = new ArrayList<>();
 		this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
+		
+		//cargo las reservas desde el fichero del user
+		user.cargarReservasCSV();
+		actualizarReservas();
 	}
 	
 	private void inicializarPanelCentral() {		

@@ -18,7 +18,8 @@ import javax.swing.SwingUtilities;
 //USO DE IA: para la generación del fichero libros.csv
 
 public class Main {
-
+	public static List<Libro> librosGlobales; //para acceder a ella desde el user
+	
 	public static void main(String[] args) {
 		//COMENTADOS: para cuando funcione la BD
 		//DBManager.createTables();
@@ -27,7 +28,7 @@ public class Main {
 		
 		// verificar si la BD está vacía 
 		List<Libro> libros = cargarLibrosCSV("libros.csv");
-		
+		librosGlobales = libros;
 		/*if (libros.isEmpty()) {
 			System.out.println("La BD está vacía, cargando desde el csv...");
 			List<Libro> librosCSV = cargarLibrosCSV("libros.csv");
