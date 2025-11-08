@@ -24,6 +24,7 @@ public class JDialogValorar extends JDialog{
 		this.setLayout(new BorderLayout());
 		this.setLocationRelativeTo(padre);
 		this.setResizable(false);
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
         //slider
         JPanel panelSlider = new JPanel(new BorderLayout());
@@ -74,21 +75,49 @@ public class JDialogValorar extends JDialog{
         });
         
         //aceptar
-        aceptar.addActionListener(e -> {
+        aceptar.addActionListener((e) -> {
             double nuevaValoracion = slider.getValue() / 10.0;
-            double original = reserva.getLibro().getValoracion();
-            double media = (original + nuevaValoracion) / 2.0;
+            String tituloLibro = reserva.getLibro().getTitulo();
             
-            reserva.setValoracionUsuario(nuevaValoracion); //guarda la valoracion puesta en el usuario
-            reserva.getLibro().setValoracion(media); //hace la media y actualiza
+            //media de todas las valoraciones del mismo libro
+            double suma = 0;
+            int contador = 0;
 
-            JOptionPane.showMessageDialog(this, "¡Gracias por valorar!\nNueva valoración: " + String.format("%.2f", media), "Valoración actualizada", JOptionPane.INFORMATION_MESSAGE);
+            for (Reserva r : frameReservas.getUser().getReservas()) {
+                if (r.getLibro().getTitulo().equals(tituloLibro) && r.getValoracionUsuario() != -1) {
+                    suma += r.getValoracionUsuario();
+                    contador++;
+                }
+            }
+
+            suma += nuevaValoracion;
+            contador++;
+
+            double mediaGlobal = suma / contador;
+            
+            //actualiza valoracion
+            for (Reserva r : frameReservas.getUser().getReservas()) {
+                if (r.getLibro().getTitulo().equals(tituloLibro)) {
+                    r.setValoracionUsuario(nuevaValoracion);
+                    r.getLibro().setValoracion(mediaGlobal);
+                }
+            }
+            
+            JOptionPane.showMessageDialog(this, "¡Gracias por valorar!\nNueva valoración: " + String.format("%.2f", mediaGlobal), "Valoración actualizada", JOptionPane.INFORMATION_MESSAGE);
+            
             dispose();
             
+            //actualiza y guarda
             if (frameReservas != null) {
                 frameReservas.actualizarReservas();
                 frameReservas.getUser().guardarReservasCSV();
             }
+            
+         // Actualiza etiqueta en JDialogReserva si está abierta
+            if (padre instanceof JDialogReserva) {
+                ((JDialogReserva) padre).actualizarValoracion();
+            }
+            
         });
         
 		

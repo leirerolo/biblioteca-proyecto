@@ -27,10 +27,14 @@ public class JDialogReserva extends JDialog {
 	
 	private JLabel lblProlongaciones;
 	
+	private JLabel puntuacion;
+	private Reserva reserva;
+	
 	public JDialogReserva(JFrame padre, Reserva reserva) {
 		super(padre, "Información de la Reserva",true);
 		this.setSize(500,300);
 		this.setLayout(new BorderLayout());
+		this.reserva = reserva;
 		
 		JPanel panelInfo= new JPanel(new BorderLayout());
 		panelInfo.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
@@ -53,7 +57,7 @@ public class JDialogReserva extends JDialog {
         autor.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         panelDatos.add(autor);
         
-        JLabel puntuacion = new JLabel("Valoracion: " + reserva.getLibro().getValoracion(), JLabel.LEFT);
+        puntuacion = new JLabel("Valoracion: " + reserva.getLibro().getValoracion(), JLabel.LEFT);
         puntuacion.setFont(fuenteMenu);
         puntuacion.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         panelDatos.add(puntuacion);
@@ -123,4 +127,9 @@ public class JDialogReserva extends JDialog {
 		this.setResizable(false);
 		this.setLocationRelativeTo(padre);
 	}
+	
+	public void actualizarValoracion() {
+	    puntuacion.setText("Valoracion: " + String.format("%.2f", reserva.getLibro().getValoracion()));
+	}
+
 }
