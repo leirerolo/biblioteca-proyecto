@@ -176,7 +176,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	            autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	            panelInfo.add(autor);
 
-	            JLabel valoracion = new JLabel(String.valueOf(l.getValoracion()), JLabel.LEFT);
+	            JLabel valoracion = new JLabel("★ " + String.valueOf(l.getValoracion()), JLabel.LEFT);
 	            valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	            panelInfo.add(valoracion);
 
