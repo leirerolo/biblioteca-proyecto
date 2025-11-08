@@ -57,7 +57,7 @@ public class JDialogReserva extends JDialog {
         autor.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         panelDatos.add(autor);
         
-        puntuacion = new JLabel("Valoracion: " + "★ " + reserva.getLibro().getValoracion(), JLabel.LEFT);
+        puntuacion = new JLabel("Valoracion: " + reserva.getLibro().getValoracion(), JLabel.LEFT);
         puntuacion.setFont(fuenteMenu);
         puntuacion.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         panelDatos.add(puntuacion);
