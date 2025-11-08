@@ -51,7 +51,9 @@ public class Main {
                 Navigator.init(librosGlobales); // si lo usas
                 JFramePrincipal frame = new JFramePrincipal(librosGlobales, "inicio", state);
                 frame.setCurrentUser(u);
-                frame.setVisible(true);
+                
+                JFrameInicio frameSalida = new JFrameInicio(librosGlobales);
+                frameSalida.setVisible(true);
             } else {
                 System.out.println("Login cancelado. Cerrando aplicación.");
                 System.exit(0);

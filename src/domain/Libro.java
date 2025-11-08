@@ -11,7 +11,10 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private String titulo;
 	private String autor;
 	private ImageIcon portada;
-	private double valoracion;
+	
+	private double valoracionOriginal; // del CSV
+    private double valoracionMedia; //valoraciones de usuarios
+    
 	private String portadaPath; // para poder acceder a la imagen a traves de la BD
 	private User reservadoPor; //usuario que tiene ahora reservado el libro (si existe)
 	
@@ -20,7 +23,8 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		this.id= id;
 		this.titulo = titulo;
 		this.autor = autor;
-		this.valoracion = valoracion;
+		this.valoracionOriginal = valoracion;
+        this.valoracionMedia = valoracion;
 		this.portadaPath= portadaPath;
 		this.portada= loadImage(portadaPath);
 	}
@@ -31,7 +35,8 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		this.titulo= titulo;
 		this.autor= autor;
 		this.portada= portada;
-		this.valoracion= valoracion;
+		this.valoracionOriginal = valoracion;
+        this.valoracionMedia = valoracion;
 		this.portadaPath = portadaPath;
 	}
 	
@@ -48,10 +53,10 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 			if (imageUrl != null) {
 				
 				ImageIcon original= new ImageIcon(imageUrl);
-			if (original.getImage()!= null) {
-				java.awt.Image img= original.getImage().getScaledInstance(120,160, java.awt.Image.SCALE_SMOOTH);
-				return new ImageIcon(img);
-			}
+				if (original.getImage()!= null) {
+					java.awt.Image img= original.getImage().getScaledInstance(120,160, java.awt.Image.SCALE_SMOOTH);
+					return new ImageIcon(img);
+				}
 			}else {
 				System.err.println("Error al cargar la imagen");
 			}
@@ -101,13 +106,18 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		this.portadaPath = portadaPath;
 	}
 	
-	public double getValoracion() {
-		return valoracion;
-	}
+    public double getValoracionOriginal() {
+        return valoracionOriginal;
+    }
 
-	public void setValoracion(double valoracion) {
-		this.valoracion = valoracion;
-	}
+    public double getValoracion() {
+        return valoracionMedia;
+    }
+
+    public void setValoracion(double valoracionMedia) {
+        this.valoracionMedia = valoracionMedia;
+    }
+    
 	public User getReservadoPor() {
 		return reservadoPor;
 	}
@@ -117,13 +127,14 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 
 	@Override
 	public String toString() {
-		return "Libro [titulo=" + titulo + ", autor=" + autor + ", portada=" + portada + ", valoracion=" + valoracion
+		return "Libro [titulo=" + titulo + ", autor=" + autor + ", portada=" + portada + 
+				", valoracionOriginal=" + valoracionOriginal + ", valoracionMedia=" + valoracionMedia
 				+ "]";
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(autor, portada, titulo, valoracion);
+		return Objects.hash(autor, portada, titulo, valoracionOriginal);
 	}
 
 	@Override
@@ -137,7 +148,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		Libro other = (Libro) obj;
 		return Objects.equals(autor, other.autor) && Objects.equals(portada, other.portada)
 				&& Objects.equals(titulo, other.titulo)
-				&& Double.doubleToLongBits(valoracion) == Double.doubleToLongBits(other.valoracion);
+				&& Double.doubleToLongBits(valoracionOriginal) == Double.doubleToLongBits(other.valoracionOriginal);
 	}
 
 	//COMPARAR POR AUTOR

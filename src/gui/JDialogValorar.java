@@ -41,7 +41,6 @@ public class JDialogValorar extends JDialog{
         labelTable.put(50, new JLabel("5"));
         slider.setLabelTable(labelTable);
         
-
     	double valorDecimalInicio = slider.getValue() / 10.0;
         JLabel lblValor = new JLabel("Valoración: " + String.format("%.1f", valorDecimalInicio), JLabel.CENTER);
         lblValor.setFont(fuenteMenu);
@@ -60,8 +59,8 @@ public class JDialogValorar extends JDialog{
         JButton aceptar = new JButton("Aceptar");
         JButton cancelar = new JButton("Cancelar");
 
-        panelBotones.add(aceptar);
         panelBotones.add(cancelar);
+        panelBotones.add(aceptar);
         
         //añadir al dialog 
         this.add(panelSlider, BorderLayout.CENTER);
@@ -78,30 +77,48 @@ public class JDialogValorar extends JDialog{
         aceptar.addActionListener((e) -> {
             double nuevaValoracion = slider.getValue() / 10.0;
             String tituloLibro = reserva.getLibro().getTitulo();
+            double valoracionInicial = reserva.getLibro().getValoracionOriginal();
             
             //media de todas las valoraciones del mismo libro
-            double suma = 0;
-            int contador = 0;
-
+            double suma = valoracionInicial;
+            int contador = 1;
+            
             for (Reserva r : frameReservas.getUser().getReservas()) {
-                if (r.getLibro().getTitulo().equals(tituloLibro) && r.getValoracionUsuario() != -1) {
+            	if (r != reserva && r.getLibro().getTitulo().equals(tituloLibro) && r.getValoracionUsuario() > 0.0) {
                     suma += r.getValoracionUsuario();
                     contador++;
                 }
             }
-
-            suma += nuevaValoracion;
-            contador++;
-
+            
+            
+         // si usuario ya valoro antes, reemplazar valoracion
+            if (reserva.getValoracionUsuario() > 0.0) {
+                System.out.println("usuario valoro anteriormente");
+            	suma += nuevaValoracion;
+                System.out.println(suma);
+                contador++;
+                System.out.println(contador);
+            } else {// primera valoracion
+            	System.out.println("primera vez");
+                suma += nuevaValoracion;
+                System.out.println(suma);
+                contador++;      
+                System.out.println(contador);
+            }
+            
             double mediaGlobal = suma / contador;
+            
+            reserva.setValoracionUsuario(nuevaValoracion);//actualiza valoracion usuario
+			//System.out.println(nuevaValoracion);
             
             //actualiza valoracion
             for (Reserva r : frameReservas.getUser().getReservas()) {
                 if (r.getLibro().getTitulo().equals(tituloLibro)) {
-                    r.setValoracionUsuario(nuevaValoracion);
                     r.getLibro().setValoracion(mediaGlobal);
                 }
             }
+            
+            
             
             JOptionPane.showMessageDialog(this, "¡Gracias por valorar!\nNueva valoración: " + String.format("%.2f", mediaGlobal), "Valoración actualizada", JOptionPane.INFORMATION_MESSAGE);
             

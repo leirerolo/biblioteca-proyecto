@@ -207,7 +207,7 @@ public class JFramePrincipal extends JFrame {
         }
     }
 
-    private void renderInicioTop6(JPanel mainPanel) {
+    protected void renderInicioTop6(JPanel mainPanel) {
         if (libros == null || libros.isEmpty()) {
             JLabel l = new JLabel("No hay libros para mostrar", JLabel.CENTER);
             l.setFont(new Font("SansSerif", Font.PLAIN, 16));
