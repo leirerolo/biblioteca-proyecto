@@ -167,7 +167,8 @@ public class User implements Serializable{
     							r.getLibro().getAutor() + ";" +
     							r.getFecha() + ";" + 
     							r.getDuracion() + ";" + 
-    							r.getProlongaciones());
+    							r.getProlongaciones()+ ";" +
+    							r.getValoracionUsuario());
     		}
     	} catch(IOException e) {
     		e.printStackTrace();

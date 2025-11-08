@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 
@@ -39,7 +40,7 @@ public class JDialogReserva extends JDialog {
 		panelInfo.add(portada, BorderLayout.WEST);
 		
 		//center: detalles
-		JPanel panelDatos = new JPanel(new GridLayout(4,1,0,10));
+		JPanel panelDatos = new JPanel(new GridLayout(5,1,0,10));
 		
 		JLabel titulo = new JLabel(reserva.getLibro().getTitulo(), JLabel.LEFT);
 		titulo.setFont(fuenteTitulo);
@@ -51,6 +52,11 @@ public class JDialogReserva extends JDialog {
         autor.setFont(fuenteMenu);
         autor.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         panelDatos.add(autor);
+        
+        JLabel puntuacion = new JLabel("Valoracion: " + reserva.getLibro().getValoracion(), JLabel.LEFT);
+        puntuacion.setFont(fuenteMenu);
+        puntuacion.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        panelDatos.add(puntuacion);
         
         JLabel fecha = new JLabel("Fecha Reserva: " + reserva.getFecha(), JLabel.LEFT);
         fecha.setFont(fuenteMenu);
@@ -71,10 +77,16 @@ public class JDialogReserva extends JDialog {
 		cerrar.setBackground(Color.RED);
 		JButton prolongar = new JButton("Prolongar");
 		prolongar.setBackground(new Color(0, 153, 204)); 
+
 		
 		panelBotones.add(cerrar);
 		panelBotones.add(prolongar);
 		
+		//boton valoracion
+        JButton valorar = new JButton("Valorar");
+        valorar.setBackground(Color.CYAN);
+        panelBotones.add(valorar);
+        
 		cerrar.addActionListener((e) -> {
 			this.dispose();
 		});
@@ -94,6 +106,17 @@ public class JDialogReserva extends JDialog {
 				JOptionPane.showMessageDialog(this, "No se puede prolongar más. Máximo alcanzado (" +  MAX_PROLONGACIONES + ")", "Limite de prolongación", JOptionPane.WARNING_MESSAGE);
 			}
 			
+		});
+		
+		valorar.addActionListener((e)->{
+			//ventana de valoracion
+			JFrameReservas frameReservas = null;
+		    if (padre instanceof JFrameReservas) {
+		        frameReservas = (JFrameReservas) padre;
+		    }
+			
+			JDialogValorar dialogValorar = new JDialogValorar(this , reserva, frameReservas);
+			dialogValorar.setVisible(true);
 		});
 		
 		this.add(panelBotones, BorderLayout.SOUTH);

@@ -31,31 +31,6 @@ public class JFrameInicio extends JFramePrincipal {
     	JPanel mainPanel = new JPanel(new BorderLayout());
     	mainPanel.setBackground(Color.WHITE);
     	
-    	/* YA TENEMOS BUSCADOR Y EXPLORAR
-        // --- Barra superior con buscador y botón para ejemplo ---
-        JPanel top = new JPanel(new BorderLayout(8, 8));
-        top.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        JTextField tfBuscar = new JTextField();
-        JButton btnBuscar = new JButton("Buscar");
-        JPanel search = new JPanel(new BorderLayout(6, 6));
-        search.add(tfBuscar, BorderLayout.CENTER);
-        search.add(btnBuscar, BorderLayout.EAST);
-
-        
-        JButton btnExplorador = new JButton("Explorador (demo)");
-        btnExplorador.addActionListener((ActionEvent e) -> {
-            // Abre cualquier otra ventana de tu app (ejemplo)
-            // new JFrameExplorador().setVisible(true);
-            // dispose(); // si quieres cerrar Inicio al ir al explorador
-            JOptionPane.showMessageDialog(this, "Aquí abrirías tu JFrameExplorador");
-            Navigator.showExplorar();
-        });
-
-        top.add(search, BorderLayout.CENTER);
-        top.add(btnExplorador, BorderLayout.EAST);
-        
-        mainPanel.add(top);*/
-
     	// --- Cabecera ---
 	    JLabel lblPopulares = new JLabel("Populares");
 	    lblPopulares.setFont(fuenteTitulo);

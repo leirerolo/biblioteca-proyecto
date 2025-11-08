@@ -14,6 +14,8 @@ public class Reserva implements Serializable{
 	private int prolongaciones;
 	private User user;
 	
+	private double valoracionUsuario;
+	
 	//Por defecto se crea la reserva con 14 días (2 semanas) de plazo
 	public Reserva(Libro libro, User user) {
 		this.libro=libro;
@@ -21,6 +23,8 @@ public class Reserva implements Serializable{
 		this.duracion=14;
 		this.prolongaciones=0;
 		this.user=user;
+		
+		this.valoracionUsuario = 0;
 	}
 	
 	//para cuando cargamos desde CSV
@@ -30,6 +34,7 @@ public class Reserva implements Serializable{
 		this.fecha=fecha;
 		this.duracion=14;
 		this.prolongaciones=0;
+		this.valoracionUsuario=0;
 	}
 
 	public Libro getLibro() {
@@ -71,7 +76,17 @@ public class Reserva implements Serializable{
     public boolean isVencida() {
         return LocalDate.now().isAfter(getVencimiento());
     }
-	
+    
+    
+	//obtener valoracion y calificar
+	public double getValoracionUsuario() {
+		return valoracionUsuario;
+	}
+
+	 public void setValoracionUsuario(double valoracionUsuario) {
+		 this.valoracionUsuario = valoracionUsuario;
+	 }
+
 	//método para prolongar la reserva
 	public void prolongar() {
 		//solo se puede prolongar hasta 2 veces
@@ -119,7 +134,7 @@ public class Reserva implements Serializable{
                 ", duracion=" + duracion +
                 ", prolongaciones=" + prolongaciones +
                 ", vencimiento=" + getVencimiento() +
-                '}';
+                ", valoracion=" + getValoracionUsuario() + '}';
     }
 	
 	
