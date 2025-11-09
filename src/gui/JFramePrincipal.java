@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.MatteBorder;
 
 import domain.*;
+import main.Main;
 import persistence.AppState;
 import persistence.AppStateStore;
 
@@ -67,6 +70,20 @@ public class JFramePrincipal extends JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null);
      
+        //al cerrar, guarda el csv actualizado
+        this.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		if (Main.librosGlobales!=null && !Main.librosGlobales.isEmpty()) {
+        			Main.guardarLibrosCSV("libros.csv", Main.librosGlobales);
+        		}
+        		//guardo también las reservas del usuario actual
+        		if (currentUser!=null) {
+        			currentUser.guardarReservasCSV();
+        		}
+        		System.exit(0); //cierra la app
+        	}
+        });
     }
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva) {
 	    this(libros, ventanaActiva, null); // carga AppState desde disco si viene null
@@ -292,8 +309,10 @@ public class JFramePrincipal extends JFrame {
             String autor     = (r.getLibro() != null) ? r.getLibro().getAutor()  : "";
             String fecha     = String.valueOf(r.getFecha());
             String restantes = String.valueOf(r.getDiasRestantes());
-            modeloReservas.addElement(String.format("%s — %s | %s | %s días restantes",
-                    titulo, autor, fecha, restantes));
+            String valoracion = String.valueOf(r.getValoracionUsuario());
+            
+            modeloReservas.addElement(String.format("%s — %s | %s | %s días restantes | Valoración: %s",
+                    titulo, autor, fecha, restantes, valoracion));
         }
     }
 

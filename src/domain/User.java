@@ -31,6 +31,7 @@ public class User implements Serializable{
     private static User LOGGED_IN = null;
     private String password;
     private String usuario;
+    
     //atributo para cuando el user esté penalizado por haberse pasado de plazo
     private LocalDate penalizacionHasta;
     
@@ -207,6 +208,11 @@ public class User implements Serializable{
     				Reserva r = new Reserva(libro, this, fecha);
     				r.setDuracion(duracion);
     				r.setProlongaciones(prolongaciones);
+    				
+    				//si se ha añadido la valoración del usuario
+    				if (datos.length>5) {
+    					r.setValoracionUsuario(Double.parseDouble(datos[5]));
+    				}
     				reservas.add(r);
     			}
     		}

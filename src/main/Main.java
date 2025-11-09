@@ -6,6 +6,7 @@ import gui.*;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -72,27 +73,50 @@ public class Main {
 
                 String[] campos = linea.split(";");
                 String pathImagenCSV = campos[2].trim();
-                String pathImagenCompleto = "images/" + pathImagenCSV;
                 double valoracion = Double.parseDouble(campos[3].trim().replace(",", "."));
+                int numValoraciones = 1;
+                
+                //si el fichero ya ha sido actualizado con nuevas valoraciones
+                if (campos.length>4) {
+                	numValoraciones = Integer.parseInt(campos[4].trim());
+                }
                 ImageIcon portada = null;
 
                 try {
-                    ImageIcon original = new ImageIcon(pathImagenCompleto);
+                    ImageIcon original = new ImageIcon(pathImagenCSV);
                     if (original.getImage() != null) {
                         Image img = original.getImage().getScaledInstance(120, 160, Image.SCALE_SMOOTH);
                         portada = new ImageIcon(img);
                     }
                 } catch (Exception e) {
-                    System.err.println("Warning: la imagen no ha podido ser cargada: " + pathImagenCompleto);
+                    System.err.println("Warning: la imagen no ha podido ser cargada: " + pathImagenCSV);
                 }
 
-                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCompleto);
+                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCSV);
+                libro.setNumValoraciones(numValoraciones);
                 listaLibros.add(libro);
             }
         } catch (FileNotFoundException e) {
             System.out.println("Error al leer el fichero CSV: " + e.getMessage());
         }
         return listaLibros;
+    }
+    
+    //para la persistencia de valoraciones
+    public static void guardarLibrosCSV(String fichero, List<Libro> libros) {
+    	try (PrintWriter pw = new PrintWriter(fichero)) {
+    		
+    		for (Libro l : libros) {
+    			pw.println(l.getTitulo() + ";"
+    					+ l.getAutor() + ";" 
+    					+ l.getPortadaPath() + ";"
+    					+ String.format("%.2f", l.getValoracion()) + ";"
+    					+ l.getNumValoraciones());
+    		}
+    		
+    	} catch(Exception e) {
+    		System.err.println("Error al guardar CSV: " + e.getMessage());
+    	}
     }
 }
 

@@ -13,9 +13,10 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private ImageIcon portada;
 	
 	private double valoracionOriginal; // del CSV
-    private double valoracionMedia; //valoraciones de usuarios
-    
-	private String portadaPath; // para poder acceder a la imagen a traves de la BD
+    private double valoracionMedia; //media actual
+    private int numValoraciones; // contador de valoraciones para hacer la media
+	
+    private String portadaPath; // para poder acceder a la imagen a traves de la BD
 	private User reservadoPor; //usuario que tiene ahora reservado el libro (si existe)
 	
   // constructor para leer el libro desde la BD
@@ -67,6 +68,12 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	}
 	public Libro() {
 		
+	}
+	public int getNumValoraciones() {
+		return numValoraciones;
+	}
+	public void setNumValoraciones(int numValoraciones) {
+		this.numValoraciones=numValoraciones;
 	}
 	
 	public int getId() {
