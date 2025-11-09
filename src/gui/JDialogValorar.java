@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
@@ -16,6 +17,7 @@ import javax.swing.JSlider;
 import domain.Reserva;
 
 public class JDialogValorar extends JDialog{
+	private static final long serialVersionUID = 1L;
 	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
 
 	public JDialogValorar(JDialog padre, Reserva reserva, JFrameReservas frameReservas) {
@@ -50,7 +52,6 @@ public class JDialogValorar extends JDialog{
             lblValor.setText("Valoración: " + String.format("%.1f", valorDecimal));
         });
         
-        //añadimos
         panelSlider.add(lblValor, BorderLayout.NORTH);
         panelSlider.add(slider, BorderLayout.CENTER);
         
@@ -93,17 +94,12 @@ public class JDialogValorar extends JDialog{
             
          // si usuario ya valoro antes, reemplazar valoracion
             if (reserva.getValoracionUsuario() > 0.0) {
-                System.out.println("usuario valoro anteriormente");
             	suma += nuevaValoracion;
-                System.out.println(suma);
                 contador++;
-                System.out.println(contador);
+                
             } else {// primera valoracion
-            	System.out.println("primera vez");
                 suma += nuevaValoracion;
-                System.out.println(suma);
                 contador++;      
-                System.out.println(contador);
             }
             
             double mediaGlobal = suma / contador;
@@ -135,8 +131,12 @@ public class JDialogValorar extends JDialog{
                 ((JDialogReserva) padre).actualizarValoracion();
             }
             
+            //refrescar panel de inicio si está abierto
+            for (Frame frame : JFrame.getFrames()) {
+            	if (frame instanceof JFrameInicio) {
+            		((JFrameInicio) frame).refrescarTopLibros();
+            	}
+            }
         });
-        
-		
 	}
 }

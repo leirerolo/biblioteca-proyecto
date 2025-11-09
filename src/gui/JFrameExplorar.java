@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
@@ -183,38 +184,31 @@ public class JFrameExplorar extends JFramePrincipal {
 	            panelLibro.add(panelInfo, BorderLayout.CENTER);
 	            
 	            panelLibro.addMouseListener(new MouseAdapter() {
-	            	//info libro + reservas
+	            	//al hacer click, se abre el diálogo de la info del libro
 	                @Override
 	                public void mouseClicked(MouseEvent e) {
 	                    JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
 	                    infoLibro.setVisible(true);
 	                }
 
-	                //al pasar raton
-					@Override
+	                //al pasar ratón, cambia a formato selección
+	                @Override
 					public void mouseEntered(MouseEvent e) {
 						panelLibro.setBackground(seleccionado);
-                        panelInfo.setBackground(seleccionado);
-                        panelLibro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                        panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+                        panelLibro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        //panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
 					}
 
 					@Override
 					public void mouseExited(MouseEvent e) {
 						panelLibro.setBackground(noSeleccionado);
-                        panelInfo.setBackground(noSeleccionado);
-                        panelLibro.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                        panelLibro.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 					}
-	                
 	            });
-
 	            panelLibros.add(panelLibro);
-	            
 	        }
-	        
 	    }
-	    
 	    panelLibros.revalidate();
 	    panelLibros.repaint();
 	}

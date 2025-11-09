@@ -46,7 +46,7 @@ public class JDialogLibro extends JDialog {
     	autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     	panelDatos.add(autor);
     	
-    	JLabel valoracion = new JLabel(String.valueOf(libro.getValoracion()), JLabel.LEFT);
+    	JLabel valoracion = new JLabel(String.format("%.2f", libro.getValoracion()), JLabel.LEFT);
     	valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     	panelDatos.add(valoracion);
     	

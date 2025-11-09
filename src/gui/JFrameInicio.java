@@ -16,13 +16,15 @@ import java.util.stream.Collectors;
 public class JFrameInicio extends JFramePrincipal {
 
     private static final long serialVersionUID = 1L;
+    
+    //panel principal que contiene los libros
+    private JPanel mainPanel;
 
     public JFrameInicio(List<Libro> libros) {
     	super(libros, "inicio");
         this.libros = libros;
         
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        //setSize(900, 600);
         setLocationRelativeTo(null);
         
         this.inicializarPanelSuperior(); //hereda de JFramePrincipal
@@ -30,26 +32,26 @@ public class JFrameInicio extends JFramePrincipal {
     }
 
     private void inicializarPanelCentral(){
-    	JPanel mainPanel = new JPanel(new BorderLayout());
+    	mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
         add(mainPanel, BorderLayout.CENTER);
     	
-//    	// --- Cabecera ---
-//	    JLabel lblPopulares = new JLabel("Populares");
-//	    lblPopulares.setFont(fuenteTitulo);
-//	    lblPopulares.setForeground(new Color(0, 102, 204));
-//	    lblPopulares.setHorizontalAlignment(JLabel.LEFT);
-//	    lblPopulares.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//	    mainPanel.add(lblPopulares, BorderLayout.NORTH);
-//	    
 	    if (libros == null || libros.isEmpty()) {
             JLabel l = new JLabel("No hay libros para mostrar", JLabel.CENTER);
             l.setFont(new Font("SansSerif", Font.PLAIN, 16));
             mainPanel.add(l, BorderLayout.CENTER);
             return;
         }
-
-        // Top 6 por valoración (desc) – compatible con JDK 8+
+	    
+	    //para que se actualice el panel de libros, si se modifican las valoraciones
+	    mainPanel.add(new JScrollPane(crearPanelTopLibros()), BorderLayout.CENTER);
+	    mainPanel.revalidate();
+	    mainPanel.repaint(); 
+    } 
+    
+    //método para construir el panel de libros del top 6
+    private JPanel crearPanelTopLibros() {
+    	// Top 6 por valoración (descendente)
         List<Libro> top6 = libros.stream()
                 .sorted((a, b) -> Double.compare(b.getValoracion(), a.getValoracion()))
                 .limit(6)
@@ -62,18 +64,17 @@ public class JFrameInicio extends JFramePrincipal {
         for (Libro lib : top6) grid.add(buildBookCard(lib));
 
         JLabel titulo = new JLabel("Mejor valorados", JLabel.LEFT);
-        titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+        titulo.setFont(fuenteTitulo);
+        titulo.setForeground(new Color(0,102,204));
         titulo.setBorder(new MatteBorder(12, 16, 8, 16, Color.WHITE));
 
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(Color.WHITE);
         wrapper.add(titulo, BorderLayout.NORTH);
         wrapper.add(grid, BorderLayout.CENTER);
-
-        mainPanel.add(new JScrollPane(wrapper), BorderLayout.CENTER);
-        mainPanel.revalidate();
-        mainPanel.repaint();
-    } 
+        
+        return wrapper;
+    }
     
     private JPanel buildBookCard(Libro lib) {
         JPanel card = new JPanel(new BorderLayout());
@@ -93,7 +94,7 @@ public class JFrameInicio extends JFramePrincipal {
         t.setFont(new Font("SansSerif", Font.BOLD, 12));
         JLabel a = new JLabel(lib.getAutor());
         a.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        JLabel r = new JLabel("★ " + String.format("%.1f", lib.getValoracion()));
+        JLabel r = new JLabel("★ " + String.format("%.2f", lib.getValoracion()));
         r.setFont(new Font("SansSerif", Font.PLAIN, 11));
 
         info.add(t);
@@ -105,15 +106,16 @@ public class JFrameInicio extends JFramePrincipal {
         Color noSeleccionado = Color.white;
     	Color seleccionado = new Color(245, 245, 245);
 
-        // (Opcional) click
+        //Eventos de ratón
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         card.addMouseListener(new java.awt.event.MouseAdapter() {
+        	//al hacer click, se abre el diálogo de la info del libro
             @Override 
             public void mouseClicked(java.awt.event.MouseEvent e) {
             	JDialogLibro dialog = new JDialogLibro(JFrameInicio.this, lib);
                 dialog.setVisible(true);
             }
-            
+            //al posar el ratón, cambia a formato selección
             @Override
 	        public void mouseEntered(MouseEvent e) {
 	            card.setBackground(seleccionado);
@@ -131,6 +133,14 @@ public class JFrameInicio extends JFramePrincipal {
 
         return card;
     }
-        
- 
+    
+    //método para refrescar los libros
+    public void refrescarTopLibros() {
+    	if (mainPanel!=null) {
+    		mainPanel.removeAll();
+    		mainPanel.add(new JScrollPane(crearPanelTopLibros()), BorderLayout.CENTER);
+    		mainPanel.revalidate();
+    		mainPanel.repaint();
+    	}
+    }
 }
