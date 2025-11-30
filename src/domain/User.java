@@ -248,4 +248,18 @@ public class User implements Serializable{
 					"Penalización activa", JOptionPane.WARNING_MESSAGE);
 		}
 	}
+    
+     //Guarda los cambios de nombre y apellido en la BD.
+     
+    public boolean guardarCambiosApellidoYNombre() throws SQLException {
+        return userDAO.actualizarpellido(this); 
+    }
+
+    
+     //Guarda los cambios de email y path de avatar en la BD.
+     
+    public boolean guardarCambiosEmailYAvatar() throws SQLException {
+        return userDAO.actualizarEmailYAvatar(this);
+    }
+    
 }

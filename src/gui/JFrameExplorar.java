@@ -36,8 +36,8 @@ public class JFrameExplorar extends JFramePrincipal {
 	public JFrameExplorar(List<Libro> libros) {
 		super(libros, "explorar");
 		this.libros = libros;
-		this.inicializarPanelSuperior(); //hereda la cabecera del frame principal
 		this.inicializarPanelCentral();
+		this.filtrarLibros();
 	}
 	
 	private void inicializarPanelCentral() {
@@ -107,8 +107,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	    mainPanel.add(scrollPane, BorderLayout.CENTER);
 	    this.add(mainPanel, BorderLayout.CENTER); // añadir al panel central
 
-	    // Mostrar mensaje inicial o todos los libros
-	    filtrarLibros();
+	    
 	    
 	}
 
@@ -211,6 +210,9 @@ public class JFrameExplorar extends JFramePrincipal {
 	    }
 	    panelLibros.revalidate();
 	    panelLibros.repaint();
+	    
+	    this.revalidate();
+	    this.repaint();
 	}
 	
 	

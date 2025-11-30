@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public class JFramePrincipal extends JFrame {
 	private DefaultListModel<String> modeloReservas;
 	
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva, AppState state) {
-        this.libros = libros;
+        this.libros = (libros != null) ? libros : new ArrayList<>();
         this.ventanaActiva = ventanaActiva;
         this.state = (state != null) ? state : AppStateStore.load();
 
@@ -62,7 +63,6 @@ public class JFramePrincipal extends JFrame {
         }
 
         this.inicializarPanelSuperior();
-        this.inicializarContenidoCentral();
         
         this.setTitle("Biblioteca");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

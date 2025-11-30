@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
 import domain.User;
+import java.sql.SQLException;
 
 public class JFramePerfil extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -83,15 +84,30 @@ public class JFramePerfil extends JFrame {
         JDialogEditarPerfil dlg = new JDialogEditarPerfil(this, user);
         dlg.setVisible(true);
         if (dlg.isAccepted()) {
+        	try {
             // Actualizar el modelo
             user.setApellido(dlg.getApellido());
             user.setEmail(dlg.getEmail());
             user.setAvatarPath(dlg.getSelectedAvatarPath());
 
-            // Refrescar UI
-            refrescarDatos();
+            boolean bdApellido = user.guardarCambiosApellidoYNombre();
+            boolean bdEmailAvatar = user.guardarCambiosEmailYAvatar();
+
+            if (bdApellido && bdEmailAvatar) {
+                JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                refrescarDatos();
+            } else {
+                 JOptionPane.showMessageDialog(this, "Error al guardar el perfil en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(this, 
+                "Error de conexión o de base de datos: " + ex.getMessage(), 
+                "Error de BD", JOptionPane.ERROR_MESSAGE);
+        }
         }
     }
+
 
     private void refrescarDatos() {
         lblNombre.setText("Nombre: " + n(user.getNombre()));
