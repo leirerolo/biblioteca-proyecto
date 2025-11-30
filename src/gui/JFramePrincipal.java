@@ -58,7 +58,7 @@ public class JFramePrincipal extends JFrame {
             this.currentUser = domain.User.getLoggedIn();
         }
         if (this.currentUser != null) {
-            this.currentUser.cargarReservasCSV();
+            this.currentUser.cargarReservas();
         }
 
         this.inicializarPanelSuperior();
@@ -74,13 +74,7 @@ public class JFramePrincipal extends JFrame {
         this.addWindowListener(new WindowAdapter() {
         	@Override
         	public void windowClosing(WindowEvent e) {
-        		if (Main.librosGlobales!=null && !Main.librosGlobales.isEmpty()) {
-        			Main.guardarLibrosCSV("libros.csv", Main.librosGlobales);
-        		}
-        		//guardo también las reservas del usuario actual
-        		if (currentUser!=null) {
-        			currentUser.guardarReservasCSV();
-        		}
+        	
         		System.exit(0); //cierra la app
         	}
         });
@@ -202,16 +196,15 @@ public class JFramePrincipal extends JFrame {
             mainPanel.add(new JScrollPane(lista), BorderLayout.CENTER);
 
             JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            JButton btnGuardar = new JButton("Guardar CSV");
+            JButton btnGuardar = new JButton("Guardar app state");
             btnGuardar.addActionListener(ev -> {
                 if (currentUser != null) {
-                    currentUser.guardarReservasCSV();
-                    JOptionPane.showMessageDialog(this, "Reservas guardadas.", "OK", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "App state guardado (sin reservas).", "OK", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             south.add(btnGuardar);
             mainPanel.add(south, BorderLayout.SOUTH);
-
+            
             cargarReservasUsuarioEnLista();
         } else if ("inicio".equalsIgnoreCase(ventanaActiva)) {
             renderInicioTop6(mainPanel);   // top 6 mejor valorados al iniciar
@@ -296,11 +289,11 @@ public class JFramePrincipal extends JFrame {
         return card;
     }
 
-    private void cargarReservasUsuarioEnLista() {
+    protected void cargarReservasUsuarioEnLista() {
         if (modeloReservas == null || currentUser == null) return;
         modeloReservas.clear();
 
-        currentUser.cargarReservasCSV();
+        currentUser.cargarReservas();
         List<Reserva> mias = currentUser.getReservas();
         if (mias == null) return;
 

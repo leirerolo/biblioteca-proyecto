@@ -103,8 +103,7 @@ public class JDialogReserva extends JDialog {
 				JOptionPane.showMessageDialog(this,"Reserva prolongada correctamente. Plazo extendido con " + DIAS_ADICIONALES + " días.","Prolongación exitosa",JOptionPane.INFORMATION_MESSAGE);
 				
 				if (padre instanceof JFrameReservas) {
-					((JFrameReservas) padre).actualizarReservas();
-					((JFrameReservas) padre).getUser().guardarReservasCSV(); //guardo la reserva actualizada
+					((JFrameReservas) padre).actualizarReservaEnBD(reserva);
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, "No se puede prolongar más. Máximo alcanzado (" +  MAX_PROLONGACIONES + ")", "Limite de prolongación", JOptionPane.WARNING_MESSAGE);

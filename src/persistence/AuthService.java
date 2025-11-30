@@ -3,16 +3,21 @@ package persistence;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.sql.SQLException;
 import java.util.Optional;
 
 
 import domain.User;
+import db.UserDAO;
 
 
 public class AuthService {
 	private final AppState state;
-
-	public AuthService(AppState state) { this.state = state; }
+	private final UserDAO userDAO;
+	
+	public AuthService(AppState state) { 
+		this.state = state;
+		this.userDAO= new UserDAO();}
 	
 	private static String normalize(String s) {
         return s == null ? "" : s.trim();
@@ -43,39 +48,46 @@ public class AuthService {
         if (p.isEmpty()) throw new IllegalArgumentException("La contraseña es obligatoria");
 
 		// Comprobar unicidad
-        state.getUsers().forEach(ur -> {
-            if (ur.getUser().getUsuario() != null &&
-                ur.getUser().getUsuario().equalsIgnoreCase(u)) {
-                throw new IllegalArgumentException("El nombre de usuario ya existe");
-            }
-            if (!e.isEmpty() && ur.getUser().getEmail() != null &&
-                ur.getUser().getEmail().equalsIgnoreCase(e)) {
-                throw new IllegalArgumentException("El email ya está registrado");
-            }
-        });
-
-
-     // Crear User con ID autoincremental (tu User no tiene constructor vacío)
-        int newId = state.nextUserId();
-        User user = new User(newId, n, a, e.isEmpty() ? null : e, /*avatarPath*/ null);
-        user.setUsuario(u);
-
         String hash = sha256(p);
-        state.getUsers().add(new UserRecord(user, hash));
-        AppStateStore.save(state);
-        return user;
-    }
+        
+      
+        User user = new User(n,a,e.isEmpty() ? null:e, /*avatarPath*/ null, u, hash);
+                try {
+                    
+                    int idGenerado = userDAO.registerUser(user);
+                    
+                    if (idGenerado > 0) {
+                    	 return user;
+                    } else {
+                        throw new IllegalStateException("No se ha podido insertar el usuario en la BD. invalid ID.");
+                    }
+                } catch (SQLException ex) {
+                    System.err.println("Error en la persistencia del usuario en la BD " + ex.getMessage());
+                    
+                    if (ex.getMessage().contains("UNIQUE constraint failed") || ex.getMessage().contains("SQLITE_CONSTRAINT")) { 
+                         throw new IllegalArgumentException("El usuario/correo ya esta en uso.");
+                    }
+                    throw new RuntimeException("Unkown error in the data base " + ex.getMessage(), ex);
+                }
+            }
 
 
-	/** Intenta loguear. Devuelve el User si coincide el hash de contraseña. */
+        	/** * Intenta loguear utilizando la Base de Datos. 
+             * Devuelve el User si coincide el hash de contraseña. 
+             */
 	public Optional<User> login(String username, String rawPassword) {
-		String u = username.trim().toLowerCase();
-		String hash = sha256(rawPassword);
-		return state.getUsers().stream()
-				.filter(ur -> ur.getUser().getUsuario().equalsIgnoreCase(u)
-						&& ur.getPasswordHash().equals(hash))
-				.map(UserRecord::getUser)
-				.findFirst();
+		String u = normalize(username).toLowerCase();
+		
+	    final String p = normalize(rawPassword); 
+		String hash = sha256(p); 
+		
+		try {
+			User user = userDAO.login(u, hash); 
+			return Optional.ofNullable(user);
+			
+		} catch (SQLException e) {
+			System.err.println("Eroare la logare din BD: " + e.getMessage());
+			return Optional.empty();
+		}
 	}
-	
 }

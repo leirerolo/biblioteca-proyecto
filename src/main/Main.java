@@ -6,40 +6,59 @@ import gui.*;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.sql.SQLException;
+
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 import persistence.AppState;
+import db.DBConnection;
+import db.LibroDAO;
 
 public class Main {
     public static List<Libro> librosGlobales; // para acceder a ella desde User
 
+    private static final LibroDAO libroDAO = new LibroDAO();
+    
     public static void main(String[] args) {
-    	//COMENTADOS: para cuando funcione la BD 
-    	//DBManager.createTables(); 
-    	//List<Libro> libros = BookDAO.getAllBooks(); 
-    	// verificar si la BD está vacía
-    	/*if (libros.isEmpty()) { System.out.println("La BD está vacía, cargando desde el csv..."); 
-    	 * List<Libro> librosCSV = cargarLibrosCSV("libros.csv"); 
-    	 * for (Libro libro: librosCSV) { BookDAO.insertBook(libro); 
-    	 * //añadimos el libro a la BD usando PreparedStatement } 
-    	 * System.out.println("Se han cargado todos los libros"); 
-    	 * libros = BookDAO.getAllBooks(); }*/
-        SwingUtilities.invokeLater(() -> {
-            // 1) Cargar catálogo (CSV)
-            List<Libro> libros = cargarLibrosCSV("libros.csv");
-            librosGlobales = libros;
-
-            if (libros.isEmpty()) {
-                System.out.println("No se han encontrado libros para mostrar");
+    	DBConnection.createTables();
+    	
+    	List<Libro> libros = new ArrayList<>();
+    	try {
+            libros = libroDAO.getTodosLosLibros();
+            
+            if (libros.isEmpty()) { 
+                System.out.println("La BD está vacía. Cargando datos iniciales desde 'libros.csv'...");
+                
+                List<Libro> librosCSV = cargarLibrosCSV("libros.csv"); 
+                
+                for (Libro libro: librosCSV) { 
+                    libroDAO.insertaLibro(libro); 
+                }
+                System.out.println("Se han cargado " + librosCSV.size() + " libros en la base de datos.");
+                libros = libroDAO.getTodosLosLibros(); 
+            }
+            
+            librosGlobales = libros; 
+            
+            if (librosGlobales.isEmpty()) {
+                System.out.println("No se han encontrado libros para mostrar. Cerrando.");
                 System.exit(0);
                 return;
             }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR  de conexión a la BD: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+            return;
+        }
+    	
+        SwingUtilities.invokeLater(() -> {
 
             // 2) Mostrar login (integrado con AppState/AuthService)
             JDialogLogin dlg = new JDialogLogin(null);
@@ -92,7 +111,7 @@ public class Main {
                     System.err.println("Warning: la imagen no ha podido ser cargada: " + pathImagenCSV);
                 }
 
-                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCSV);
+                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), null, valoracion, pathImagenCSV);
                 libro.setNumValoraciones(numValoraciones);
                 listaLibros.add(libro);
             }
@@ -103,20 +122,7 @@ public class Main {
     }
     
     //para la persistencia de valoraciones
-    public static void guardarLibrosCSV(String fichero, List<Libro> libros) {
-    	try (PrintWriter pw = new PrintWriter(fichero)) {
-    		
-    		for (Libro l : libros) {
-    			pw.println(l.getTitulo() + ";"
-    					+ l.getAutor() + ";" 
-    					+ l.getPortadaPath() + ";"
-    					+ String.format("%.2f", l.getValoracion()) + ";"
-    					+ l.getNumValoraciones());
-    		}
-    		
-    	} catch(Exception e) {
-    		System.err.println("Error al guardar CSV: " + e.getMessage());
-    	}
+    
     }
-}
+
 

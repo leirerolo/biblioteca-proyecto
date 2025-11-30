@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.sql.SQLException;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
@@ -16,6 +17,7 @@ import javax.swing.JSlider;
 
 import domain.Libro;
 import domain.Reserva;
+import domain.User;
 
 public class JDialogValorar extends JDialog{
 	private static final long serialVersionUID = 1L;
@@ -78,41 +80,50 @@ public class JDialogValorar extends JDialog{
         //aceptar
         aceptar.addActionListener((e) -> {
             double nuevaValoracion = slider.getValue() / 10.0;
-            Libro libro = reserva.getLibro();
             
-         //si es la primera vez que lo valora
-            if (reserva.getValoracionUsuario() == 0.0) {
-            	libro.setNumValoraciones(libro.getNumValoraciones()+1); //aumento el contador
-            } //si ya lo había valorado, su número de valoraciones no cambia
-            
-            //recalculamos la media de valoraciones de ese libro
-            double mediaNueva = ((libro.getValoracion() * (libro.getNumValoraciones()-1)) + nuevaValoracion) / libro.getNumValoraciones();
-            
-            //actualizamos en el libro y en la reserva
-            libro.setValoracion(mediaNueva);
+            // 1. Establecer la nueva valoración LOCALMENTE en el objeto Reserva
             reserva.setValoracionUsuario(nuevaValoracion);
+            
+            try {
+                User currentUser = User.getLoggedIn();
+                if (currentUser == null) {
+                    JOptionPane.showMessageDialog(this, "Error: Usuario no autentificado.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 
-            JOptionPane.showMessageDialog(this, 
-            		"¡Gracias por valorar!\nNueva valoración: " + String.format("%.2f", mediaNueva), 
-            		"Valoración actualizada", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
-            
-            //actualiza y guarda
-            if (frameReservas != null) {
-                frameReservas.actualizarReservas();
-                frameReservas.getUser().guardarReservasCSV();
-            }
-            
-         // Actualiza etiqueta en JDialogReserva si está abierta
-            if (padre instanceof JDialogReserva) {
-                ((JDialogReserva) padre).actualizarValoracion();
-            }
-            
-            //refrescar panel de inicio si está abierto
-            for (Frame frame : JFrame.getFrames()) {
-            	if (frame instanceof JFrameInicio) {
-            		((JFrameInicio) frame).refrescarTopLibros();
-            	}
+                // 2. Persistir en la BD: Llama a User.actualizarReserva(), que maneja la BD.
+                currentUser.actualizarReserva(reserva); 
+                
+                JOptionPane.showMessageDialog(this, 
+                        "¡Gracias por valorar!\nValoración personal guardada: " + String.format("%.1f", nuevaValoracion) +
+                        "\nLa valoración media del libro ha sido actualizada.", 
+                        "Valoración actualizada", JOptionPane.INFORMATION_MESSAGE);
+                
+                dispose();
+                
+                // 3. Actualizar la UI
+                
+                // Recargar/Refrescar las listas de reservas
+                if (frameReservas != null) {
+                    frameReservas.cargarReservasUsuarioEnLista(); 
+                }
+                
+                // Actualiza etiqueta en JDialogReserva si está abierta
+                if (padre instanceof JDialogReserva) {
+                    ((JDialogReserva) padre).actualizarValoracion();
+                }
+                
+                // Refrescar panel de inicio
+                for (Frame frame : JFrame.getFrames()) {
+                    if (frame instanceof JFrameInicio) {
+                        ((JFrameInicio) frame).refrescarTopLibros();
+                    }
+                }
+                
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, 
+                        "Error al guardar el rating en la Base de Datos: " + ex.getMessage(), 
+                        "Error BD", JOptionPane.ERROR_MESSAGE);
             }
         });
 	}

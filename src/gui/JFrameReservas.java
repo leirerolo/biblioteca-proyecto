@@ -12,6 +12,7 @@ import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -56,19 +58,25 @@ public class JFrameReservas extends JFramePrincipal{
 	
 	public JFrameReservas(List<Libro> libros) {
 		super(libros,"reservas");
-		this.libros = new ArrayList<>();
-		this.inicializarPanelSuperior(); //hereda de JFramePrincipal
+
 		this.inicializarPanelCentral();
-		
-		//cargo las reservas desde el fichero del user
-		user.cargarReservasCSV();
 		actualizarReservas();
 	}
 	
 	public User getUser() {
 		return user;
 	}
-	
+	public void actualizarReservaEnBD(Reserva reserva) {
+        try {
+            user.actualizarReserva(reserva); 
+            System.out.println("Reserva ID " + reserva.getLibro().getId() + " actualizada en la BD (Prolongación).");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al prolongar la reserva en la Base de Datos: " + e.getMessage(), 
+                "Error de BD", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
 	private void inicializarPanelCentral() {		
 		JPanel contentPanel = new JPanel(new BorderLayout());
 	    contentPanel.setBackground(Color.WHITE);
@@ -188,8 +196,7 @@ public class JFrameReservas extends JFramePrincipal{
 
         panelDevolucion.add(btnDevolver);
         
-        this.add(contentPanel, BorderLayout.CENTER);
-        this.add(panelDevolucion, BorderLayout.SOUTH);
+        
            
         
         //LISTENER PARA HABILITAR BOTÓN
@@ -239,8 +246,6 @@ public class JFrameReservas extends JFramePrincipal{
         			seleccionada, user, panelIzq, panelCen, panelDer,
         			progressBar, () -> { //al terminar el hilo:
         				dialogSimulacion.dispose(); //cerrar diálogo al terminar
-        				user.getReservas().remove(seleccionada); //elimiar reserva de la lista del user
-        				user.guardarReservasCSV(); //guarda el csv actualizado
         				actualizarReservas(); //actualizar tabla
         			});
         	hilo.start();
@@ -276,10 +281,11 @@ public class JFrameReservas extends JFramePrincipal{
            	}
          });
          actualizarReservas();
+         this.add(contentPanel, BorderLayout.CENTER);
+         this.add(panelDevolucion, BorderLayout.SOUTH);
 	}
 	
 	public void actualizarReservas() {
-		this.libros.clear();
 		listaReservas.clear();
 		
         List<Reserva> reservas = (this.user.getReservas() != null) ? this.user.getReservas() : new ArrayList<>();

@@ -2,11 +2,14 @@ package domain;
 
 
 import java.util.Comparator;
+import db.LibroDAO;
+import java.sql.SQLException;
 import java.util.Objects;
 
 import javax.swing.ImageIcon;
 
 public class Libro implements Comparable<Libro>, Comparator<Libro>{
+	private static final transient LibroDAO libroDAO = new LibroDAO();
 	private int id; //para la BD
 	private String titulo;
 	private String autor;
@@ -17,7 +20,6 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
     private int numValoraciones; // contador de valoraciones para hacer la media
 	
     private String portadaPath; // para poder acceder a la imagen a traves de la BD
-	private User reservadoPor; //usuario que tiene ahora reservado el libro (si existe)
 	
   // constructor para leer el libro desde la BD
 	public Libro(int id, String titulo, String autor, double valoracion, String portadaPath) {
@@ -41,7 +43,10 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 		this.portadaPath = portadaPath;
 	}
 	
-	//para poder cargar las imagenes desde la BD
+	public void setId(int id) {
+        this.id = id;
+    }
+	
 	
 	private ImageIcon loadImage(String path) {
 		if(path == null || path.isEmpty()) return null;
@@ -125,12 +130,28 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
         this.valoracionMedia = valoracionMedia;
     }
     
-	public User getReservadoPor() {
-		return reservadoPor;
-	}
-	public void setReservadoPor(User u) {
-		this.reservadoPor=u;
-	}
+	
+	
+
+	
+	
+public void aplicarNuevaValoracion(double nuevaValoracion) {
+        
+        double totalAcumulado = this.valoracionMedia * this.numValoraciones;
+        this.numValoraciones++;
+        double nuevoTotal = totalAcumulado + nuevaValoracion;
+        this.valoracionMedia = nuevoTotal / this.numValoraciones;
+        
+        try {
+            libroDAO.updateRating(this); 
+            System.out.println("Rating actualizado para '" + this.titulo + "' y persistido en la Base de Datos.");
+            
+        } catch (SQLException e) {
+            System.err.println("Error al guardar el nuevo rating en la BD: " + e.getMessage());
+            this.numValoraciones--; 
+            this.valoracionMedia = totalAcumulado / this.numValoraciones; 
+        }
+    }
 
 	@Override
 	public String toString() {

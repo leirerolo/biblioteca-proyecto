@@ -71,8 +71,7 @@ public class JDialogLibro extends JDialog {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);
 			if (!user.getReservas().contains(nueva)) {
-				user.getReservas().add(nueva);
-				user.guardarReservasCSV(); // guarda la nueva reserva en el fichero de reservas del user
+				user.agregarReserva(nueva);
 				this.dispose(); //cerrar el diálogo
 				
 				//creo una ventana nueva de reservas para que se actualice

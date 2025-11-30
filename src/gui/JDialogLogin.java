@@ -30,7 +30,6 @@ public class JDialogLogin extends JDialog {
 
     private User loggedUser = null;
 
-    // NUEVO: mantenemos el estado cargado para pasarlo luego al JFrame principal
     private final AppState state;
     private final AuthService auth;
 
@@ -41,7 +40,6 @@ public class JDialogLogin extends JDialog {
         setSize(360, 220);
         setLocationRelativeTo(parent);
 
-        // Cargar estado persistido y preparar servicio de auth
         this.state = AppStateStore.load();
         this.auth  = new AuthService(state);
 
@@ -75,7 +73,6 @@ public class JDialogLogin extends JDialog {
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-        // NUEVO: Botón Registrarme
         JButton btnRegister = new JButton("Registrarme");
         btnRegister.addActionListener((ActionEvent e) -> abrirRegistro());
         buttonPane.add(btnRegister);
@@ -93,13 +90,11 @@ public class JDialogLogin extends JDialog {
         });
         buttonPane.add(cancelButton);
 
-        // Enter en password para aceptar
         pfPassword.addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
             }
         });
-        // (opcional) Enter en usuario también
         tfUsuario.addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
@@ -139,7 +134,7 @@ public class JDialogLogin extends JDialog {
         auth.login(username, password).ifPresentOrElse(u -> {
             this.loggedUser = u;
             User.setLoggedIn(u);
-            u.cargarReservasCSV();
+            u.cargarReservas();
             u.verificarPenalizacion();
             dispose(); // <-- MUY IMPORTANTE: dejar que Main continúe
         }, () -> {
