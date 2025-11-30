@@ -22,7 +22,7 @@ import db.LibroDAO;
 public class Main {
     public static List<Libro> librosGlobales; // para acceder a ella desde User
 
-    private static final LibroDAO libroDAO = new LibroDAO();
+    private static final transient LibroDAO libroDAO = new LibroDAO();
     
     public static void main(String[] args) {
     	DBConnection.createTables();

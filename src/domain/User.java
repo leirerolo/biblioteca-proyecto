@@ -190,8 +190,7 @@ public class User implements Serializable{
         if (reserva.getValoracionUsuario() > 0) { 
             reserva.getLibro().aplicarNuevaValoracion(reserva.getValoracionUsuario()); 
    
-            LibroDAO libroDAO = new LibroDAO(); 
-            libroDAO.updateRating(reserva.getLibro()); 
+            this.libroDAO.updateRating(reserva.getLibro()); 
         }
         
         System.out.println("Reserva y/o rating actualizados en BD para libro ID: " + reserva.getLibro().getId());
