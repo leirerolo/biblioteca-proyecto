@@ -36,7 +36,7 @@ public class Main {
                 
                 List<Libro> librosCSV = cargarLibrosCSV("libros.csv"); 
                 
-                for (Libro libro: librosCSV) { 
+                for (Libro libro: librosCSV) {  
                     libroDAO.insertaLibro(libro); 
                 }
                 System.out.println("Se han cargado " + librosCSV.size() + " libros en la base de datos.");
@@ -96,19 +96,24 @@ public class Main {
                 if (campos.length>4) {
                 	numValoraciones = Integer.parseInt(campos[4].trim());
                 }
-                ImageIcon portada = null;
 
+
+                
+                ImageIcon portada = null;
                 try {
-                    ImageIcon original = new ImageIcon(pathImagenCSV);
-                    if (original.getImage() != null) {
+                	File imgFile = new File(pathImagenCSV);
+                    if (imgFile.exists()) {
+                        ImageIcon original = new ImageIcon(imgFile.getAbsolutePath());
                         Image img = original.getImage().getScaledInstance(120, 160, Image.SCALE_SMOOTH);
                         portada = new ImageIcon(img);
+                    } else {
+                        System.err.println("No se encontró la imagen: " + imgFile.getAbsolutePath());
                     }
                 } catch (Exception e) {
                     System.err.println("Warning: la imagen no ha podido ser cargada: " + pathImagenCSV);
                 }
 
-                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), null, valoracion, pathImagenCSV);
+                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCSV);
                 libro.setNumValoraciones(numValoraciones);
                 listaLibros.add(libro);
             }

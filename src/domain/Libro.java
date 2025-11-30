@@ -3,6 +3,8 @@ package domain;
 
 import java.util.Comparator;
 import db.LibroDAO;
+
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -51,21 +53,33 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private ImageIcon loadImage(String path) {
 		if(path == null || path.isEmpty()) return null;
 		
-		String resourcePath = path.replaceFirst("images/", "");
+		//String resourcePath = path.replaceFirst("images/", "");
 		try {
 			
-			java.net.URL imageUrl = getClass().getClassLoader().getResource(resourcePath);
+			//java.net.URL imageUrl = getClass().getClassLoader().getResource(resourcePath);
 			
-			if (imageUrl != null) {
-				
-				ImageIcon original= new ImageIcon(imageUrl);
-				if (original.getImage()!= null) {
-					java.awt.Image img= original.getImage().getScaledInstance(120,160, java.awt.Image.SCALE_SMOOTH);
-					return new ImageIcon(img);
-				}
-			}else {
-				System.err.println("Error al cargar la imagen");
-			}
+//			if (imageUrl != null) {
+//				
+//				ImageIcon original= new ImageIcon(imageUrl);
+//				if (original.getImage()!= null) {
+//					java.awt.Image img= original.getImage().getScaledInstance(120,160, java.awt.Image.SCALE_SMOOTH);
+//					return new ImageIcon(img);
+//				}
+//			}else {
+//				System.err.println("Error al cargar la imagen");
+//			}
+			
+			File imgFile = new File(path); 
+	        if (imgFile.exists()) {
+	            ImageIcon original = new ImageIcon(imgFile.getAbsolutePath());
+	            if (original.getImage() != null) {
+	                java.awt.Image img = original.getImage().getScaledInstance(120, 160, java.awt.Image.SCALE_SMOOTH);
+	                return new ImageIcon(img);
+	            }
+	        } else {
+	            System.err.println("No se encontró la imagen en: " + imgFile.getAbsolutePath());
+	        }
+			
 		} catch (Exception e) {
 			System.err.println("Error al cargar la imagen:  " + path);
 		}
