@@ -9,9 +9,12 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -24,7 +27,9 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import db.ReservaDAO;
 import domain.Libro;
+import domain.Reserva;
 
 //hereda de inicio para heredar su cabecera
 public class JFrameExplorar extends JFramePrincipal {
@@ -111,7 +116,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	}
 
-	private void filtrarLibros() {
+	public void filtrarLibros() {
 		
 	    panelLibros.removeAll(); 
 	    
@@ -120,18 +125,36 @@ public class JFrameExplorar extends JFramePrincipal {
 	        tit = "";
 	    }
 	    
-	    String op = (String) opciones.getSelectedItem();
 	    List<Libro> listaLibros = new ArrayList<>();
 	    
-	    // sin filtro - mostrar lista en orden default (fichero csv)
-	    if (tit.isEmpty()) {
-	    	listaLibros.addAll(libros);
-	    } else {
-	        for (Libro libro : libros) {
-	            if (libro.getTitulo().toLowerCase().contains(tit)) {
-	            	listaLibros.add(libro);
-	            }
-	        }
+	    //cargo de la base de datos de reservas las que estén activas ahora
+	    List<Reserva> reservasActivas = new ArrayList<>();
+	    
+	    try {
+	    	ReservaDAO reservaDAO = new ReservaDAO();
+	    	reservasActivas = reservaDAO.getTodasLasReservasActivas();
+	   
+	    } catch(SQLException e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    // sin filtro - mostrar lista en orden por defecto 
+	    for (Libro libro : libros) {
+	    	boolean reservado = false;
+	    	
+	    	for (Reserva r : reservasActivas) {
+	    		if (r.getLibro().getId() == libro.getId()) {
+	    			reservado = true;
+	    			break; //si está reservado, no se añade a la lista
+	    		}
+	    	}
+	    	if (!reservado) {
+	    		if (tit.isEmpty() || libro.getTitulo().toLowerCase().contains(tit)) {
+	    			if (!listaLibros.contains(libro)) {
+	    				listaLibros.add(libro);
+	    			}
+	    		}
+	    	}
 	    }
 	    
 	    // aplicar orden segun filtro
@@ -142,6 +165,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	        JLabel mensaje = new JLabel("No hay coincidencias");
 	        mensaje.setHorizontalAlignment(JLabel.CENTER);
 	        panelLibros.add(mensaje);
+	    
 	    } else {
 	    	
 	    	Color noSeleccionado = Color.white;
@@ -176,7 +200,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	            autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	            panelInfo.add(autor);
 
-	            JLabel valoracion = new JLabel("★ " + String.valueOf(l.getValoracion()), JLabel.LEFT);
+	            JLabel valoracion = new JLabel("★ " + String.format("%.2f", l.getValoracion()), JLabel.LEFT);
 	            valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	            panelInfo.add(valoracion);
 

@@ -68,8 +68,13 @@ public class Main {
             if (u != null) {
                 persistence.AppState state = dlg.getAppState();
 
-                Navigator.init(librosGlobales);
+                //crear el JFrame principal
+                JFramePrincipal principalFrame = new JFramePrincipal(librosGlobales, "inicio", state);
+                principalFrame.setCurrentUser(u);
+                principalFrame.setVisible(true);
                 
+                Navigator.init(principalFrame, librosGlobales);
+
                 Navigator.showInicio();
             } else {
                 System.out.println("Login cancelado. Cerrando aplicación.");

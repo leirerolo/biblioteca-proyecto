@@ -15,6 +15,7 @@ import java.util.List;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -32,6 +33,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import db.ReservaDAO;
 import domain.Libro;
 import domain.Reserva;
 import domain.User;
@@ -46,6 +48,7 @@ public class JFrameReservas extends JFramePrincipal{
 	private JLabel lblNoReservas;
 	private User user = User.getLoggedIn(); //la ventana de reservas es del user que ha iniciado sesión
 
+	private JFramePrincipal mainFrame;
 	//para la devolucion
 	private JButton btnDevolver;
 	private JProgressBar progressBar;
@@ -56,9 +59,10 @@ public class JFrameReservas extends JFramePrincipal{
 	
 	private List<Reserva> listaReservas = new ArrayList<>();
 	
-	public JFrameReservas(List<Libro> libros) {
+	public JFrameReservas(JFramePrincipal mainFrame, List<Libro> libros) {
 		super(libros,"reservas");
-
+		this.mainFrame = mainFrame;
+		
 		this.inicializarPanelCentral();
 		actualizarReservas();
 	}
@@ -70,6 +74,13 @@ public class JFrameReservas extends JFramePrincipal{
         try {
             user.actualizarReserva(reserva); 
             System.out.println("Reserva ID " + reserva.getLibro().getId() + " actualizada en la BD (Prolongación).");
+        
+            //refrescar tabla para que se actualicen los días restantes
+            int fila = listaReservas.indexOf(reserva);
+            if (fila!=-1) {
+            	//hago que el jtable redibuje la fila
+            	modeloTabla.fireTableRowsUpdated(fila, fila);
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, 
                 "Error al prolongar la reserva en la Base de Datos: " + e.getMessage(), 
@@ -140,11 +151,17 @@ public class JFrameReservas extends JFramePrincipal{
 				if (column == 3) {
 					try {
 						int dias = Integer.parseInt(value.toString());
-						if (dias<=0) {
-							fondo = new Color(255, 102, 102); //rojo suave
-						} else if (dias<=7) {
-							fondo = new Color(255, 255, 153); //amarillo suave
-						}
+						
+						//para añadir complejidad: mostramos los días restantes mediante una barra de progreso
+						JProgressBar barra = new JProgressBar(0, 28);
+					    barra.setValue(Math.max(dias,0));
+					    barra.setString(dias + " días");
+					    barra.setStringPainted(true);
+					    if(dias <= 0) barra.setForeground(Color.RED); //si se ha pasado el plazo, rojo
+					    else if(dias <= 7) barra.setForeground(Color.ORANGE); //si queda una semana o menos, naranja
+					    else barra.setForeground(Color.GREEN); //por lo demás, verde
+					    return barra;
+					    
 					} catch(NumberFormatException e) {
 						//excepción por si no es numérico.
 					}
@@ -160,8 +177,66 @@ public class JFrameReservas extends JFramePrincipal{
 			}
 		};
 		tablaReservas.setDefaultRenderer(Object.class, miCellRenderer);
+		
+		// Renderizado específico para la columna título: portada centrada + título debajo
+		tablaReservas.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
+		    @Override
+		    public Component getTableCellRendererComponent(JTable table, Object value,
+		            boolean isSelected, boolean hasFocus, int row, int column) {
+
+		        Reserva r = listaReservas.get(row);
+
+		        // Panel principal vertical
+		        JPanel panel = new JPanel();
+		        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		        panel.setOpaque(true);
+		        panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+
+		        // Espacio superior
+		        panel.add(Box.createRigidArea(new java.awt.Dimension(0, 5)));
+
+		        // Escalar la portada según la altura de la fila
+		        int filaAltura = table.getRowHeight();
+		        int portadaAltura = (int)(filaAltura * 0.7); // ahora 70% de la altura
+		        int portadaAncho = (int)(portadaAltura * 0.7); // proporción aproximada
+
+		        // Escalar imagen
+		        javax.swing.Icon icon = r.getLibro().getPortada();
+		        if (icon instanceof javax.swing.ImageIcon) {
+		            java.awt.Image img = ((javax.swing.ImageIcon) icon).getImage();
+		            java.awt.Image imgEscalada = img.getScaledInstance(portadaAncho, portadaAltura, java.awt.Image.SCALE_SMOOTH);
+		            icon = new javax.swing.ImageIcon(imgEscalada);
+		        }
+
+		        JLabel lblPortada = new JLabel(icon);
+		        lblPortada.setAlignmentX(Component.CENTER_ALIGNMENT);
+		        panel.add(lblPortada);
+
+		        // Espacio extra para empujar título más abajo
+		        panel.add(Box.createVerticalGlue());
+
+		        // Título centrado debajo de la portada
+		        JLabel lblTitulo = new JLabel(r.getLibro().getTitulo());
+		        lblTitulo.setFont(fuenteMenu.deriveFont(12f));
+		        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+		        panel.add(lblTitulo);
+
+		        // Pequeño margen inferior
+		        panel.add(Box.createRigidArea(new java.awt.Dimension(0, 5)));
+
+		        return panel;
+		    }
+		});
+
+
+
+		// Ajuste de altura de fila
+		tablaReservas.setRowHeight(90);
+
+
+
 		tablaReservas.setFillsViewportHeight(true); //para que llene el espacio
-		tablaReservas.setRowHeight(25);
+		tablaReservas.setRowHeight(90);
 		tablaReservas.setBackground(Color.WHITE);
 		tablaReservas.getTableHeader().setBackground(new Color(230, 230, 250));
         tablaReservas.getTableHeader().setFont(fuenteMenu);
@@ -245,8 +320,38 @@ public class JFrameReservas extends JFramePrincipal{
         	HiloDevoluciones hilo = new HiloDevoluciones(
         			seleccionada, user, panelIzq, panelCen, panelDer,
         			progressBar, () -> { //al terminar el hilo:
+        				
+        				//borrar la reserva de la bd
+        				ReservaDAO reservaDAO = new ReservaDAO();
+        				try {
+        					reservaDAO.eliminaReserva(seleccionada);
+        				} catch(Exception ex) {
+        					ex.printStackTrace();
+        				}
+        				
+        				//quitar de la lista de reservas
+        				listaReservas.remove(seleccionada);
+        				//quitar de la lista del user
+        				user.getReservas().remove(seleccionada);
+        				
+        				//volvemos a añadir el libro a la biblioteca
+        				// (vuelve a estar disponible)
+        				if (!libros.contains(seleccionada.getLibro())) {
+        					libros.add(seleccionada.getLibro());
+        				}
+        				
+        				//actualizar tabla de reservas
+        				actualizarReservas();
+        				        				
+        				//actualizar paneles de populares y explorar
+        				if (Navigator.inicio != null) {
+        					Navigator.inicio.refrescarTopLibros();
+        				}
+        				if (Navigator.explorar !=null) {
+        					Navigator.explorar.filtrarLibros();
+        				}
+        				
         				dialogSimulacion.dispose(); //cerrar diálogo al terminar
-        				actualizarReservas(); //actualizar tabla
         			});
         	hilo.start();
         	
@@ -293,14 +398,16 @@ public class JFrameReservas extends JFramePrincipal{
         CardLayout cl = (CardLayout) (panelTableContainer.getLayout());
 
         if (!listaReservas.isEmpty()) {
-        	for (Reserva reserva: listaReservas) {
-        		this.libros.add(reserva.getLibro());
-            }
         	modeloTabla.setRowCount(listaReservas.size());
         	cl.show(panelTableContainer, "TABLA");
         }else {
         	cl.show(panelTableContainer, "MENSAJE");
         }
+        
+        //limpiar la selección y deshabilitar el botón de devolver
+        tablaReservas.clearSelection();
+        btnDevolver.setEnabled(false);
+        
 		this.revalidate();
 		this.repaint();
 	}

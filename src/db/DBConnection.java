@@ -8,7 +8,7 @@ import java.sql.Statement;
 public class DBConnection {
 	
 	private static final String DB_FILE = "biblioteca.db";
-	private static final String URL = "jdbc:sqlite:resources db/" + DB_FILE;
+	private static final String URL = "jdbc:sqlite:resources_db/" + DB_FILE;
 	
 
 	

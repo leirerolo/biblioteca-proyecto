@@ -70,13 +70,24 @@ public class JDialogLibro extends JDialog {
 		reservar.addActionListener((e) -> {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);
+			
 			if (!user.getReservas().contains(nueva)) {
 				user.agregarReserva(nueva);
-				this.dispose(); //cerrar el diálogo
+				this.dispose();
+				//obtenemos el padre, que es jframe principal o hereda de él
+				JFramePrincipal padreFrame = (JFramePrincipal) getParent();
+				if (padreFrame.libros.contains(libro)) {
+					
+					//elimino el libro de la lista de libros que tiene la ventana padre
+					padreFrame.libros.remove(libro);
+				}
 				
-				//creo una ventana nueva de reservas para que se actualice
-				JFrameReservas ventanaReservas = new JFrameReservas(null);
-			    ventanaReservas.setVisible(true);
+				if (Navigator.inicio != null) {
+					Navigator.inicio.refrescarTopLibros(); // para que desaparezca de inicio
+				}
+				//abro la ventana de reservas con esta ya incluida
+				Navigator.showReservas();
+				
 			} else {
 				JOptionPane.showMessageDialog(
 		                this,

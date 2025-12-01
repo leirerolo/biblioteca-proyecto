@@ -86,6 +86,8 @@ public class JFramePrincipal extends JFrame {
 	public void setCurrentUser(User u) {
         this.currentUser = u;
     }
+	public List<Libro> getLibros() { return libros; }
+	public AppState getAppState() { return state; }
 	
 	protected void inicializarPanelSuperior() {		
 		JPanel upperPanel = new JPanel(new BorderLayout());

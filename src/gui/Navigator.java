@@ -7,15 +7,15 @@ import domain.Libro;
 
 public class Navigator {
 
-	private static JFrameInicio inicio;
-	private static JFrameExplorar explorar;
-	private static JFrameReservas reservas;
-	private static JFramePrincipal principal;
+	protected static JFrameInicio inicio;
+	protected static JFrameExplorar explorar;
+	protected static JFrameReservas reservas;
+	protected static JFramePrincipal principal;
 	
-	public static void init(List<Libro> libros) {
+	public static void init(JFramePrincipal principalFrame, List<Libro> libros) {
         inicio = new JFrameInicio(libros);
         explorar = new JFrameExplorar(libros);
-        reservas = new JFrameReservas(libros);
+        reservas = new JFrameReservas(principalFrame, libros);
     }
 	
 	public static void showInicio() {

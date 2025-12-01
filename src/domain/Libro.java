@@ -176,7 +176,7 @@ public void aplicarNuevaValoracion(double nuevaValoracion) {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(autor, portada, titulo, valoracionOriginal);
+		return Integer.hashCode(id);
 	}
 
 	@Override
@@ -188,9 +188,7 @@ public void aplicarNuevaValoracion(double nuevaValoracion) {
 		if (getClass() != obj.getClass())
 			return false;
 		Libro other = (Libro) obj;
-		return Objects.equals(autor, other.autor) && Objects.equals(portada, other.portada)
-				&& Objects.equals(titulo, other.titulo)
-				&& Double.doubleToLongBits(valoracionOriginal) == Double.doubleToLongBits(other.valoracionOriginal);
+		return this.id == other.id; 
 	}
 
 	//COMPARAR POR AUTOR

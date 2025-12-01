@@ -102,4 +102,71 @@ public class ReservaDAO {
             pstmt.executeUpdate();
         }
     }
+    
+    public List<Reserva> getReservasActivas() throws SQLException {
+        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario FROM Reserva";
+        List<Reserva> listaReservas = new ArrayList<>();
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int idLibro = rs.getInt("id_libro");
+                int idUser = rs.getInt("id_user");
+                LocalDate fecha = LocalDate.parse(rs.getString("fecha_reserva"));
+                int duracion = rs.getInt("duracion");
+                int prolongaciones = rs.getInt("prolongaciones");
+                double valoracion = rs.getDouble("valoracion_usuario");
+
+                Libro libro = libroDAO.getLibroById(idLibro);
+                User user = userDAO.getUserById(idUser);
+
+                if (libro != null && user != null) {
+                    Reserva reserva = new Reserva(libro, user, fecha);
+                    reserva.setDuracion(duracion);
+                    reserva.setProlongaciones(prolongaciones);
+                    reserva.setValoracionUsuario(valoracion);
+                    listaReservas.add(reserva);
+                }
+            }
+        }
+        return listaReservas;
+    }
+
+    public List<Reserva> getTodasLasReservasActivas() throws SQLException {
+    	String sql = "SELECT id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario " +
+                "FROM Reserva " +
+                "WHERE date('now') <= date(fecha_reserva, '+' || duracion || ' days')";
+
+    	List<Reserva> listaReservas = new ArrayList<>();
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                int idLibro = rs.getInt("id_libro");
+                int idUser = rs.getInt("id_user");
+                LocalDate fecha = LocalDate.parse(rs.getString("fecha_reserva"));
+                int duracion = rs.getInt("duracion");
+                int prolongaciones = rs.getInt("prolongaciones");
+                double valoracion = rs.getDouble("valoracion_usuario");
+                
+                Libro libro = libroDAO.getLibroById(idLibro);
+                User user = userDAO.getUserById(idUser);
+                
+                if (libro != null && user != null) {
+                    Reserva r = new Reserva(libro, user, fecha);
+                    r.setDuracion(duracion);
+                    r.setProlongaciones(prolongaciones);
+                    r.setValoracionUsuario(valoracion);
+                    listaReservas.add(r);
+                }
+            }
+        }
+        return listaReservas;
+    }
+
+
 }

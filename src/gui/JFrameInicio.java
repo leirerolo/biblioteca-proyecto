@@ -3,12 +3,17 @@ package gui;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
+import db.ReservaDAO;
 import domain.Libro;
+import domain.Reserva;
+import domain.User;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,17 +56,28 @@ public class JFrameInicio extends JFramePrincipal {
     
     //método para construir el panel de libros del top 6
     private JPanel crearPanelTopLibros() {
-    	// Top 6 por valoración (descendente)
-        List<Libro> top6 = libros.stream()
-                .sorted((a, b) -> Double.compare(b.getValoracion(), a.getValoracion()))
-                .limit(6)
-                .collect(Collectors.toList());
+    	List<Libro> disponibles = new ArrayList<>();
+    	try {
+    	    ReservaDAO reservaDAO = new ReservaDAO();
+    	    List<Reserva> reservasActivas = reservaDAO.getTodasLasReservasActivas();
+    	    
+    	    disponibles = libros.stream()
+    	        .filter(lib -> reservasActivas.stream()
+    	            .noneMatch(r -> r.getLibro().equals(lib)))
+    	        .sorted((a, b) -> Double.compare(b.getValoracion(), a.getValoracion()))
+    	        .limit(6)
+    	        .collect(Collectors.toList());
+    	    
+    	} catch (SQLException ex) {
+    	    ex.printStackTrace();
+    	}
+
 
         JPanel grid = new JPanel(new GridLayout(0, 3, 16, 16));
         grid.setBackground(Color.WHITE);
         grid.setBorder(new MatteBorder(16, 16, 16, 16, Color.WHITE));
 
-        for (Libro lib : top6) grid.add(buildBookCard(lib));
+        for (Libro lib : disponibles) grid.add(buildBookCard(lib));
 
         JLabel titulo = new JLabel("Mejor valorados", JLabel.LEFT);
         titulo.setFont(fuenteTitulo);
