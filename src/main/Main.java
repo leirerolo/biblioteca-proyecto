@@ -67,13 +67,14 @@ public class Main {
             User u = dlg.getLoggedUser();
             if (u != null) {
                 persistence.AppState state = dlg.getAppState();
-
-                //crear el JFrame principal
                 JFramePrincipal principalFrame = new JFramePrincipal(librosGlobales, "inicio", state);
-                principalFrame.setCurrentUser(u);
-                principalFrame.setVisible(true);
                 
-                Navigator.init(principalFrame, librosGlobales);
+                //crear el JFrame principal
+                JFrameInicio inicioFrame = new JFrameInicio(librosGlobales);
+                principalFrame.setCurrentUser(u);
+                inicioFrame.setVisible(true);
+                
+                Navigator.init(inicioFrame, librosGlobales);
 
                 Navigator.showInicio();
             } else {

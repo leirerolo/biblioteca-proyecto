@@ -85,7 +85,7 @@ public class JFramePrincipal extends JFrame {
                         JOptionPane.QUESTION_MESSAGE
                     );
                     if (opcion == JOptionPane.YES_OPTION) {
-                        System.exit(0); // 🔧 cerrar toda la aplicación
+                        System.exit(0);
                     }
                 }
             }
