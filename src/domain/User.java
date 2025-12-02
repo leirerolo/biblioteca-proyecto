@@ -34,7 +34,7 @@ public class User implements Serializable{
     
     //atributo para cuando el user esté penalizado por haberse pasado de plazo
     private LocalDate penalizacionHasta;
-    
+     
 
     // ya existente
     public User(int id, String nombre, String apellido) {

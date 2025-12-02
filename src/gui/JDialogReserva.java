@@ -126,7 +126,7 @@ public class JDialogReserva extends JDialog {
 		this.setResizable(false);
 		this.setLocationRelativeTo(padre);
 	}
-	
+	 
 	public void actualizarValoracion() {
 	    puntuacion.setText("Valoracion: " + String.format("%.2f", reserva.getLibro().getValoracion()));
 	}

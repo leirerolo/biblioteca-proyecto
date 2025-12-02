@@ -71,6 +71,14 @@ public class JDialogLibro extends JDialog {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);
 			
+			if (user != null && user.estaPenalizado()) {
+		        JOptionPane.showMessageDialog(
+		            this,"No puedes reservar. Penalización activa hasta " + user.getPenalizacionHasta() + ".",
+		            "Penalización activa",JOptionPane.WARNING_MESSAGE
+		        );
+		        return; 
+		    }
+			
 			if (!user.getReservas().contains(nueva)) {
 				user.agregarReserva(nueva);
 				this.dispose();
@@ -82,7 +90,7 @@ public class JDialogLibro extends JDialog {
 					padreFrame.libros.remove(libro);
 				}
 				
-				if (Navigator.inicio != null) {
+				if (Navigator.inicio != null) { 
 					Navigator.inicio.refrescarTopLibros(); // para que desaparezca de inicio
 				}
 				//abro la ventana de reservas con esta ya incluida
