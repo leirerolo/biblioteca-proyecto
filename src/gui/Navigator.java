@@ -1,6 +1,6 @@
 package gui;
 
-import java.awt.Window;
+
 import java.util.List;
 
 import domain.Libro;

@@ -7,6 +7,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
@@ -21,6 +23,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -43,6 +46,7 @@ public class JFrameExplorar extends JFramePrincipal {
 		this.libros = libros;
 		this.inicializarPanelCentral();
 		this.filtrarLibros();
+		
 	}
 	
 	private void inicializarPanelCentral() {
@@ -71,6 +75,25 @@ public class JFrameExplorar extends JFramePrincipal {
 		        }
 		    }
 		});
+		
+		txtFiltro.addKeyListener(new KeyAdapter() {
+		    @Override
+		    public void keyPressed(KeyEvent e) {
+		        if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_E) {
+		            int opcion = JOptionPane.showConfirmDialog(
+		                JFrameExplorar.this,
+		                "¿Seguro que quieres salir?",
+		                "Confirmar salida",
+		                JOptionPane.YES_NO_OPTION,
+		                JOptionPane.QUESTION_MESSAGE
+		            );
+		            if (opcion == JOptionPane.YES_OPTION) {
+		                System.exit(0);
+		            }
+		        }
+		    }
+		});
+		
 		//document listener para el filtro de texto
 		DocumentListener miTxtListener = new DocumentListener() {
 			@Override
@@ -171,11 +194,13 @@ public class JFrameExplorar extends JFramePrincipal {
 	    	Color noSeleccionado = Color.white;
 	    	Color seleccionado = new Color(245, 245, 245);
 	    	
+	    	
 	        for (Libro l : listaLibros) {
 	            JPanel panelLibro = new JPanel(new BorderLayout());
 	            panelLibro.setPreferredSize(new Dimension(800, 160));
 	            panelLibro.setMaximumSize(new Dimension(800, 160));
 	            panelLibro.setAlignmentX(Component.LEFT_ALIGNMENT);
+	            panelLibro.setOpaque(true);
 	            
 	            panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
@@ -188,7 +213,8 @@ public class JFrameExplorar extends JFramePrincipal {
 	            JPanel panelInfo = new JPanel(new GridLayout(3, 1, 0, 10));
 
 	            panelInfo.setBackground(noSeleccionado);
-	            panelInfo.setOpaque(true);
+	            panelInfo.setOpaque(false);
+	            portada.setOpaque(false);
 	            
 	            JLabel titulo = new JLabel(l.getTitulo(), JLabel.LEFT);
 	            titulo.setFont(fuenteTitulo);
@@ -206,7 +232,7 @@ public class JFrameExplorar extends JFramePrincipal {
 
 	            panelLibro.add(panelInfo, BorderLayout.CENTER);
 	            
-	            panelLibro.addMouseListener(new MouseAdapter() {
+	            MouseAdapter hoverListener = new MouseAdapter() {
 	            	//al hacer click, se abre el diálogo de la info del libro
 	                @Override
 	                public void mouseClicked(MouseEvent e) {
@@ -217,8 +243,10 @@ public class JFrameExplorar extends JFramePrincipal {
 	                //al pasar ratón, cambia a formato selección
 	                @Override
 					public void mouseEntered(MouseEvent e) {
+	                	//System.out.println("Mouse dentro de: " + l.getTitulo());
 						panelLibro.setBackground(seleccionado);
                         panelLibro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        panelLibro.repaint();
                         //panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
 					}
 
@@ -227,8 +255,14 @@ public class JFrameExplorar extends JFramePrincipal {
 						panelLibro.setBackground(noSeleccionado);
                         panelLibro.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                        panelLibro.repaint();
 					}
-	            });
+	            };
+	            
+	            panelLibro.addMouseListener(hoverListener);
+	            portada.addMouseListener(hoverListener);
+	            panelInfo.addMouseListener(hoverListener);
+	            
 	            panelLibros.add(panelLibro);
 	        }
 	    }

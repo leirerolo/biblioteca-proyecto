@@ -30,7 +30,7 @@ public class JFrameInicio extends JFramePrincipal {
     	super(libros, "inicio");
         this.libros = libros;
         
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         
         this.inicializarPanelSuperior(); //hereda de JFramePrincipal
@@ -96,7 +96,7 @@ public class JFrameInicio extends JFramePrincipal {
     private JPanel buildBookCard(Libro lib) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
-        card.setBorder(new MatteBorder(1, 1, 1, 1, new Color(230, 230, 230)));
+        card.setBorder(new MatteBorder(1, 1, 1, 1, new Color(240, 240, 240)));
 
         // Portada
         JLabel img = new JLabel();
@@ -137,7 +137,7 @@ public class JFrameInicio extends JFramePrincipal {
 	        public void mouseEntered(MouseEvent e) {
 	            card.setBackground(seleccionado);
 	            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-	            card.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+	            //card.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
 	        }
 
 	        @Override

@@ -13,13 +13,14 @@ import java.sql.SQLException;
 
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import persistence.AppState;
 import db.DBConnection;
 import db.LibroDAO;
 
-public class Main {
+public class Main { 
     public static List<Libro> librosGlobales; // para acceder a ella desde User
 
     private static final transient LibroDAO libroDAO = new LibroDAO();
