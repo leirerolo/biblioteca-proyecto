@@ -6,6 +6,8 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -65,19 +67,43 @@ public class JFramePrincipal extends JFrame {
         this.inicializarPanelSuperior();
         
         this.setTitle("Biblioteca");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setSize(600, 800);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-     
-        //al cerrar, guarda el csv actualizado
-        this.addWindowListener(new WindowAdapter() {
-        	@Override
-        	public void windowClosing(WindowEvent e) {
-        	
-        		System.exit(0); //cierra la app
-        	}
+        
+        //evento de teclado, exit only tras clickar control + e
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_E && e.isControlDown()) {
+                    int opcion = JOptionPane.showConfirmDialog(
+                        JFramePrincipal.this,
+                        "¿Seguro que quieres salir?",
+                        "Confirmar salida",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                    );
+                    if (opcion == JOptionPane.YES_OPTION) {
+                        System.exit(0); // 🔧 cerrar toda la aplicación
+                    }
+                }
+            }
         });
+        
+        this.setFocusable(true);
+        this.requestFocusInWindow();
+        
+// esto no hace nada ???
+//        //al cerrar, guarda el csv actualizado
+//        this.addWindowListener(new WindowAdapter() {
+//        	@Override
+//        	public void windowClosing(WindowEvent e) {
+//        	
+//        		System.exit(0); //cierra la app
+//        	}
+//        });
+        
     }
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva) {
 	    this(libros, ventanaActiva, null); // carga AppState desde disco si viene null
@@ -186,38 +212,6 @@ public class JFramePrincipal extends JFrame {
     }
 
 	// ================== CONTENIDO CENTRAL ==================
-	private void inicializarContenidoCentral() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-        add(mainPanel, BorderLayout.CENTER);
-
-        if ("reservas".equalsIgnoreCase(ventanaActiva)) {
-            // Lista de reservas del usuario actual
-            modeloReservas = new DefaultListModel<>();
-            JList<String> lista = new JList<>(modeloReservas);
-            mainPanel.add(new JScrollPane(lista), BorderLayout.CENTER);
-
-            JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            JButton btnGuardar = new JButton("Guardar app state");
-            btnGuardar.addActionListener(ev -> {
-                if (currentUser != null) {
-                    JOptionPane.showMessageDialog(this, "App state guardado (sin reservas).", "OK", JOptionPane.INFORMATION_MESSAGE);
-                }
-            });
-            south.add(btnGuardar);
-            mainPanel.add(south, BorderLayout.SOUTH);
-            
-            cargarReservasUsuarioEnLista();
-        } else if ("inicio".equalsIgnoreCase(ventanaActiva)) {
-            renderInicioTop6(mainPanel);   // top 6 mejor valorados al iniciar
-        } else { // "explorar" u otros
-            JPanel placeholder = new JPanel(new BorderLayout());
-            JLabel l = new JLabel("Explorar", JLabel.CENTER);
-            l.setFont(new Font("SansSerif", Font.PLAIN, 16));
-            placeholder.add(l, BorderLayout.CENTER);
-            mainPanel.add(placeholder, BorderLayout.CENTER);
-        }
-    }
 
     protected void renderInicioTop6(JPanel mainPanel) {
         if (libros == null || libros.isEmpty()) {

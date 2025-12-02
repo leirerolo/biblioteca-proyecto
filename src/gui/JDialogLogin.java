@@ -35,7 +35,7 @@ public class JDialogLogin extends JDialog {
 
     public JDialogLogin(java.awt.Frame parent) {
         super(parent, "Iniciar sesión", true);
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setResizable(false);
         setSize(360, 220);
         setLocationRelativeTo(parent);
