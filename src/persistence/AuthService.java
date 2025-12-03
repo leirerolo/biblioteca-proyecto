@@ -51,7 +51,7 @@ public class AuthService {
         String hash = sha256(p);
         
       
-        User user = new User(n,a,e.isEmpty() ? null:e, /*avatarPath*/ null, u, hash);
+        User user = new User(n,a,e.isEmpty() ? null:e, /*avatarPath*/ null, u, hash, User.Rol.USER);
                 try {
                     
                     int idGenerado = userDAO.registerUser(user);

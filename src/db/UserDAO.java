@@ -47,7 +47,7 @@ public class UserDAO {
 
 
 public int registerUser(User user) throws SQLException {
-    String sql = "INSERT INTO User(nombre, apellido, email, password, avatar_path, penalizacion_hasta, usuario) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO User(nombre, apellido, email, password, avatar_path, penalizacion_hasta, usuario, rol) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     int idGenerado = -1;
 
     try (Connection con = DBConnection.getConnection();
@@ -58,11 +58,10 @@ public int registerUser(User user) throws SQLException {
         pstmt.setString(3, user.getEmail());
         pstmt.setString(4, user.getPassword());
         pstmt.setString(5, user.getAvatarPath());
-        
-        
-        String penalizacionStr = (user.getPenalizacionHasta() != null) ? user.getPenalizacionHasta().toString() : null;
-        pstmt.setString(6, penalizacionStr);
+        pstmt.setString(6, user.getPenalizacionHasta() != null ? user.getPenalizacionHasta().toString() : null);
         pstmt.setString(7, user.getUsuario());
+        pstmt.setString(8, user.getRol() != null ? user.getRol().name() : "USER");
+        
         int affectedRows = pstmt.executeUpdate(); 
         
         if (affectedRows > 0) {
@@ -84,8 +83,10 @@ private User construirUser(ResultSet rs) throws SQLException {
     String email = rs.getString("email");
     String password = rs.getString("password");
     String avatarPath = rs.getString("avatar_path");
-    String penalizacionStr = rs.getString("penalizacion_hasta");
     String usuarioStr = rs.getString("usuario");
+    String penalizacionStr = rs.getString("penalizacion_hasta");
+    String rolStr = rs.getString("rol");
+    
     
     // Usamos el constructor existente, luego establecemos campos adicionales
     User user = new User(id, nombre, apellido); 
@@ -98,7 +99,15 @@ private User construirUser(ResultSet rs) throws SQLException {
     if (penalizacionStr != null) {
         user.setPenalizacionHasta(LocalDate.parse(penalizacionStr));
     }
-    
+    if (rolStr != null) {
+        try {
+            user.setRol(User.Rol.valueOf(rolStr));
+        } catch (IllegalArgumentException e) {
+            user.setRol(User.Rol.USER);
+        }
+    } else {
+        user.setRol(User.Rol.USER);
+    }
     return user;
 }
 

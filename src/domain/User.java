@@ -36,12 +36,19 @@ public class User implements Serializable{
     private LocalDate penalizacionHasta;
      
 
+    //para la diferenciación de roles: user o admin
+    public enum Rol {
+    	USER, ADMIN
+    }
+    private Rol rol;
+    
     // ya existente
     public User(int id, String nombre, String apellido) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.reservas= new ArrayList<>();
+        this.rol=Rol.USER; //por defecto
     }
 
     //CREA NUEVO
@@ -51,15 +58,15 @@ public class User implements Serializable{
     	this.reservas= new ArrayList<>();
     }
 
-    // OPCIONAL: constructor completo
     public User(int id, String nombre, String apellido, String email, String avatarPath) {
         this(id, nombre, apellido);
         this.email = email;
         this.avatarPath = avatarPath;
+        this.rol=Rol.USER;
         this.reservas= new ArrayList<>();
     }
 
-    public User(String nombre, String apellido, String email, String avatarPath, String usuario, String password) {
+    public User(String nombre, String apellido, String email, String avatarPath, String usuario, String password, Rol rol) {
         this.id = 0; 
         this.nombre = nombre;
         this.apellido = apellido;
@@ -67,6 +74,7 @@ public class User implements Serializable{
         this.avatarPath = avatarPath;
         this.usuario = usuario;
         this.password = password; 
+        this.rol = rol;
         
         this.reservas = new ArrayList<>();
         this.penalizacionHasta = null;
@@ -141,6 +149,12 @@ public class User implements Serializable{
     }
     public static boolean isLoggedIn() { 
     	return LOGGED_IN != null; 
+    }
+    public Rol getRol() { 
+    	return rol; 
+    }
+    public void setRol(Rol rol) { 
+    	this.rol = rol; 
     }
     
     //obtener si el user está penalizado
@@ -260,6 +274,11 @@ public class User implements Serializable{
      
     public boolean guardarCambiosEmailYAvatar() throws SQLException {
         return userDAO.actualizarEmailYAvatar(this);
+    }
+    
+    // *********** ADMIN *******************
+    public boolean isAdmin() {
+    	return "ADMIN".equalsIgnoreCase(rol.toString());
     }
     
 }

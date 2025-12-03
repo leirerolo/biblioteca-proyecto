@@ -71,6 +71,11 @@ public class JDialogLibro extends JDialog {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);
 			
+			//primero actualizamos sus reservas
+			//y aplicamos la penalización si tiene algún atraso
+			user.cargarReservas();
+			user.verificarPenalizacion();
+			
 			if (user != null && user.estaPenalizado()) {
 		        JOptionPane.showMessageDialog(
 		            this,"No puedes reservar. Penalización activa hasta " + user.getPenalizacionHasta() + ".",

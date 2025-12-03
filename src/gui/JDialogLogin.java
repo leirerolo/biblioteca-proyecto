@@ -145,7 +145,7 @@ public class JDialogLogin extends JDialog {
 
     public User getLoggedUser() { return loggedUser; }
 
-    // Pásalo al JFramePrincipal para que pueda persistir otros cambios si hace falta
+    // lo pasamos al JFramePrincipal para que pueda persistir otros cambios si hace falta
     public AppState getAppState() { return state; }
 }
 

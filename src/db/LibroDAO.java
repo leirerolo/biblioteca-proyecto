@@ -112,5 +112,15 @@ public class LibroDAO {
             
         } 
     }
+    //para el admin
+    public void deleteLibro(Libro libro) throws SQLException {
+        String sql = "DELETE FROM Libro WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, libro.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
     
 }

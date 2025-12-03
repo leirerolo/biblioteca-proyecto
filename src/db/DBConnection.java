@@ -44,7 +44,8 @@ public class DBConnection {
                 + " password TEXT NOT NULL,\n"
                 + " avatar_path TEXT,\n"
                 + " usuario TEXT UNIQUE NOT NULL,\n"
-                + " penalizacion_hasta TEXT\n"              
+                + " penalizacion_hasta TEXT\n"      
+                + " role TEXT DEFAULT 'USER'\n"
                 + ");";
 		
 		//tabla reserva

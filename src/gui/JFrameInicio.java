@@ -50,7 +50,8 @@ public class JFrameInicio extends JFramePrincipal {
         }
 	    
 	    //para que se actualice el panel de libros, si se modifican las valoraciones
-	    mainPanel.add(new JScrollPane(crearPanelTopLibros()), BorderLayout.CENTER);
+	    mainPanel.add(crearPanelTopLibros(), BorderLayout.CENTER);
+	    
 	    mainPanel.revalidate();
 	    mainPanel.repaint(); 
     } 
@@ -74,11 +75,13 @@ public class JFrameInicio extends JFramePrincipal {
     	}
 
 
-        JPanel grid = new JPanel(new GridLayout(0, 3, 16, 16));
+        JPanel grid = new JPanel(new GridLayout(0, 3, 12, 12));
         grid.setBackground(Color.WHITE);
         grid.setBorder(new MatteBorder(16, 16, 16, 16, Color.WHITE));
 
-        for (Libro lib : disponibles) grid.add(buildBookCard(lib));
+        for (Libro lib : disponibles) {
+        	grid.add(buildBookCard(lib));
+        }
 
         JLabel titulo = new JLabel("Mejor valorados", JLabel.LEFT);
         titulo.setFont(fuenteTitulo);
@@ -155,7 +158,9 @@ public class JFrameInicio extends JFramePrincipal {
     public void refrescarTopLibros() {
     	if (mainPanel!=null) {
     		mainPanel.removeAll();
-    		mainPanel.add(new JScrollPane(crearPanelTopLibros()), BorderLayout.CENTER);
+    		
+    		mainPanel.add(crearPanelTopLibros(), BorderLayout.CENTER);
+    		
     		mainPanel.revalidate();
     		mainPanel.repaint();
     	}

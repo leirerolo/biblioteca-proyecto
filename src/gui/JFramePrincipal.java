@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.MatteBorder;
 
+import db.LibroDAO;
 import domain.*;
+import domain.User.Rol;
 import main.Main;
 import persistence.AppState;
 import persistence.AppStateStore;
@@ -51,6 +54,9 @@ public class JFramePrincipal extends JFrame {
 	private String ventanaActiva;
 	
 	private DefaultListModel<String> modeloReservas;
+	
+	//para el admin
+	private final LibroDAO libroDAO = new LibroDAO();
 	
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva, AppState state) {
         this.libros = (libros != null) ? libros : new ArrayList<>();
@@ -94,15 +100,6 @@ public class JFramePrincipal extends JFrame {
         this.setFocusable(true);
         this.requestFocusInWindow();
         
-// esto no hace nada ???
-//        //al cerrar, guarda el csv actualizado
-//        this.addWindowListener(new WindowAdapter() {
-//        	@Override
-//        	public void windowClosing(WindowEvent e) {
-//        	
-//        		System.exit(0); //cierra la app
-//        	}
-//        });
         
     }
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva) {
@@ -318,4 +315,23 @@ public class JFramePrincipal extends JFrame {
             otro.setOpaque(false);
         }
     }
+    
+    // ****************** ADMIN ***************************
+ // Añadir libro
+    public void agregarLibro(Libro libro) throws SQLException {
+        if(User.getLoggedIn().getRol() != Rol.ADMIN) return;
+        
+        libroDAO.insertaLibro(libro);
+        this.libros.add(libro);
+        Navigator.inicio.refrescarTopLibros();
+    }
+
+    // Eliminar libro
+    public void eliminarLibro(Libro libro) throws SQLException {
+        if(User.getLoggedIn().getRol() != Rol.ADMIN) return;
+        libroDAO.deleteLibro(libro);
+        this.libros.remove(libro);
+        Navigator.inicio.refrescarTopLibros();
+    }
+
 }
