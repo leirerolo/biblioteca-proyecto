@@ -2,6 +2,7 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -44,8 +45,8 @@ public class DBConnection {
                 + " password TEXT NOT NULL,\n"
                 + " avatar_path TEXT,\n"
                 + " usuario TEXT UNIQUE NOT NULL,\n"
-                + " penalizacion_hasta TEXT\n"      
-                + " role TEXT DEFAULT 'USER'\n"
+                + " penalizacion_hasta TEXT,\n"  
+                + " rol TEXT\n"
                 + ");";
 		
 		//tabla reserva
@@ -66,6 +67,29 @@ public class DBConnection {
 	            stmt.execute(sqlLibro); 
 	            stmt.execute(sqlUser);
 	            stmt.execute(sqlReserva);
+	            
+	            /*//como hemos creado roles después de haber creado la tabla,
+	            //no se ha actualizado la nueva columna
+	            
+	            //comprobar si existe
+	            boolean rolExiste = false;
+	            //AYUDA DE IA
+	            try (ResultSet rs = stmt.executeQuery("PRAGMA tabla_info(User);")) {
+	            	while (rs.next()) {
+	            		if ("rol".equalsIgnoreCase(rs.getString("name"))) {
+	            			rolExiste = true;
+	            			break;
+	            		}
+	            	}
+	            }
+	            
+	            //si no existe, añadimos la columna
+	            if (!rolExiste) {
+	            	stmt.execute("ALTER TABLE User ADD COLUMN rol TEXT DEFAULT 'USER';");
+	            	System.out.println("Columna 'rol' añadida a la tabla User.");
+
+	            }*/
+	            
 	            System.out.println("Tablas de la base de datos verificadas/creadas con éxito.");
 
 	        } catch (SQLException e) {

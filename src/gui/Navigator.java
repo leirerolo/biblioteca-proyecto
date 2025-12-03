@@ -11,11 +11,13 @@ public class Navigator {
 	protected static JFrameExplorar explorar;
 	protected static JFrameReservas reservas;
 	protected static JFramePrincipal principal;
+	protected static JFrameAdmin admin;
 	
 	public static void init(JFramePrincipal principalFrame, List<Libro> libros) {
         inicio = new JFrameInicio(libros);
         explorar = new JFrameExplorar(libros);
         reservas = new JFrameReservas(principalFrame, libros);
+        admin = new JFrameAdmin(libros);
     }
 	
 	public static void showInicio() {
@@ -36,12 +38,18 @@ public class Navigator {
 		hideAll();
 		explorar.setVisible(true);
 	}
+	// ************* ADMIN *************************
+	public static void showAdmin() {
+		hideAll();
+		if (admin != null) admin.setVisible(true);
+	}
 	
 	private static void hideAll() {
 		if (inicio != null) inicio.setVisible(false);
         if (explorar != null) explorar.setVisible(false);
         if (reservas != null) reservas.setVisible(false);
         if (principal != null) principal.setVisible(false);
+        if (admin != null) admin.setVisible(false);
 	}
 
 }

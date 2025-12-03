@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import persistence.AppState;
+import persistence.AuthService;
 import db.DBConnection;
 import db.LibroDAO;
 import db.UserDAO;
@@ -34,12 +35,33 @@ public class Main {
     	//el usuario administrador lo predefinimos
     	//será siempre este, y cuando se haga loggin con sus datos, se entrará como administrador a la app
     	UserDAO user = new UserDAO();
-    	User admin = new User("Admin", "Root", "admin@lib.com", null, "admin", "1234", Rol.ADMIN);
+    	String hash = AuthService.sha256("1234"); // para la contraseña
+    	
     	try {
-    		user.registerUser(admin);
-    	} catch(SQLException e) {
-    		e.printStackTrace();
+    	    // Comprobar si existe
+    	    User adminExistente = user.getUserByUsuario("administrador");
+
+    	    // si no existe, crearlo
+    	    if (adminExistente == null) {
+    	        User admin = new User(
+    	            "Admin", "Root",
+    	            "administrador@lib.com",
+    	            null,
+    	            "administrador",
+    	            hash,
+    	            Rol.ADMIN
+    	        );
+    	        user.registerUser(admin);
+    	        System.out.println("Administrador creado");
+    	    } else {
+    	        System.out.println("Administrador ya existe, no se vuelve a insertar.");
+    	    }
+
+    	} catch (SQLException e) {
+    	    e.printStackTrace();
     	}
+    	
+    
     	
     	List<Libro> libros = new ArrayList<>();
     	try {
@@ -86,21 +108,20 @@ public class Main {
                 
                 // ******************* ADMINISTRADOR ***********************
                 // abre su ventana de administrador
-                /*if (u.getRol() == Rol.ADMIN) {
+                if (u.getRol() == Rol.ADMIN) {
                 	JFrameAdmin adminFrame = new JFrameAdmin(librosGlobales);
                 	adminFrame.setVisible(true);
-                	Navigator.init(adminFrame, librosGlobales);
                 	Navigator.showAdmin();
                 	
                 	
                 // **************** USER NORMAL *****************************
                 //Abre inicio
-                } else {*/
+                } else {
                 	JFrameInicio inicioFrame = new JFrameInicio(librosGlobales);
                 	inicioFrame.setVisible(true);
                 	Navigator.init(inicioFrame, librosGlobales);
                 	Navigator.showInicio();
-                //}
+                }
                 
             } else {
                 System.out.println("Login cancelado. Cerrando aplicación.");
