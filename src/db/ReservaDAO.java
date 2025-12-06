@@ -7,7 +7,10 @@ import domain.User;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReservaDAO {
     
@@ -167,6 +170,43 @@ public class ReservaDAO {
         }
         return listaReservas;
     }
+
+    public List<Object[]> getLibrosMasReservados(int limite) throws SQLException {
+        String sql = 
+            "SELECT l.id, COUNT(r.id) AS reservas " +
+            "FROM Libro l " +
+            "JOIN Reserva r ON l.id = r.id_libro " +
+            "GROUP BY l.id " +
+            "HAVING reservas > 0 " +
+            "ORDER BY reservas DESC " +
+            "LIMIT ?";
+        
+        //hará las veces de mapa con la estructura: 
+        //libro reservado, veces que ha sido reservado
+        List<Object[]> lista = new ArrayList<>();
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            stmt.setInt(1, limite);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int idLibro = rs.getInt("id");
+                    int numReservas = rs.getInt("reservas");
+
+                    Libro libro = new LibroDAO().getLibroById(idLibro);  
+                    if (libro != null) {
+                        lista.add(new Object[] {
+                        		libro, numReservas
+                        });
+                    }
+                }
+            }
+        }
+        return lista;
+    }
+
 
 
 }

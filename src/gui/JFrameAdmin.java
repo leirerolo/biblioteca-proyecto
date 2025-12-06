@@ -144,9 +144,10 @@ public class JFrameAdmin extends JFrame {
 
     private void mostrarMasReservados() {
         panelCentral.removeAll();
-        JLabel l = new JLabel("Top 6 Libros más Reservados", JLabel.CENTER);
-        l.setFont(fuenteTitulo);
-        panelCentral.add(l, BorderLayout.CENTER);
+        
+        PanelMasReservados panelMasReservados = new PanelMasReservados();
+        panelCentral.add(panelMasReservados, BorderLayout.CENTER);
+        
         panelCentral.revalidate();
         panelCentral.repaint();
         resaltarMenu(lblMasReservados);
