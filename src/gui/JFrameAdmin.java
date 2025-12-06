@@ -133,9 +133,10 @@ public class JFrameAdmin extends JFrame {
 	// ******************** SUBVENTANAS ****************************
 	private void mostrarUsuarios() {
         panelCentral.removeAll();
-        JLabel l = new JLabel("Panel Usuarios (JTable aquí)", JLabel.CENTER);
-        l.setFont(fuenteTitulo);
-        panelCentral.add(l, BorderLayout.CENTER);
+        
+        PanelUsers panelUsers = new PanelUsers();
+        panelCentral.add(panelUsers, BorderLayout.CENTER);
+        
         panelCentral.revalidate();
         panelCentral.repaint();
         resaltarMenu(lblUsuarios);

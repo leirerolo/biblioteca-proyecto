@@ -3,10 +3,12 @@ package db;
 import domain.User;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
 	public User getUserById(int id) throws SQLException {
-        String sql = "SELECT id, nombre, apellido, email, password, avatar_path, usuario, penalizacion_hasta FROM User WHERE id = ?";
+        String sql = "SELECT id, nombre, apellido, email, password, avatar_path, usuario, penalizacion_hasta, rol FROM User WHERE id = ?";
         User user = null;
 
         try (Connection con = DBConnection.getConnection();
@@ -15,7 +17,7 @@ public class UserDAO {
             pstmt.setInt(1, id); 
             
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) { // Solo esperamos un resultado 
+                if (rs.next()) {
                     user = construirUser(rs);
                 }
             }
@@ -185,9 +187,9 @@ public class UserDAO {
 	            if (rs.next()) {
 	                User user = new User(
 	                    rs.getString("nombre"),
-	                    rs.getString("apellidos"),
-	                    rs.getString("correo"),
-	                    rs.getString("telefono"),
+	                    rs.getString("apellido"),
+	                    rs.getString("email"),
+	                    rs.getString("avatar_path"),
 	                    rs.getString("usuario"),
 	                    rs.getString("password"),
 	                    User.Rol.valueOf(rs.getString("rol"))
@@ -199,5 +201,47 @@ public class UserDAO {
 
 	    return null; // si no existe
 	}
+	
+	public List<User> getTodosLosUsuarios() throws SQLException {
+        List<User> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM User";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getString("apellido")
+                );
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setUsuario(rs.getString("usuario"));
+                user.setAvatarPath(rs.getString("avatar_path"));
+
+                String penalizacionStr = rs.getString("penalizacion_hasta");
+                if (penalizacionStr != null) {
+                    user.setPenalizacionHasta(LocalDate.parse(penalizacionStr));
+                }
+
+                String rolStr = rs.getString("rol");
+                if (rolStr != null) {
+                    try {
+                        user.setRol(User.Rol.valueOf(rolStr));
+                    } catch (IllegalArgumentException e) {
+                        user.setRol(User.Rol.USER);
+                    }
+                } else {
+                    user.setRol(User.Rol.USER);
+                }
+
+                usuarios.add(user);
+            }
+        }
+
+        return usuarios;
+    }
 
 }
