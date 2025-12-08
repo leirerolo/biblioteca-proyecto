@@ -193,5 +193,43 @@ public class LibroDAO {
             }
         }
     }
+    
+    
+    public List<Libro> getLibrosDisponibles(List<Libro> todosLibros) throws SQLException {
+        List<Libro> disponibles = new ArrayList<>();
+        
+        String sql = "SELECT l.id " +
+                     "FROM Libro l " +
+                     "LEFT JOIN Reserva r ON l.id = r.id_libro AND r.devuelto = 0 " +
+                     "WHERE r.id IS NULL"; // solo los libros sin reserva activa
 
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+
+                // Buscar el libro original en la lista para mantener portada y demás datos
+                for (Libro l : todosLibros) {
+                    if (l.getId() == id) {
+                        disponibles.add(l);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return disponibles;
+    }
+
+    //Para que el admin pueda eliminar libros de la aplicación
+    public void eliminarLibro(Libro libro) throws SQLException {
+        String sql = "DELETE FROM Libro WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, libro.getId());
+            pstmt.executeUpdate();
+        }
+    }
 }

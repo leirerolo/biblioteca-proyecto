@@ -166,9 +166,10 @@ public class JFrameAdmin extends JFrame {
 
     private void mostrarGestionLibros() {
         panelCentral.removeAll();
-        JLabel l = new JLabel("Añadir / Eliminar Libros", JLabel.CENTER);
-        l.setFont(fuenteTitulo);
-        panelCentral.add(l, BorderLayout.CENTER);
+        
+        PanelGestionLibros panelGestion = new PanelGestionLibros(libros);
+        panelCentral.add(panelGestion, BorderLayout.CENTER);
+
         panelCentral.revalidate();
         panelCentral.repaint();
         resaltarMenu(lblGestionLibros);
