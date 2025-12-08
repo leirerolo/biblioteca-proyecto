@@ -21,8 +21,8 @@ public class ReservaDAO {
      * Inserta una nueva reserva en la base de datos.
      */
     public void insertaReserva(Reserva reserva) throws SQLException {
-        String sql = "INSERT INTO Reserva(id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Reserva(id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario, devuelto) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) { 
@@ -35,6 +35,7 @@ public class ReservaDAO {
             pstmt.setInt(4, reserva.getDuracion());
             pstmt.setInt(5, reserva.getProlongaciones());
             pstmt.setDouble(6, reserva.getValoracionUsuario());
+            pstmt.setInt(7, reserva.isDevuelto() ? 1 : 0);
             
             pstmt.executeUpdate();
         } 
@@ -42,7 +43,7 @@ public class ReservaDAO {
     
 
     public List<Reserva> getReservasByUser(User user) throws SQLException {
-        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario FROM Reserva WHERE id_user = ?";
+        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario, devuelto FROM Reserva WHERE id_user = ? AND devuelto = 0";
         List<Reserva> listaReservas = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
@@ -68,6 +69,8 @@ public class ReservaDAO {
                         reserva.setDuracion(duracion);
                         reserva.setProlongaciones(prolongaciones);
                         reserva.setValoracionUsuario(valoracion);
+                        reserva.setDevuelto(rs.getInt("devuelto") == 1);
+                        
                         listaReservas.add(reserva);
                     }
                 }
@@ -106,8 +109,19 @@ public class ReservaDAO {
         }
     }
     
+    public void marcarComoDevuelto(Reserva reserva) throws SQLException {
+        String sql = "UPDATE Reserva SET devuelto = 1 WHERE id_libro = ? AND id_user = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, reserva.getLibro().getId());
+            pstmt.setInt(2, reserva.getUser().getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    
     public List<Reserva> getReservasActivas() throws SQLException {
-        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario FROM Reserva";
+        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario FROM Reserva WHERE devuelto = 0";
         List<Reserva> listaReservas = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
@@ -140,7 +154,7 @@ public class ReservaDAO {
     public List<Reserva> getTodasLasReservasActivas() throws SQLException {
     	String sql = "SELECT id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario " +
                 "FROM Reserva " +
-                "WHERE date('now') <= date(fecha_reserva, '+' || duracion || ' days')";
+                "WHERE devuelto = 0 AND date('now') <= date(fecha_reserva, '+' || duracion || ' days')";
 
     	List<Reserva> listaReservas = new ArrayList<>();
         
@@ -181,8 +195,6 @@ public class ReservaDAO {
             "ORDER BY reservas DESC " +
             "LIMIT ?";
         
-        //hará las veces de mapa con la estructura: 
-        //libro reservado, veces que ha sido reservado
         List<Object[]> lista = new ArrayList<>();
         
         try (Connection con = DBConnection.getConnection();
@@ -197,9 +209,7 @@ public class ReservaDAO {
 
                     Libro libro = new LibroDAO().getLibroById(idLibro);  
                     if (libro != null) {
-                        lista.add(new Object[] {
-                        		libro, numReservas
-                        });
+                        lista.add(new Object[] { libro, numReservas });
                     }
                 }
             }

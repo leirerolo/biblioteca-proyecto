@@ -58,15 +58,29 @@ public class DBConnection {
                 + " duracion INTEGER NOT NULL,\n"             
                 + " prolongaciones INTEGER NOT NULL,\n"
                 + " valoracion_usuario REAL DEFAULT 0.0,\n"  
+                + "devuelto INTEGER DEFAULT 0,\n"
                 + " FOREIGN KEY (id_libro) REFERENCES Libro(id),\n"
                 + " FOREIGN KEY (id_user) REFERENCES User(id)\n"
                 + ");";
+		
+		
+		//tabla valoración
+		String sqlValoracion = "CREATE TABLE IF NOT EXISTS Valoracion (\n"
+				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+				+ "codigoLibro INTEGER NOT NULL,\n"
+			    + "puntuacion REAL NOT NULL,\n"
+			    + "usuario TEXT,\n"
+			    + "FOREIGN KEY (codigoLibro) REFERENCES Libro(id)\n"
+			    + ");";
+		
+		
 		try (Connection con = getConnection();
 	             Statement stmt = con.createStatement()) { 
 	            
 	            stmt.execute(sqlLibro); 
 	            stmt.execute(sqlUser);
 	            stmt.execute(sqlReserva);
+	            stmt.execute(sqlValoracion);
 	            
 	            /*//como hemos creado roles después de haber creado la tabla,
 	            //no se ha actualizado la nueva columna
@@ -96,5 +110,9 @@ public class DBConnection {
 	            System.err.println("Error al crear las tablas: " + e.getMessage());
 	        }
 	    
+		
+		
+			    
+			
 	}
 }

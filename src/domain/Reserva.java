@@ -13,6 +13,7 @@ public class Reserva implements Serializable{
 	private int duracion; //en días
 	private int prolongaciones;
 	private User user;
+	private boolean devuelto = false; //por defecto, al crear la reserva no está devuelta
 	
 	private double valoracionUsuario;
 	
@@ -86,6 +87,14 @@ public class Reserva implements Serializable{
 	 public void setValoracionUsuario(double valoracionUsuario) {
 		 this.valoracionUsuario = valoracionUsuario;
 	 }
+	 
+	public boolean isDevuelto() {
+		return devuelto;
+	}
+
+	public void setDevuelto(boolean devuelto) {
+		this.devuelto = devuelto;
+	}
 
 	//método para prolongar la reserva
 	public void prolongar() {

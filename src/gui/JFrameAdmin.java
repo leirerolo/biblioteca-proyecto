@@ -155,9 +155,10 @@ public class JFrameAdmin extends JFrame {
 
     private void mostrarPeorValorados() {
         panelCentral.removeAll();
-        JLabel l = new JLabel("Top 6 Libros Peor Valorados", JLabel.CENTER);
-        l.setFont(fuenteTitulo);
-        panelCentral.add(l, BorderLayout.CENTER);
+        
+        PanelPeorValorados panel = new PanelPeorValorados();
+        panelCentral.add(panel, BorderLayout.CENTER);
+        
         panelCentral.revalidate();
         panelCentral.repaint();
         resaltarMenu(lblPeorValorados);

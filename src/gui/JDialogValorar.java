@@ -15,6 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import db.LibroDAO;
+import db.ValoracionDAO;
 import domain.Libro;
 import domain.Reserva;
 import domain.User;
@@ -93,6 +95,15 @@ public class JDialogValorar extends JDialog{
                 
                 // 2. Persistir en la BD: Llama a User.actualizarReserva(), que maneja la BD.
                 currentUser.actualizarReserva(reserva); 
+                
+                //guardar también en la tabla de valoraciones
+                ValoracionDAO valoracionDAO = new ValoracionDAO();
+                valoracionDAO.insertaVal(reserva.getLibro().getId(), nuevaValoracion, currentUser.getUsuario());
+                
+                //actualizar también la media de valoraciones y el número en la tabla libro
+                LibroDAO libroDAO = new LibroDAO();
+                libroDAO.actualizarValoracionMedia(reserva.getLibro().getId());
+                
                 
                 JOptionPane.showMessageDialog(this, 
                         "¡Gracias por valorar!\nValoración personal guardada: " + String.format("%.1f", nuevaValoracion) +

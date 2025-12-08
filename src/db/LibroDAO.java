@@ -123,4 +123,75 @@ public class LibroDAO {
             pstmt.executeUpdate();
         }
     }
+    
+    public List<Object[]> getLibrosPeorValorados(int limite) throws SQLException {
+        String sql =
+            "SELECT l.id, l.titulo, l.autor, l.valoracion_original, l.valoracion_media, " +
+            "       l.num_valoraciones, l.portada_path, AVG(v.puntuacion) AS media " +
+            "FROM Libro l " +
+            "JOIN Valoracion v ON l.id = v.codigoLibro " + 
+            "GROUP BY l.id " +
+            "ORDER BY media ASC " +
+            "LIMIT ?";
+
+        List<Object[]> lista = new ArrayList<>();
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, limite);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+
+                    // Construir libro igual que en tu DAO
+                    int id = rs.getInt("id");
+                    String titulo = rs.getString("titulo");
+                    String autor = rs.getString("autor");
+                    double valOriginal = rs.getDouble("valoracion_original");
+                    double valMediaGuardada = rs.getDouble("valoracion_media");
+                    int numVal = rs.getInt("num_valoraciones");
+                    String path = rs.getString("portada_path");
+
+                    Libro libro = new Libro(id, titulo, autor, valOriginal, path);
+                    libro.setValoracion(valMediaGuardada);
+                    libro.setNumValoraciones(numVal);
+
+                    double mediaCalculada = rs.getDouble("media");
+
+                    lista.add(new Object[] { libro, mediaCalculada });
+                }
+            }
+        }
+        System.out.println(lista);
+        return lista;
+    }
+
+    
+    public void actualizarValoracionMedia(int idLibro) throws SQLException {
+        String sql = "SELECT AVG(puntuacion) AS media, COUNT(*) AS num " +
+                     "FROM Valoracion WHERE codigoLibro = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idLibro);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    double media = rs.getDouble("media");
+                    int numVal = rs.getInt("num");
+
+                    String updateSql = "UPDATE Libro SET valoracion_media = ?, num_valoraciones = ? WHERE id = ?";
+                    try (PreparedStatement psUpdate = con.prepareStatement(updateSql)) {
+                        psUpdate.setDouble(1, media);
+                        psUpdate.setInt(2, numVal);
+                        psUpdate.setInt(3, idLibro);
+                        psUpdate.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
 }

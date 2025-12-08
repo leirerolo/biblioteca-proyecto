@@ -321,13 +321,13 @@ public class JFrameReservas extends JFramePrincipal{
         			seleccionada, user, panelIzq, panelCen, panelDer,
         			progressBar, () -> { //al terminar el hilo:
         				
-        				//borrar la reserva de la bd
+        				//marcar como libro devuelto en la base de datos
         				ReservaDAO reservaDAO = new ReservaDAO();
         				try {
-        					reservaDAO.eliminaReserva(seleccionada);
-        				} catch(Exception ex) {
-        					ex.printStackTrace();
-        				}
+							reservaDAO.marcarComoDevuelto(seleccionada);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
         				
         				//quitar de la lista de reservas
         				listaReservas.remove(seleccionada);
@@ -393,8 +393,14 @@ public class JFrameReservas extends JFramePrincipal{
 	public void actualizarReservas() {
 		listaReservas.clear();
 		
-        List<Reserva> reservas = (this.user.getReservas() != null) ? this.user.getReservas() : new ArrayList<>();
-        listaReservas.addAll(reservas);
+		List<Reserva> reservas = (this.user.getReservas() != null) ? this.user.getReservas() : new ArrayList<>();
+		for (Reserva r : reservas) {
+		    if (!r.isDevuelto()) {  // <-- solo las activas
+		        listaReservas.add(r);
+		    }
+		}
+		
+        
         CardLayout cl = (CardLayout) (panelTableContainer.getLayout());
 
         if (!listaReservas.isEmpty()) {
