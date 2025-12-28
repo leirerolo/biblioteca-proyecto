@@ -51,6 +51,7 @@ public class JFrameReservas extends JFramePrincipal{
 	private JFramePrincipal mainFrame;
 	//para la devolucion
 	private JButton btnDevolver;
+	private JButton btnHistorial;
 	private JProgressBar progressBar;
 	private JPanel panelIzq;
 	private JPanel panelCen;
@@ -262,6 +263,12 @@ public class JFrameReservas extends JFramePrincipal{
         
         //botón para la devolución
         btnDevolver = new JButton("Devolver préstamo");
+        btnHistorial = new JButton("Ver historial");
+        btnHistorial.setBackground(new Color(230, 230, 250));
+        btnHistorial.addActionListener(e -> {
+            JDialogHistorialReservas dlg = new JDialogHistorialReservas(this, user);
+            dlg.setVisible(true);
+        });
         btnDevolver.setEnabled(false);//está deshabilitado hasta que se seleccione un préstamo
         
         panelDevolucion = new JPanel(new BorderLayout());
@@ -269,7 +276,11 @@ public class JFrameReservas extends JFramePrincipal{
         panelDevolucion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panelDevolucion.setOpaque(true);
 
-        panelDevolucion.add(btnDevolver);
+        JPanel panelBotones = new JPanel(new GridLayout(1,2,10,0));
+        panelBotones.setBackground(Color.WHITE);
+        panelBotones.add(btnDevolver);
+        panelBotones.add(btnHistorial);
+        panelDevolucion.add(panelBotones, BorderLayout.CENTER);
         
         
            
@@ -418,3 +429,4 @@ public class JFrameReservas extends JFramePrincipal{
 		this.repaint();
 	}
 }
+

@@ -67,7 +67,7 @@ public class AuthService {
                     if (ex.getMessage().contains("UNIQUE constraint failed") || ex.getMessage().contains("SQLITE_CONSTRAINT")) { 
                          throw new IllegalArgumentException("El usuario/correo ya esta en uso.");
                     }
-                    throw new RuntimeException("Unkown error in the data base " + ex.getMessage(), ex);
+					throw new RuntimeException("Error inesperado en la base de datos: " + ex.getMessage(), ex);
                 }
             }
 
@@ -86,7 +86,7 @@ public class AuthService {
 			return Optional.ofNullable(user);
 			
 		} catch (SQLException e) {
-			System.err.println("Eroare la logare din BD: " + e.getMessage());
+			System.err.println("Error al iniciar sesión contra la BD: " + e.getMessage());
 			return Optional.empty();
 		}
 	}

@@ -9,6 +9,7 @@ import java.util.List;
 import db.LibroDAO;
 import db.ReservaDAO; 
 import db.UserDAO; 
+import db.FavoritoDAO;
 import java.sql.SQLException; 
 
 import javax.swing.JOptionPane;
@@ -21,6 +22,8 @@ public class User implements Serializable{
 	private final transient ReservaDAO reservaDAO = new ReservaDAO();
 	private final transient UserDAO userDAO = new UserDAO();
 	private final transient LibroDAO libroDAO = new LibroDAO();
+	private final transient FavoritoDAO favoritoDAO = new FavoritoDAO();
+
 	
     private int id;
     private String nombre;
@@ -216,8 +219,8 @@ public class User implements Serializable{
             return dao.login(email, password); 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, 
-                "Eroare la conectarea la baza de date: " + e.getMessage(), 
-                "Eroare BD", JOptionPane.ERROR_MESSAGE);
+	            "Error al conectar con la base de datos: " + e.getMessage(), 
+	            "Error BD", JOptionPane.ERROR_MESSAGE);
             return null;
         }
     }
@@ -276,6 +279,56 @@ public class User implements Serializable{
         return userDAO.actualizarEmailYAvatar(this);
     }
     
+
+    // ==================== FAVORITOS ====================
+    public boolean esFavorito(Libro libro) {
+        try {
+            return favoritoDAO.esFavorito(this, libro);
+        } catch (SQLException e) {
+            System.err.println("Error al comprobar favorito: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Alterna favorito: si ya lo era, lo elimina; si no, lo añade.
+     * @return true si queda como favorito tras la operación.
+     */
+    public boolean toggleFavorito(Libro libro) {
+        try {
+            boolean ya = favoritoDAO.esFavorito(this, libro);
+            if (ya) {
+                favoritoDAO.removeFavorito(this, libro);
+                return false;
+            } else {
+                favoritoDAO.addFavorito(this, libro);
+                return true;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Error al guardar favorito en la base de datos: " + e.getMessage(),
+                    "Error BD", JOptionPane.ERROR_MESSAGE);
+            return esFavorito(libro);
+        }
+    }
+
+    public List<Libro> cargarFavoritos() {
+        try {
+            return favoritoDAO.getFavoritosByUser(this);
+        } catch (SQLException e) {
+            System.err.println("Error al cargar favoritos: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public int contarFavoritos() {
+        try {
+            return favoritoDAO.countFavoritos(this);
+        } catch (SQLException e) {
+            return 0;
+        }
+    }
+
     // *********** ADMIN *******************
     public boolean isAdmin() {
     	return "ADMIN".equalsIgnoreCase(rol.toString());

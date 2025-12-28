@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import persistence.AppState;
 import persistence.AuthService;
@@ -29,6 +30,18 @@ public class Main {
     private static final transient LibroDAO libroDAO = new LibroDAO();
     
     public static void main(String[] args) {
+		// Mejor apariencia por defecto
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception ignore) {
+			// si falla, Swing usará el L&F por defecto
+		}
+
     	DBConnection.createTables();
     	
     	// *************** ADMIN **************************
@@ -178,5 +191,7 @@ public class Main {
     //para la persistencia de valoraciones
     
     }
+
+
 
 

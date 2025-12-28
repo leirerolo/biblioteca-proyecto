@@ -69,12 +69,23 @@ public class JFramePerfil extends JFrame {
         JButton btnEditar = new JButton("Editar");
         btnEditar.addActionListener(e -> editarPerfil());
 
+        JButton btnFavoritos = new JButton("Mis favoritos");
+        btnFavoritos.addActionListener(e -> {
+            JFrameFavoritos favWin = new JFrameFavoritos(user);
+            favWin.setVisible(true);
+        });
+
         JPanel right = new JPanel(new BorderLayout(8,8));
         right.add(datos, BorderLayout.CENTER);
 
         root.add(lblAvatar, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
-        root.add(btnEditar, BorderLayout.SOUTH);
+        JPanel panelBotones = new JPanel(new GridLayout(1,2,10,0));
+        panelBotones.setBackground(Color.WHITE);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnFavoritos);
+        root.add(panelBotones, BorderLayout.SOUTH);
         root.setBackground(Color.WHITE);
         root.setOpaque(true);
         setContentPane(root);

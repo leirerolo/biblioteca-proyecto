@@ -60,13 +60,42 @@ public class JDialogLibro extends JDialog {
 		cerrar.setBackground(Color.RED);
 		JButton reservar = new JButton("Reservar");
 		reservar.setBackground(Color.GREEN);
+		
+		JButton btnFavorito = new JButton("⭐ Favorito");
+		btnFavorito.setBackground(new Color(255, 230, 150));
+		
 		panelBotones.add(cerrar);
+		panelBotones.add(btnFavorito);
 		panelBotones.add(reservar);
 		
 		//COMPORTAMIENTO DE LOS BOTONES
 		cerrar.addActionListener((e) -> {
 			this.dispose();
 		});
+		
+		// Favoritos (requiere sesión)
+		User uFav = User.getLoggedIn();
+		if (uFav == null) {
+			btnFavorito.setEnabled(false);
+			btnFavorito.setToolTipText("Inicia sesión para usar favoritos");
+		} else {
+			boolean esFav = uFav.esFavorito(libro);
+			btnFavorito.setText(esFav ? "★ Quitar favorito" : "⭐ Añadir favorito");
+		}
+		
+		btnFavorito.addActionListener(ev -> {
+			User u = User.getLoggedIn();
+			if (u == null) {
+				JOptionPane.showMessageDialog(this, "Inicia sesión para usar favoritos.", "Favoritos", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			boolean ahora = u.toggleFavorito(libro);
+			btnFavorito.setText(ahora ? "★ Quitar favorito" : "⭐ Añadir favorito");
+			JOptionPane.showMessageDialog(this,
+				ahora ? "Añadido a favoritos." : "Eliminado de favoritos.",
+				"Favoritos", JOptionPane.INFORMATION_MESSAGE);
+		});
+
 		reservar.addActionListener((e) -> {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
 			Reserva nueva = new Reserva(libro, user);

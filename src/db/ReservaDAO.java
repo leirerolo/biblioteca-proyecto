@@ -80,6 +80,46 @@ public class ReservaDAO {
     }
     
 
+    /**
+     * Devuelve el historial de reservas (las que ya están marcadas como devueltas).
+     */
+    public List<Reserva> getHistorialReservasByUser(User user) throws SQLException {
+        String sql = "SELECT id, id_libro, id_user, fecha_reserva, duracion, prolongaciones, valoracion_usuario, devuelto " +
+                     "FROM Reserva WHERE id_user = ? AND devuelto = 1 ORDER BY date(fecha_reserva) DESC";
+        List<Reserva> lista = new ArrayList<>();
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+
+            pstmt.setInt(1, user.getId());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int idLibro = rs.getInt("id_libro");
+                    int idUser = rs.getInt("id_user");
+                    LocalDate fecha = LocalDate.parse(rs.getString("fecha_reserva"));
+                    int duracion = rs.getInt("duracion");
+                    int prolongaciones = rs.getInt("prolongaciones");
+                    double valoracion = rs.getDouble("valoracion_usuario");
+
+                    Libro libro = libroDAO.getLibroById(idLibro);
+                    User reservador = userDAO.getUserById(idUser);
+
+                    if (libro != null && reservador != null) {
+                        Reserva reserva = new Reserva(libro, reservador, fecha);
+                        reserva.setDuracion(duracion);
+                        reserva.setProlongaciones(prolongaciones);
+                        reserva.setValoracionUsuario(valoracion);
+                        reserva.setDevuelto(true);
+                        lista.add(reserva);
+                    }
+                }
+            }
+        }
+        return lista;
+    }
+
+
     public void actualizaReserva(Reserva reserva) throws SQLException {
         String sql = "UPDATE Reserva SET duracion = ?, prolongaciones = ?, valoracion_usuario = ? WHERE id_libro = ? AND id_user = ?";
         
