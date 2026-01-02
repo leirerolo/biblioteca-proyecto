@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -18,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import domain.User;
@@ -31,9 +34,6 @@ public class JDialogLogin extends JDialog {
 
     private JComboBox<String> cbUsuarios;
     private JPasswordField pfPassword;
-
-
-
 
     private User loggedUser = null;
 
@@ -49,6 +49,8 @@ public class JDialogLogin extends JDialog {
 
         this.state = AppStateStore.load();
         this.auth  = new AuthService(state);
+        
+        
 
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(14, 14, 14, 14));
@@ -68,6 +70,7 @@ public class JDialogLogin extends JDialog {
         cbUsuarios.setEditable(true); 
         cbUsuarios.setBounds(120, 40, 214, 24); 
         contentPanel.add(cbUsuarios);
+        
         if (state.getSavedCredentials().isEmpty()) { 
         	cbUsuarios.addItem("No hay usuarios guardados"); 
         	cbUsuarios.setSelectedItem(""); 
@@ -129,15 +132,29 @@ public class JDialogLogin extends JDialog {
             pfPassword.setText("");
         });
         
-        cbUsuarios.addActionListener(e -> {
-            if (!cbUsuarios.isPopupVisible()) return; // Solo si el usuario abrió el menú
+     // Listener para menú contextual "Olvidar usuario"
+        MouseAdapter popupListener = new MouseAdapter() {
 
-            String user = (String) cbUsuarios.getSelectedItem();
-            if (user == null || user.equals("No hay usuarios guardados")) return;
+            private void mostrarMenu(MouseEvent e) {
+                String user = (String) cbUsuarios.getSelectedItem();
+                if (user == null || user.equals("No hay usuarios guardados")) return;
 
-            // Mostrar menú justo debajo del combo
-            menuOlvidar.show(cbUsuarios, 0, cbUsuarios.getHeight());
-        });
+                // Mostrar el menú sobre el componente donde se hizo clic
+                menuOlvidar.show(e.getComponent(), e.getX(), e.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                // Usamos botón derecho directamente, sin depender de isPopupTrigger
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    mostrarMenu(e);
+                }
+            }
+        };
+
+        // Añadir el listener tanto al combo como al editor
+        cbUsuarios.addMouseListener(popupListener);
+        cbUsuarios.getEditor().getEditorComponent().addMouseListener(popupListener);
 
 
 
