@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -8,9 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -29,6 +33,7 @@ import persistence.AppStateStore;
 import persistence.AuthService;
 
 public class JDialogLogin extends JDialog {
+
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
 
@@ -44,13 +49,11 @@ public class JDialogLogin extends JDialog {
         super(parent, "Iniciar sesión", true);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setResizable(false);
-        setSize(360, 220);
+        setSize(360, 211);
         setLocationRelativeTo(parent);
 
         this.state = AppStateStore.load();
         this.auth  = new AuthService(state);
-        
-        
 
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(14, 14, 14, 14));
@@ -62,59 +65,129 @@ public class JDialogLogin extends JDialog {
         lblTitulo.setBounds(10, 0, 324, 28);
         contentPanel.add(lblTitulo);
 
-        JLabel lblUsuario = new JLabel("Usuario:");
-        lblUsuario.setBounds(10, 44, 100, 16);
-        contentPanel.add(lblUsuario);
+        // Campo usuario
+        cbUsuarios = new JComboBox<>();
+        cbUsuarios.setEditable(true);
 
-        cbUsuarios = new JComboBox<>(); 
-        cbUsuarios.setEditable(true); 
-        cbUsuarios.setBounds(120, 40, 214, 24); 
-        contentPanel.add(cbUsuarios);
+        // Campo contraseña
+        pfPassword = new JPasswordField();
+
+        // Añadir campos con iconos
+        contentPanel.add(crearCampoConIcono("user.png", cbUsuarios, 40));
+        contentPanel.add(crearCampoConIcono("lock.png", pfPassword, 80));
+
+
+        JTextField editorUsuario = (JTextField) cbUsuarios.getEditor().getEditorComponent();
         
-        if (state.getSavedCredentials().isEmpty()) { 
-        	cbUsuarios.addItem("No hay usuarios guardados"); 
-        	cbUsuarios.setSelectedItem(""); 
-        } else { 
-        	for (String u : state.getSavedCredentials().keySet()) { 
-        		cbUsuarios.addItem(u); 
-        	}
+        final boolean[] placeholderActivo = {true};
+        
+        editorUsuario.setText("Usuario...");
+        editorUsuario.setForeground(Color.GRAY);
+        
+        cbUsuarios.setSelectedItem("");
+        
+        editorUsuario.addMouseListener(new MouseAdapter() { 
+        	@Override 
+        	public void mousePressed(MouseEvent e) { 
+        		if (placeholderActivo[0]) { 
+        			editorUsuario.setText(""); 
+        			editorUsuario.setForeground(Color.BLACK); 
+        			placeholderActivo[0] = false; 
+        		} 
+        	} 
+        });
+        
+
+        editorUsuario.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (editorUsuario.getText().equals("Usuario...")) {
+                    editorUsuario.setText("");
+                    editorUsuario.setForeground(Color.BLACK);
+                }
+            }
+        });
+
+        editorUsuario.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (editorUsuario.getText().isEmpty()) {
+                    editorUsuario.setText("Usuario...");
+                    editorUsuario.setForeground(Color.GRAY);
+                }
+            }
+        });
+
+
+
+        pfPassword.setText("Contraseña...");
+        pfPassword.setForeground(Color.GRAY);
+        pfPassword.setEchoChar((char) 0);
+
+        pfPassword.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (new String(pfPassword.getPassword()).equals("Contraseña...")) {
+                    pfPassword.setText("");
+                    pfPassword.setForeground(Color.BLACK);
+                    pfPassword.setEchoChar('*');
+                }
+            }
+        });
+
+        pfPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (new String(pfPassword.getPassword()).isEmpty()) {
+                    pfPassword.setText("Contraseña...");
+                    pfPassword.setForeground(Color.GRAY);
+                    pfPassword.setEchoChar((char) 0);
+                }
+            }
+        });
+
+        // Cargar usuarios guardados
+        if (state.getSavedCredentials().isEmpty()) {
+            cbUsuarios.addItem("No hay usuarios guardados");
+            cbUsuarios.setSelectedItem("");
+        } else {
+            for (String u : state.getSavedCredentials().keySet()) {
+                cbUsuarios.addItem(u);
+            }
         }
-        
+
+        // Mostrar contraseña
+        JCheckBox cbMostrarCont = new JCheckBox("Mostrar contraseña");
+        cbMostrarCont.setBounds(62, 110, 240, 20);
+        contentPanel.add(cbMostrarCont);
+
+        cbMostrarCont.addActionListener(e -> {
+            if (cbMostrarCont.isSelected()) {
+                if (!new String(pfPassword.getPassword()).equals("Contraseña...")) {
+                    pfPassword.setEchoChar((char) 0);
+                }
+            } else {
+                if (!new String(pfPassword.getPassword()).equals("Contraseña...")) {
+                    pfPassword.setEchoChar('*');
+                }
+            }
+        });
+
+        // Autocompletar contraseña
+        cbUsuarios.addActionListener(e -> {
+            String user = (String) cbUsuarios.getSelectedItem();
+            if (user != null && state.getSavedCredentials().containsKey(user)) {
+                pfPassword.setText(state.getSavedCredentials().get(user));
+                pfPassword.setForeground(Color.BLACK);
+                pfPassword.setEchoChar('*');
+            }
+        });
+
+        //olvidar usuario
         JPopupMenu menuOlvidar = new JPopupMenu();
         JMenuItem itemOlvidar = new JMenuItem("Olvidar usuario");
         menuOlvidar.add(itemOlvidar);
 
-        JLabel lblPass = new JLabel("Contraseña:");
-        lblPass.setBounds(10, 78, 100, 16);
-        contentPanel.add(lblPass);
-
-        pfPassword = new JPasswordField();
-        pfPassword.setBounds(120, 74, 214, 24);
-        contentPanel.add(pfPassword);
-        
-        JCheckBox cbMostrarCont = new JCheckBox("Mostrar contraseña");
-        cbMostrarCont.setBounds(120,102,214,20);
-        contentPanel.add(cbMostrarCont);
-        
-        //mostrar contraseña
-        cbMostrarCont.addActionListener(e -> {
-        	if (cbMostrarCont.isSelected()) { 
-        		pfPassword.setEchoChar((char) 0); 
-        	}else { 
-        		pfPassword.setEchoChar('*');
-        	}
-        });
-        
-        //autocompletado usuario/contraseña
-        cbUsuarios.addActionListener(e -> { 
-        	String user = (String) cbUsuarios.getSelectedItem(); 
-        	if (user != null && state.getSavedCredentials().containsKey(user)) { 
-        		pfPassword.setText(state.getSavedCredentials().get(user)); 
-        	} 
-        });
-        
-        
-        //olvidar usuario
         itemOlvidar.addActionListener(e -> {
             String user = (String) cbUsuarios.getSelectedItem();
             if (user == null || user.equals("No hay usuarios guardados")) return;
@@ -129,37 +202,32 @@ public class JDialogLogin extends JDialog {
             }
 
             cbUsuarios.setSelectedItem("");
-            pfPassword.setText("");
+            pfPassword.setText("Contraseña...");
+            pfPassword.setForeground(Color.GRAY);
+            pfPassword.setEchoChar((char) 0);
         });
-        
-     // Listener para menú contextual "Olvidar usuario"
-        MouseAdapter popupListener = new MouseAdapter() {
 
+        MouseAdapter popupListener = new MouseAdapter() {
             private void mostrarMenu(MouseEvent e) {
                 String user = (String) cbUsuarios.getSelectedItem();
                 if (user == null || user.equals("No hay usuarios guardados")) return;
-
-                // Mostrar el menú sobre el componente donde se hizo clic
                 menuOlvidar.show(e.getComponent(), e.getX(), e.getY());
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                // Usamos botón derecho directamente, sin depender de isPopupTrigger
                 if (SwingUtilities.isRightMouseButton(e)) {
                     mostrarMenu(e);
                 }
             }
         };
 
-        // Añadir el listener tanto al combo como al editor
         cbUsuarios.addMouseListener(popupListener);
         cbUsuarios.getEditor().getEditorComponent().addMouseListener(popupListener);
 
-
-
+        //Botones inferior
         JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
         JButton btnRegister = new JButton("Registrarme");
@@ -184,6 +252,7 @@ public class JDialogLogin extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
             }
         });
+
         cbUsuarios.addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
@@ -191,19 +260,34 @@ public class JDialogLogin extends JDialog {
         });
     }
 
-    // --- Acciones ---
+    private JPanel crearCampoConIcono(String iconName, JComponent campo, int y) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        panel.setBounds(20, y, 300, 28);
+
+        String ruta = System.getProperty("user.dir") + "/icons/" + iconName;
+
+        ImageIcon rawIcon = new ImageIcon(ruta);
+        ImageIcon scaledIcon = new ImageIcon(rawIcon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH));
+
+        JLabel icono = new JLabel(scaledIcon);
+        icono.setPreferredSize(new Dimension(24, 24));
+
+        campo.setPreferredSize(new Dimension(240, 24));
+
+        panel.add(icono);
+        panel.add(campo);
+
+        return panel;
+    }
 
     private void abrirRegistro() {
-        // owner de este JDialog es el mismo Frame que le pasaste al constructor
         java.awt.Window owner = getOwner();
         java.awt.Frame frameOwner = (owner instanceof java.awt.Frame) ? (java.awt.Frame) owner : null;
 
-        // usa 'state' (sin guion bajo)
         JDialogRegistro reg = new JDialogRegistro(frameOwner, state);
         reg.setLocationRelativeTo(this);
         reg.setVisible(true);
 
-        // Autocompletar usuario si se creó
         if (reg.getCreatedUser() != null && reg.getCreatedUser().getUsuario() != null) {
 
             String nuevoUser = reg.getCreatedUser().getUsuario();
@@ -223,15 +307,20 @@ public class JDialogLogin extends JDialog {
             if (!existe) cbUsuarios.addItem(nuevoUser);
 
             cbUsuarios.setSelectedItem("");
-
-            pfPassword.setText("");
+            pfPassword.setText("Contraseña...");
+            pfPassword.setForeground(Color.GRAY);
+            pfPassword.setEchoChar((char) 0);
             pfPassword.requestFocusInWindow();
         }
     }
 
     private void intentarLogin() {
-    	String username = (String) cbUsuarios.getEditor().getItem();
-        String password = new String(pfPassword.getPassword());
+
+        String rawUsername = (String) cbUsuarios.getEditor().getItem();
+        String rawPassword = new String(pfPassword.getPassword());
+
+        String username = (rawUsername == null || rawUsername.equals("Usuario...")) ? "" : rawUsername;
+        String password = (rawPassword == null || rawPassword.equals("Contraseña...")) ? "" : rawPassword;
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Introduce usuario y contraseña.", "Faltan datos", JOptionPane.WARNING_MESSAGE);
@@ -256,11 +345,9 @@ public class JDialogLogin extends JDialog {
 
                 if (opcion == JOptionPane.YES_OPTION) {
 
-                    // Guardar credenciales
                     state.saveCredential(username, password);
                     AppStateStore.save(state);
 
-                    // Añadir al combo si no estaba
                     boolean existe = false;
                     for (int i = 0; i < cbUsuarios.getItemCount(); i++) {
                         if (cbUsuarios.getItemAt(i).equals(username)) {
@@ -269,7 +356,6 @@ public class JDialogLogin extends JDialog {
                         }
                     }
 
-                    // Si antes solo estaba "No hay usuarios guardados", lo quitamos
                     if (cbUsuarios.getItemCount() == 1 &&
                         cbUsuarios.getItemAt(0).equals("No hay usuarios guardados")) {
                         cbUsuarios.removeAllItems();
@@ -281,19 +367,13 @@ public class JDialogLogin extends JDialog {
                 }
             }
 
-            dispose(); // continuar a la app
+            dispose();
 
         }, () -> {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "No se pudo iniciar sesión", JOptionPane.ERROR_MESSAGE);
         });
-
     }
-    // --- Getters públicos ---
 
     public User getLoggedUser() { return loggedUser; }
-
-    // lo pasamos al JFramePrincipal para que pueda persistir otros cambios si hace falta
     public AppState getAppState() { return state; }
 }
-
-
