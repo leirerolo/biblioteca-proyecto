@@ -40,6 +40,13 @@ public class JDialogRegistro extends JDialog {
 		form.add(new JLabel("Contraseña:")); form.add(pfPass);
 
 
+		JCheckBox cbGuardar = new JCheckBox("Guardar usuario y contraseña");
+		form.add(new JLabel(""));
+		form.add(cbGuardar);
+
+
+
+
 		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton btnCancel = new JButton("Cancelar");
 		JButton btnOk = new JButton("Crear cuenta");
@@ -63,6 +70,12 @@ public class JDialogRegistro extends JDialog {
 					return;
 				}
 				createdUser = auth.register(usuario, email, nombre, apellido, pass);
+				
+				if (cbGuardar.isSelected()) {
+					state.saveCredential(usuario, pass); 
+					persistence.AppStateStore.save(state);
+				}
+				
 				JOptionPane.showMessageDialog(this, "Cuenta creada para '"+usuario+"'", "OK", JOptionPane.INFORMATION_MESSAGE);
 				dispose();
 			} catch (IllegalArgumentException ex) {

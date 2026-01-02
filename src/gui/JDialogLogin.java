@@ -7,12 +7,16 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -25,8 +29,11 @@ public class JDialogLogin extends JDialog {
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
 
-    private JTextField tfUsuario;
+    private JComboBox<String> cbUsuarios;
     private JPasswordField pfPassword;
+
+
+
 
     private User loggedUser = null;
 
@@ -57,9 +64,22 @@ public class JDialogLogin extends JDialog {
         lblUsuario.setBounds(10, 44, 100, 16);
         contentPanel.add(lblUsuario);
 
-        tfUsuario = new JTextField();
-        tfUsuario.setBounds(120, 40, 214, 24);
-        contentPanel.add(tfUsuario);
+        cbUsuarios = new JComboBox<>(); 
+        cbUsuarios.setEditable(true); 
+        cbUsuarios.setBounds(120, 40, 214, 24); 
+        contentPanel.add(cbUsuarios);
+        if (state.getSavedCredentials().isEmpty()) { 
+        	cbUsuarios.addItem("No hay usuarios guardados"); 
+        	cbUsuarios.setSelectedItem(""); 
+        } else { 
+        	for (String u : state.getSavedCredentials().keySet()) { 
+        		cbUsuarios.addItem(u); 
+        	}
+        }
+        
+        JPopupMenu menuOlvidar = new JPopupMenu();
+        JMenuItem itemOlvidar = new JMenuItem("Olvidar usuario");
+        menuOlvidar.add(itemOlvidar);
 
         JLabel lblPass = new JLabel("Contraseña:");
         lblPass.setBounds(10, 78, 100, 16);
@@ -68,6 +88,58 @@ public class JDialogLogin extends JDialog {
         pfPassword = new JPasswordField();
         pfPassword.setBounds(120, 74, 214, 24);
         contentPanel.add(pfPassword);
+        
+        JCheckBox cbMostrarCont = new JCheckBox("Mostrar contraseña");
+        cbMostrarCont.setBounds(120,102,214,20);
+        contentPanel.add(cbMostrarCont);
+        
+        //mostrar contraseña
+        cbMostrarCont.addActionListener(e -> {
+        	if (cbMostrarCont.isSelected()) { 
+        		pfPassword.setEchoChar((char) 0); 
+        	}else { 
+        		pfPassword.setEchoChar('*');
+        	}
+        });
+        
+        //autocompletado usuario/contraseña
+        cbUsuarios.addActionListener(e -> { 
+        	String user = (String) cbUsuarios.getSelectedItem(); 
+        	if (user != null && state.getSavedCredentials().containsKey(user)) { 
+        		pfPassword.setText(state.getSavedCredentials().get(user)); 
+        	} 
+        });
+        
+        
+        //olvidar usuario
+        itemOlvidar.addActionListener(e -> {
+            String user = (String) cbUsuarios.getSelectedItem();
+            if (user == null || user.equals("No hay usuarios guardados")) return;
+
+            state.removeCredential(user);
+            AppStateStore.save(state);
+
+            cbUsuarios.removeItem(user);
+
+            if (cbUsuarios.getItemCount() == 0) {
+                cbUsuarios.addItem("No hay usuarios guardados");
+            }
+
+            cbUsuarios.setSelectedItem("");
+            pfPassword.setText("");
+        });
+        
+        cbUsuarios.addActionListener(e -> {
+            if (!cbUsuarios.isPopupVisible()) return; // Solo si el usuario abrió el menú
+
+            String user = (String) cbUsuarios.getSelectedItem();
+            if (user == null || user.equals("No hay usuarios guardados")) return;
+
+            // Mostrar menú justo debajo del combo
+            menuOlvidar.show(cbUsuarios, 0, cbUsuarios.getHeight());
+        });
+
+
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -95,7 +167,7 @@ public class JDialogLogin extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
             }
         });
-        tfUsuario.addKeyListener(new KeyAdapter() {
+        cbUsuarios.addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
             }
@@ -116,14 +188,32 @@ public class JDialogLogin extends JDialog {
 
         // Autocompletar usuario si se creó
         if (reg.getCreatedUser() != null && reg.getCreatedUser().getUsuario() != null) {
-            tfUsuario.setText(reg.getCreatedUser().getUsuario());
+
+            String nuevoUser = reg.getCreatedUser().getUsuario();
+
+            if (cbUsuarios.getItemCount() == 1 &&
+                cbUsuarios.getItemAt(0).equals("No hay usuarios guardados")) {
+                cbUsuarios.removeAllItems();
+            }
+
+            boolean existe = false;
+            for (int i = 0; i < cbUsuarios.getItemCount(); i++) {
+                if (cbUsuarios.getItemAt(i).equals(nuevoUser)) {
+                    existe = true;
+                    break;
+                }
+            }
+            if (!existe) cbUsuarios.addItem(nuevoUser);
+
+            cbUsuarios.setSelectedItem("");
+
             pfPassword.setText("");
             pfPassword.requestFocusInWindow();
         }
     }
 
     private void intentarLogin() {
-        String username = tfUsuario.getText().trim();
+    	String username = (String) cbUsuarios.getEditor().getItem();
         String password = new String(pfPassword.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -132,14 +222,54 @@ public class JDialogLogin extends JDialog {
         }
 
         auth.login(username, password).ifPresentOrElse(u -> {
+
             this.loggedUser = u;
             User.setLoggedIn(u);
             u.cargarReservas();
             u.verificarPenalizacion();
-            dispose(); // <-- MUY IMPORTANTE: dejar que Main continúe
+
+            if (!state.getSavedCredentials().containsKey(username)) {
+
+                int opcion = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Le gustaría recordar este usuario?",
+                        "Recordar usuario",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (opcion == JOptionPane.YES_OPTION) {
+
+                    // Guardar credenciales
+                    state.saveCredential(username, password);
+                    AppStateStore.save(state);
+
+                    // Añadir al combo si no estaba
+                    boolean existe = false;
+                    for (int i = 0; i < cbUsuarios.getItemCount(); i++) {
+                        if (cbUsuarios.getItemAt(i).equals(username)) {
+                            existe = true;
+                            break;
+                        }
+                    }
+
+                    // Si antes solo estaba "No hay usuarios guardados", lo quitamos
+                    if (cbUsuarios.getItemCount() == 1 &&
+                        cbUsuarios.getItemAt(0).equals("No hay usuarios guardados")) {
+                        cbUsuarios.removeAllItems();
+                    }
+
+                    if (!existe) {
+                        cbUsuarios.addItem(username);
+                    }
+                }
+            }
+
+            dispose(); // continuar a la app
+
         }, () -> {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "No se pudo iniciar sesión", JOptionPane.ERROR_MESSAGE);
         });
+
     }
     // --- Getters públicos ---
 

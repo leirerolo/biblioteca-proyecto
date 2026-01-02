@@ -3,8 +3,9 @@ package persistence;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import domain.Reserva;
 import domain.User;
@@ -28,6 +29,22 @@ public class AppState implements Serializable {
 	/** Secuencia simple para asignar IDs a nuevos usuarios */
 	private int nextUserId = 1;
 
+	
+	//recordar user
+		private final Map<String, String> savedCredentials = new HashMap<>();
+		
+		public Map<String, String> getSavedCredentials() {
+			return savedCredentials; 
+		}
+		
+		public void saveCredential(String user, String pass) { 
+			savedCredentials.put(user, pass); 
+		}
+		
+		public void removeCredential(String user) { 
+			savedCredentials.remove(user); 
+		}
+	
 
 	public List<UserRecord> getUsers() { return users; }
 	public List<Reserva> getReservas() { return reservas; }
