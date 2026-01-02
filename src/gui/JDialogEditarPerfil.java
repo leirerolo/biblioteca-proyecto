@@ -14,6 +14,7 @@ public class JDialogEditarPerfil extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private final JPanel content = new JPanel();
+    private JTextField tfNombre;
     private JTextField tfApellido;
     private JTextField tfEmail;
     private JLabel lblAvatarPreview;
@@ -29,34 +30,42 @@ public class JDialogEditarPerfil extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         content.setBorder(new EmptyBorder(12,12,12,12));
         content.setLayout(null);
+        
+        JLabel l0 = new JLabel("Nombre:"); 
+        l0.setBounds(10, 10, 120, 24); 
+        content.add(l0); 
+        
+        tfNombre = new JTextField(user.getNombre() != null ? user.getNombre() : ""); 
+        tfNombre.setBounds(140, 10, 250, 28); 
+        content.add(tfNombre);
 
         JLabel l1 = new JLabel("Apellido:");
-        l1.setBounds(10, 10, 120, 24);
+        l1.setBounds(10, 46, 120, 24);
         content.add(l1);
 
         tfApellido = new JTextField(user.getApellido() != null ? user.getApellido() : "");
-        tfApellido.setBounds(140, 10, 250, 24);
+        tfApellido.setBounds(140, 46, 250, 28);
         content.add(tfApellido);
 
         JLabel l2 = new JLabel("Email:");
-        l2.setBounds(10, 46, 120, 24);
+        l2.setBounds(10, 82, 120, 24);
         content.add(l2);
 
         tfEmail = new JTextField(user.getEmail() != null ? user.getEmail() : "");
-        tfEmail.setBounds(140, 46, 250, 24);
+        tfEmail.setBounds(140, 82, 250, 28);
         content.add(tfEmail);
 
         JLabel l3 = new JLabel("Avatar:");
-        l3.setBounds(10, 82, 120, 24);
+        l3.setBounds(10, 118, 120, 24);
         content.add(l3);
 
         JButton btnElegir = new JButton("Elegir imagen...");
-        btnElegir.setBounds(140, 82, 150, 24);
+        btnElegir.setBounds(140, 118, 150, 24);
         btnElegir.addActionListener((ActionEvent e) -> elegirAvatar());
         content.add(btnElegir);
 
         lblAvatarPreview = new JLabel("Sin imagen", SwingConstants.CENTER);
-        lblAvatarPreview.setBounds(300, 82, 90, 90);
+        lblAvatarPreview.setBounds(300, 118, 90, 90);
         content.add(lblAvatarPreview);
 
         // Carga previa del avatar
@@ -110,6 +119,7 @@ public class JDialogEditarPerfil extends JDialog {
     }
 
     public boolean isAccepted() { return accepted; }
+    public String getNombre() { return tfNombre.getText().trim(); }
     public String getApellido() { return tfApellido.getText().trim(); }
     public String getEmail() { return tfEmail.getText().trim(); }
     public String getSelectedAvatarPath() { return selectedAvatarPath; }
