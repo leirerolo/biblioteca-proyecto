@@ -472,9 +472,21 @@ public class JFramePrincipal extends JFrame {
         }
 
 
-        if (comp instanceof JButton) {
-            comp.setBackground(menuBg);
-            comp.setForeground(texto);
+        if (comp instanceof JButton btn) {
+        	 String text = btn.getText();
+
+        	    if ("Devolver préstamo".equals(text)) {
+        	        if (darkMode) {
+        	            btn.setBackground(new Color(120, 80, 180)); // ejemplo
+        	            btn.setForeground(Color.BLACK);
+        	        } else {
+        	            btn.setBackground(new Color(200, 200, 200));
+        	            btn.setForeground(Color.BLACK);
+        	        }
+        	    } else {
+        	        btn.setBackground(menuBg);
+        	        btn.setForeground(texto);
+        	    }
         }
 
         if (comp instanceof JComboBox) {
