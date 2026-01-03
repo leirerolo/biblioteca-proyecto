@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 import db.ReservaDAO;
@@ -33,14 +34,18 @@ public class JFrameInicio extends JFramePrincipal {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         
-        this.inicializarPanelSuperior(); //hereda de JFramePrincipal
+        //this.inicializarPanelSuperior(); //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
+		aplicarTema();
     }
 
     private void inicializarPanelCentral(){
     	mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-        add(mainPanel, BorderLayout.CENTER);
+    	//mainPanel.setBackground(JFramePrincipal.darkMode ? new Color(30,30,30) : Color.WHITE);
+    	mainPanel.setBackground(Color.white);
+    	mainPanel.setOpaque(true);
+    	this.add(mainPanel, BorderLayout.CENTER);
+    	
     	
 	    if (libros == null || libros.isEmpty()) {
             JLabel l = new JLabel("No hay libros para mostrar", JLabel.CENTER);
@@ -54,10 +59,13 @@ public class JFrameInicio extends JFramePrincipal {
 	    
 	    mainPanel.revalidate();
 	    mainPanel.repaint(); 
+	    
     } 
     
     //método para construir el panel de libros del top 6
     private JPanel crearPanelTopLibros() {
+    	Color fondo = JFramePrincipal.darkMode ? new Color(30,30,30) : Color.WHITE;
+
     	List<Libro> disponibles = new ArrayList<>();
     	try {
     	    ReservaDAO reservaDAO = new ReservaDAO();
@@ -76,9 +84,9 @@ public class JFrameInicio extends JFramePrincipal {
 
 
         JPanel grid = new JPanel(new GridLayout(0, 3, 12, 12));
-        grid.setBackground(Color.WHITE);
-        grid.setBorder(new MatteBorder(16, 16, 16, 16, Color.WHITE));
-
+        //grid.setBackground(fondo);
+        grid.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
         for (Libro lib : disponibles) {
         	grid.add(buildBookCard(lib));
         }
@@ -86,10 +94,11 @@ public class JFrameInicio extends JFramePrincipal {
         JLabel titulo = new JLabel("Mejor valorados", JLabel.LEFT);
         titulo.setFont(fuenteTitulo);
         titulo.setForeground(new Color(0,102,204));
-        titulo.setBorder(new MatteBorder(12, 16, 8, 16, Color.WHITE));
+        titulo.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
 
         JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(Color.WHITE);
+        wrapper.setBackground(fondo);
         wrapper.add(titulo, BorderLayout.NORTH);
         wrapper.add(grid, BorderLayout.CENTER);
         
@@ -98,8 +107,22 @@ public class JFrameInicio extends JFramePrincipal {
     
     private JPanel buildBookCard(Libro lib) {
         JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(Color.WHITE);
-        card.setBorder(new MatteBorder(1, 1, 1, 1, new Color(240, 240, 240)));
+        Color fondoCard = JFramePrincipal.darkMode ? new Color(40,40,40) : Color.WHITE;
+        card.setBackground(fondoCard);
+        //card.setOpaque(true);
+        
+        
+        Border bordeNormal = new MatteBorder(1, 1, 1, 1, new Color(180, 180, 180)); // gris claro
+        Border bordeHover;
+
+        if (JFramePrincipal.darkMode) {
+            bordeHover = new MatteBorder(2, 2, 2, 2, Color.WHITE); // hover blanco en dark mode
+        } else {
+            bordeHover = new MatteBorder(2, 2, 2, 2, new Color(100, 100, 100)); // hover gris oscuro en light mode
+        }
+
+        card.setBorder(bordeNormal);
+        
 
         // Portada
         JLabel img = new JLabel();
@@ -109,7 +132,7 @@ public class JFrameInicio extends JFramePrincipal {
 
         // Texto (título + autor + valoración)
         JPanel info = new JPanel(new GridLayout(0, 1));
-        info.setBackground(Color.WHITE);
+        info.setBackground(JFramePrincipal.darkMode ? new Color(40,40,40) : Color.WHITE);
         JLabel t = new JLabel(lib.getTitulo());
         t.setFont(new Font("SansSerif", Font.BOLD, 12));
         JLabel a = new JLabel(lib.getAutor());
@@ -120,36 +143,74 @@ public class JFrameInicio extends JFramePrincipal {
         info.add(t);
         info.add(a);
         info.add(r);
-        info.setBorder(new MatteBorder(8, 8, 8, 8, Color.WHITE));
+        info.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         card.add(info, BorderLayout.SOUTH);
+
+        card.setOpaque(true); 
+        info.setOpaque(true); 
+        img.setOpaque(true);
+        img.setBackground(card.getBackground());
+        img.putClientProperty("theme-card", true);
+
         
-        Color noSeleccionado = Color.white;
-    	Color seleccionado = new Color(245, 245, 245);
+        Color noSeleccionado = JFramePrincipal.darkMode ? new Color(40,40,40) : Color.WHITE;
+        Color seleccionado = JFramePrincipal.darkMode ? new Color(60,60,60) : new Color(245,245,245);
 
         //Eventos de ratón
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.addMouseListener(new java.awt.event.MouseAdapter() {
-        	//al hacer click, se abre el diálogo de la info del libro
-            @Override 
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-            	JDialogLibro dialog = new JDialogLibro(JFrameInicio.this, lib);
-                dialog.setVisible(true);
-            }
-            //al posar el ratón, cambia a formato selección
-            @Override
-	        public void mouseEntered(MouseEvent e) {
-	            card.setBackground(seleccionado);
-	            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-	            //card.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
-	        }
+//        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//        card.addMouseListener(new java.awt.event.MouseAdapter() {
+//        	//al hacer click, se abre el diálogo de la info del libro
+//            @Override 
+//            public void mouseClicked(java.awt.event.MouseEvent e) {
+//            	JDialogLibro dialog = new JDialogLibro(JFrameInicio.this, lib);
+//                dialog.setVisible(true);
+//            }
+//            //al posar el ratón, cambia a formato selección
+//            @Override
+//	        public void mouseEntered(MouseEvent e) {
+//	            card.setBackground(seleccionado);
+//	            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//	            //card.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+//	        }
+//
+//	        @Override
+//	        public void mouseExited(MouseEvent e) {
+//	        	card.setBackground(noSeleccionado);
+//	        	card.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//	        	card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+//	        }
+//        });
+        
+        MouseAdapter listener = new MouseAdapter() {
 
-	        @Override
-	        public void mouseExited(MouseEvent e) {
-	        	card.setBackground(noSeleccionado);
-	        	card.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-	        	card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-	        }
-        });
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBorder(bordeHover);
+                card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBorder(bordeNormal);
+                card.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new JDialogLibro(JFrameInicio.this, lib).setVisible(true);
+            }
+        };
+
+
+        // Añadir el listener a card y a TODOS sus hijos
+        addMouseListenerRecursively(card, listener);
+//        card.addMouseListener(listener); 
+//        img.addMouseListener(listener); 
+//        info.addMouseListener(listener); 
+//        t.addMouseListener(listener); 
+//        a.addMouseListener(listener); 
+//        r.addMouseListener(listener);
+
 
         return card;
     }
@@ -165,4 +226,14 @@ public class JFrameInicio extends JFramePrincipal {
     		mainPanel.repaint();
     	}
     }
+    
+    private void addMouseListenerRecursively(Component comp, MouseAdapter listener) {
+        comp.addMouseListener(listener);
+        if (comp instanceof Container cont) {
+            for (Component child : cont.getComponents()) {
+                addMouseListenerRecursively(child, listener);
+            }
+        }
+    }
+
 }

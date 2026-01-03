@@ -66,6 +66,7 @@ public class JFrameReservas extends JFramePrincipal{
 		
 		this.inicializarPanelCentral();
 		actualizarReservas();
+		//aplicarTema();
 	}
 	
 	public User getUser() {
