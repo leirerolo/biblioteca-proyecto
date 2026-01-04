@@ -45,15 +45,26 @@ public class JFramePerfil extends JFrame {
         datos.setOpaque(true);
         lblNombre = new JLabel("Nombre: " + n(user.getNombre()));
         lblNombre.setFont(fuenteMenu);
-    	lblNombre.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    	lblNombre.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
+        lblNombre.setBorder(
+        		BorderFactory.createCompoundBorder(
+        	        new MatteBorder(0,0,1,0,Color.GRAY),
+        	        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        		)
+        	);
         lblApellido = new JLabel("Apellido: " + n(user.getApellido()));
         lblApellido.setFont(fuenteMenu);
-    	lblApellido.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    	lblApellido.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
+        lblApellido.setBorder(
+        	    BorderFactory.createCompoundBorder(
+        	        new MatteBorder(0,0,1,0,Color.GRAY),
+        	        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        	    )
+        	);
         lblEmail   = new JLabel("Email: "   + n(user.getEmail()));
         lblEmail.setFont(fuenteMenu);
-    	lblEmail.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        lblEmail.setBorder(
+        	    BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        	);
+
 
         //datos.add(new JLabel("ID: " + user.getId()));
         datos.add(lblNombre);
@@ -63,6 +74,7 @@ public class JFramePerfil extends JFrame {
         // Avatar
         lblAvatar = new JLabel("", SwingConstants.CENTER);
         //lblAvatar.setVerticalAlignment(SwingConstants.TOP);
+        lblAvatar.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         cargarAvatarEn(lblAvatar, user.getAvatarPath());
 
         // Botón Editar
@@ -97,25 +109,27 @@ public class JFramePerfil extends JFrame {
         if (dlg.isAccepted()) {
         	try {
             // Actualizar el modelo
-            user.setApellido(dlg.getApellido());
-            user.setEmail(dlg.getEmail());
-            user.setAvatarPath(dlg.getSelectedAvatarPath());
-
-            boolean bdApellido = user.guardarCambiosApellidoYNombre();
-            boolean bdEmailAvatar = user.guardarCambiosEmailYAvatar();
-
-            if (bdApellido && bdEmailAvatar) {
-                JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                refrescarDatos();
-            } else {
-                 JOptionPane.showMessageDialog(this, "Error al guardar el perfil en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (SQLException ex){
-            JOptionPane.showMessageDialog(this, 
-                "Error de conexión o de base de datos: " + ex.getMessage(), 
-                "Error de BD", JOptionPane.ERROR_MESSAGE);
-        }
+        		user.setNombre(dlg.getNombre());
+	            user.setApellido(dlg.getApellido());
+	            user.setEmail(dlg.getEmail());
+	            user.setAvatarPath(dlg.getSelectedAvatarPath());
+	
+	            boolean bdNombre = user.guardarCambiosNombre();
+	            boolean bdApellido = user.guardarCambiosApellidoYNombre();
+	            boolean bdEmailAvatar = user.guardarCambiosEmailYAvatar();
+	
+	            if (bdNombre && bdApellido && bdEmailAvatar) {
+	                JOptionPane.showMessageDialog(this, "Perfil actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+	                refrescarDatos();
+	            } else {
+	                 JOptionPane.showMessageDialog(this, "Error al guardar el perfil en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+	            }
+	
+	        } catch (SQLException ex){
+	            JOptionPane.showMessageDialog(this, 
+	                "Error de conexión o de base de datos: " + ex.getMessage(), 
+	                "Error de BD", JOptionPane.ERROR_MESSAGE);
+	        }
         }
     }
 
@@ -193,8 +207,14 @@ public class JFramePerfil extends JFrame {
 
         // Dibujar imagen recortada
         g2.drawImage(img, 0, 0, size, size, null);
-        g2.dispose();
 
+        g2.setClip(null);
+        g2.setColor(new Color(30, 30, 30));
+        g2.setStroke(new java.awt.BasicStroke(1.5f));
+        g2.draw(new Ellipse2D.Float(0.75f, 0.75f, size - 1.5f, size - 1.5f));
+        
+        g2.dispose();
+        
         return output;
     }
 

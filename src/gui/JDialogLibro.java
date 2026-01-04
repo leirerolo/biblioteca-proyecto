@@ -37,8 +37,13 @@ public class JDialogLibro extends JDialog {
 		JPanel panelDatos = new JPanel(new GridLayout(3,1,0,10));
 		JLabel titulo = new JLabel(libro.getTitulo(), JLabel.LEFT);
 		titulo.setFont(fuenteTitulo);
-    	titulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    	titulo.setBorder(new MatteBorder(0,0,1,0,Color.GRAY));
+		titulo.setBorder(
+			    BorderFactory.createCompoundBorder(
+			        new MatteBorder(0, 0, 1, 0, Color.GRAY),
+			        BorderFactory.createEmptyBorder(10, 12, 10, 10)
+			    )
+			);
+
     	panelDatos.add(titulo);
     	
     	JLabel autor = new JLabel(libro.getAutor(), JLabel.LEFT);

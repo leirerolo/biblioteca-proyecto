@@ -267,7 +267,11 @@ public class User implements Serializable{
 	}
     
      //Guarda los cambios de nombre y apellido en la BD.
-     
+    
+    public boolean guardarCambiosNombre() throws SQLException {
+        return userDAO.actualizarnombre(this); 
+    }
+    
     public boolean guardarCambiosApellidoYNombre() throws SQLException {
         return userDAO.actualizarpellido(this); 
     }

@@ -128,6 +128,30 @@ public class UserDAO {
 	    }
 	}
 	
+	public boolean actualizarnombre(User user) throws SQLException {
+	    String sql = "UPDATE User SET \"nombre\" = ? WHERE id = ?";
+	    int filasAfectadas = 0;
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement pstmt = con.prepareStatement(sql)) {
+	        
+	        // 1. Establecer el nuevo apellido
+	        pstmt.setString(1, user.getApellido());
+	        
+	        // 2. Establecer el ID del usuario a actualizar
+	        pstmt.setInt(2, user.getId()); 
+	
+	        // Ejecutar la consulta de actualización
+	        filasAfectadas = pstmt.executeUpdate();
+	        
+	    } catch (SQLException e) {
+	        System.err.println("ERROR al actualizar nombre del usuario en BD: " + e.getMessage());
+	        throw e; 
+	    }
+	    
+	    return filasAfectadas > 0;
+	}
+	
 	public boolean actualizarpellido(User user) throws SQLException {
 	    String sql = "UPDATE User SET \"apellido\" = ? WHERE id = ?";
 	    int filasAfectadas = 0;

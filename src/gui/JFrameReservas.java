@@ -66,6 +66,7 @@ public class JFrameReservas extends JFramePrincipal{
 		
 		this.inicializarPanelCentral();
 		actualizarReservas();
+		//aplicarTema();
 	}
 	
 	public User getUser() {
@@ -263,6 +264,7 @@ public class JFrameReservas extends JFramePrincipal{
         
         //botón para la devolución
         btnDevolver = new JButton("Devolver préstamo");
+        btnDevolver.setForeground(Color.BLACK);
         btnHistorial = new JButton("Ver historial");
         btnHistorial.setBackground(new Color(230, 230, 250));
         btnHistorial.addActionListener(e -> {

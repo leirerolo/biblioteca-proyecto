@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -28,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -49,7 +52,7 @@ public class JFrameExplorar extends JFramePrincipal {
 		this.libros = libros;
 		this.inicializarPanelCentral();
 		this.filtrarLibros();
-		
+		//aplicarTema();
 	}
 	
 	private void inicializarPanelCentral() {
@@ -222,9 +225,9 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    } else {
 	    	
-	    	Color noSeleccionado = Color.white;
-	    	Color seleccionado = new Color(245, 245, 245);
-	    	
+	    	Color noSeleccionado = JFramePrincipal.darkMode ? new Color(40,40,40) : Color.WHITE;
+	    	Color seleccionado    = JFramePrincipal.darkMode ? new Color(60,60,60) : new Color(245,245,245);
+
 	    	
 	        for (Libro l : listaLibros) {
 	            JPanel panelLibro = new JPanel(new BorderLayout());
@@ -233,7 +236,19 @@ public class JFrameExplorar extends JFramePrincipal {
 	            panelLibro.setAlignmentX(Component.LEFT_ALIGNMENT);
 	            panelLibro.setOpaque(true);
 	            
-	            panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	            Border bordeNormal = new MatteBorder(1, 1, 1, 1, new Color(180, 180, 180)); // gris claro
+	            Border bordeHover;
+
+	            if (JFramePrincipal.darkMode) {
+	                bordeHover = new MatteBorder(2, 2, 2, 2, Color.WHITE); // hover blanco en dark mode
+	            } else {
+	                bordeHover = new MatteBorder(2, 2, 2, 2, new Color(80, 80, 80)); // hover gris oscuro en light mode
+	            }
+
+	            panelLibro.setBorder(bordeNormal);
+	            
+	            
+	            //panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
 	    	    panelLibro.setBackground(noSeleccionado);
 	            panelLibro.setOpaque(true);
@@ -244,8 +259,8 @@ public class JFrameExplorar extends JFramePrincipal {
 	            JPanel panelInfo = new JPanel(new GridLayout(3, 1, 0, 10));
 
 	            panelInfo.setBackground(noSeleccionado);
-	            panelInfo.setOpaque(false);
-	            portada.setOpaque(false);
+	            panelInfo.setOpaque(true);
+	            portada.setOpaque(true);
 	            
 	            JLabel titulo = new JLabel(l.getTitulo(), JLabel.LEFT);
 	            titulo.setFont(fuenteTitulo);
@@ -263,36 +278,58 @@ public class JFrameExplorar extends JFramePrincipal {
 
 	            panelLibro.add(panelInfo, BorderLayout.CENTER);
 	            
-	            MouseAdapter hoverListener = new MouseAdapter() {
-	            	//al hacer click, se abre el diálogo de la info del libro
+//	            MouseAdapter hoverListener = new MouseAdapter() {
+//	            	//al hacer click, se abre el diálogo de la info del libro
+//	                @Override
+//	                public void mouseClicked(MouseEvent e) {
+//	                    JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
+//	                    infoLibro.setVisible(true);
+//	                }
+//
+//	                //al pasar ratón, cambia a formato selección
+//	                @Override
+//					public void mouseEntered(MouseEvent e) {
+//	                	//System.out.println("Mouse dentro de: " + l.getTitulo());
+//						panelLibro.setBackground(seleccionado);
+//                        panelLibro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//                        panelLibro.repaint();
+//                        //panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
+//					}
+//
+//					@Override
+//					public void mouseExited(MouseEvent e) {
+//						panelLibro.setBackground(noSeleccionado);
+//                        panelLibro.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//                        panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+//                        panelLibro.repaint();
+//					}
+//	            };
+	            
+	            MouseAdapter listener = new MouseAdapter() {
+
 	                @Override
-	                public void mouseClicked(MouseEvent e) {
-	                    JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
-	                    infoLibro.setVisible(true);
+	                public void mouseEntered(MouseEvent e) {
+	                    panelLibro.setBorder(bordeHover);
+	                    panelLibro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 	                }
 
-	                //al pasar ratón, cambia a formato selección
 	                @Override
-					public void mouseEntered(MouseEvent e) {
-	                	//System.out.println("Mouse dentro de: " + l.getTitulo());
-						panelLibro.setBackground(seleccionado);
-                        panelLibro.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        panelLibro.repaint();
-                        //panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
-					}
+	                public void mouseExited(MouseEvent e) {
+	                	panelLibro.setBorder(bordeNormal);
+	                	panelLibro.setCursor(Cursor.getDefaultCursor());
+	                }
 
-					@Override
-					public void mouseExited(MouseEvent e) {
-						panelLibro.setBackground(noSeleccionado);
-                        panelLibro.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                        panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-                        panelLibro.repaint();
-					}
+	                @Override
+	                public void mouseClicked(MouseEvent e) {
+	                    new JDialogLibro(JFrameExplorar.this, l).setVisible(true);
+	                }
 	            };
 	            
-	            panelLibro.addMouseListener(hoverListener);
-	            portada.addMouseListener(hoverListener);
-	            panelInfo.addMouseListener(hoverListener);
+//	            panelLibro.addMouseListener(hoverListener);
+//	            portada.addMouseListener(hoverListener);
+//	            panelInfo.addMouseListener(hoverListener);
+	            
+	            addMouseListenerRecursively(panelLibro, listener);
 	            
 	            panelLibros.add(panelLibro);
 	        }
@@ -328,5 +365,14 @@ public class JFrameExplorar extends JFramePrincipal {
 		
 		filtrarLibros();
 	}
+	
+    private void addMouseListenerRecursively(Component comp, MouseAdapter listener) {
+        comp.addMouseListener(listener);
+        if (comp instanceof Container cont) {
+            for (Component child : cont.getComponents()) {
+                addMouseListenerRecursively(child, listener);
+            }
+        }
+    }
 }
 
