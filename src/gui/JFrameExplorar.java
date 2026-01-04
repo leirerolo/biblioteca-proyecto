@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import utils.RecursiveSorter;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -34,6 +33,8 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import utils.RecursiveSorter;
+import utils.RecursiveSearch;
 
 import db.ReservaDAO;
 import db.FavoritoDAO;
@@ -97,6 +98,8 @@ public class JFrameExplorar extends JFramePrincipal {
 		            if (opcion == JOptionPane.YES_OPTION) {
 		                System.exit(0);
 		            }
+		        } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+		        	buscarYMostrarLibroPorTituloExacto();
 		        }
 		    }
 		});
@@ -342,23 +345,56 @@ public class JFrameExplorar extends JFramePrincipal {
 	    this.repaint();
 	}
 	
+	/**
+	 * Búsqueda EXACTA por título usando recursividad (búsqueda binaria).
+	 *
+	 * Uso: escribe el título y pulsa ENTER.
+	 */
+	private void buscarYMostrarLibroPorTituloExacto() {
+		if (txtFiltro == null) return;
+		String query = txtFiltro.getText();
+		if (query == null) return;
+		query = query.trim();
+		if (query.isEmpty()) return;
+		if (query.equalsIgnoreCase("Buscar por título o autor...") || query.equalsIgnoreCase("Buscar por título...")) {
+			return;
+		}
+		
+		// Copia + ordenación por título (con MergeSort recursivo)
+		List<Libro> copia = new ArrayList<>(libros);
+		RecursiveSorter.mergeSort(copia, Libro.COMPARADOR_TITULO);
+		
+		// Búsqueda binaria recursiva
+		Libro encontrado = RecursiveSearch.binarySearchByTitle(copia, query);
+		if (encontrado != null) {
+			new JDialogLibro(this, encontrado).setVisible(true);
+		} else {
+			java.awt.Toolkit.getDefaultToolkit().beep();
+			JOptionPane.showMessageDialog(
+				this,
+				"No existe un libro con el título exacto:\n\"" + query + "\"\n\nTip: escribe el título exactamente y pulsa ENTER.",
+				"No encontrado",
+				JOptionPane.INFORMATION_MESSAGE
+			);
+		}
+	}
+	
 	
 	private void ordenarLista(List<Libro> lista) {
-	    String op = (String) opciones.getSelectedItem();
-
-	    // Ordenación hecha con recursividad (MergeSort)
-	    if (op.equals("Ordenar")) {
-	        // Por título
-	        RecursiveSorter.mergeSort(lista, Libro.COMPARADOR_TITULO);
-	    } else if (op.equals("Por autor")) {
-	        // Por autor (Libro implements Comparable -> autor)
-	        RecursiveSorter.mergeSort(lista, (l1, l2) -> l1.compareTo(l2));
-	    } else if (op.equals("Por valoración")) {
-	        // Por valoración (descendente)
-	        RecursiveSorter.mergeSort(lista, (l1, l2) -> Double.compare(l2.getValoracion(), l1.getValoracion()));
-	    }
+		String op = (String) opciones.getSelectedItem();
+		
+		// Ordenación hecha con recursividad (MergeSort) -> ver utils/RecursiveSorter
+		if (op.equals("Ordenar")) {
+			// Por título
+			RecursiveSorter.mergeSort(lista, Libro.COMPARADOR_TITULO);
+		} else if (op.equals("Por autor")) {
+			// Por autor (Libro implements Comparable -> autor)
+			RecursiveSorter.mergeSort(lista, (l1, l2) -> l1.compareTo(l2));
+		} else if (op.equals("Por valoración")) {
+			// Por valoración (descendente)
+			RecursiveSorter.mergeSort(lista, (l1, l2) -> Double.compare(l2.getValoracion(), l1.getValoracion()));
+		}
 	}
-
 	
 	private void actualizarFiltro() {
 		String texto = txtFiltro.getText();
