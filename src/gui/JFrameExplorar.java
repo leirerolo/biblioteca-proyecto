@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import utils.RecursiveSorter;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -343,16 +344,21 @@ public class JFrameExplorar extends JFramePrincipal {
 	
 	
 	private void ordenarLista(List<Libro> lista) {
-		String op = (String) opciones.getSelectedItem();
-		
-		if(op.equals("Ordenar")) {
-			lista.sort(Libro.COMPARADOR_TITULO);
-		}else if (op.equals("Por autor")) {
-			Collections.sort(lista);
-		}else if (op.equals("Por valoración")) {
-			Collections.sort(lista, new Libro());
-		}
+	    String op = (String) opciones.getSelectedItem();
+
+	    // Ordenación hecha con recursividad (MergeSort)
+	    if (op.equals("Ordenar")) {
+	        // Por título
+	        RecursiveSorter.mergeSort(lista, Libro.COMPARADOR_TITULO);
+	    } else if (op.equals("Por autor")) {
+	        // Por autor (Libro implements Comparable -> autor)
+	        RecursiveSorter.mergeSort(lista, (l1, l2) -> l1.compareTo(l2));
+	    } else if (op.equals("Por valoración")) {
+	        // Por valoración (descendente)
+	        RecursiveSorter.mergeSort(lista, (l1, l2) -> Double.compare(l2.getValoracion(), l1.getValoracion()));
+	    }
 	}
+
 	
 	private void actualizarFiltro() {
 		String texto = txtFiltro.getText();
