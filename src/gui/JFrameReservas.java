@@ -31,6 +31,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -163,7 +164,15 @@ public class JFrameReservas extends JFramePrincipal{
 					    
 					    //texto en negrita y negro
 					    barra.setFont(barra.getFont().deriveFont(java.awt.Font.BOLD));
-					    barra.setForeground(Color.black);
+					    BasicProgressBarUI ui = new BasicProgressBarUI() {
+					    	protected Color getSelectionForeground() {
+					    		return Color.BLACK;
+					    	}
+					    	protected Color getSelectionBackground() {
+					    		return Color.BLACK;
+					    	}
+					    };
+					    barra.setUI(ui);
 					    
 					    //color de la barra de progreso según los días que quedan
 					    if(dias >= 14) barra.setForeground(Color.GREEN); //quedan 2 semanas o más --> verde
@@ -171,7 +180,7 @@ public class JFrameReservas extends JFramePrincipal{
 					    else barra.setForeground(Color.RED); //queda menos --> rojo
 					    
 					    //borde inferor para separar filas
-					    barra.setBorder(new MatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
+					    barra.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
 					    return barra;
 					    
 					} catch(NumberFormatException e) {
