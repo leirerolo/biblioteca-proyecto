@@ -7,15 +7,19 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.JTableHeader;
 
@@ -35,7 +40,7 @@ import domain.*;
 import domain.User.Rol;
 import persistence.AppState;
 import persistence.AppStateStore;
-
+import recursividad.RecomendadorLibros;
 import theme.DarkMode;
 
 
@@ -69,6 +74,8 @@ public class JFramePrincipal extends JFrame {
 	
 	//para el admin
 	private final LibroDAO libroDAO = new LibroDAO();
+	//para el recomendador de libros
+	private static RecomendadorLibros ventanaRecomendador = null;
 	
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva, AppState state) {
         this.libros = (libros != null) ? libros : new ArrayList<>();
@@ -109,7 +116,7 @@ public class JFramePrincipal extends JFrame {
                 }
             }
         });
-        
+        habilitarCtrlT();
         this.setFocusable(true);
         this.requestFocusInWindow();
         
@@ -504,12 +511,43 @@ public class JFramePrincipal extends JFrame {
                 aplicarTemaRecursivo(child, fondo, texto, menuBg);
             }
         }
-        
-
     }
+    
+    // ************* KEY BINDING PARA RECURSIÓN ***************
+    protected void habilitarCtrlT() {
+    	//key binding en vez de key listener
+    	//para que funcione aunque la ventana no tenga el foco
+        this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            .put(KeyStroke.getKeyStroke("control T"), "abrirRecomendador");
 
-
-
+        this.getRootPane().getActionMap().put("abrirRecomendador", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                abrirRecomendador();
+            }
+        }); 
+    }
+    //para evitar que se creen muchas ventanas
+    protected void abrirRecomendador() {
+    	//si ya existe, se trae al frente
+    	if (ventanaRecomendador != null && ventanaRecomendador.isVisible()) {
+    		ventanaRecomendador.toFront();
+    		ventanaRecomendador.requestFocus();
+    		return;
+    	}
+    	
+    	//si no está abierta ya, se crea una nueva
+    	ventanaRecomendador = new RecomendadorLibros(libros);
+    	ventanaRecomendador.setVisible(true);
+    	
+    	//al cerrar la ventana, se pone a null
+    	ventanaRecomendador.addWindowListener(new WindowAdapter() {
+    		@Override
+    		public void windowClosing(WindowEvent e) {
+    			ventanaRecomendador = null;
+    		}
+    	});
+    }
     
     
     

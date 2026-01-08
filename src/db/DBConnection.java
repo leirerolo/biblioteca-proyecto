@@ -48,7 +48,8 @@ public class DBConnection {
                 + " valoracion_original REAL DEFAULT 0.0,\n" 
                 + " valoracion_media REAL DEFAULT 0.0,\n"     
                 + " num_valoraciones INTEGER DEFAULT 0,\n"    
-                + " portada_path TEXT\n"                     
+                + " portada_path TEXT,\n"                     
+                + " genero TEXT\n"
                 + ");";
 		
 		//tabla user

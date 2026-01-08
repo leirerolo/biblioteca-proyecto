@@ -147,6 +147,7 @@ public class Main {
     private static List<Libro> cargarLibrosCSV(String fichero) {
         File f = new File(fichero);
         List<Libro> listaLibros = new ArrayList<>();
+        
         try (Scanner sc = new Scanner(f)) {
             while (sc.hasNextLine()) {
                 String linea = sc.nextLine();
@@ -162,7 +163,20 @@ public class Main {
                 	numValoraciones = Integer.parseInt(campos[4].trim());
                 }
 
-
+                //para el género
+                Genero genero = Genero.DESCONOCIDO; //por defecto por si da error
+                try {
+                	String generoStr = campos[5].trim();
+                	//convertir a enum
+                	for (Genero g : Genero.values()) {
+                		if (g.getNombre().equalsIgnoreCase(generoStr)) {
+                			genero = g;
+                			break;
+                		}
+                	}
+                } catch (Exception e) {
+                	System.err.println("Género no válido " + campos[0] + ": " + campos[5]);
+                }
                 
                 ImageIcon portada = null;
                 try {
@@ -178,7 +192,7 @@ public class Main {
                     System.err.println("Warning: la imagen no ha podido ser cargada: " + pathImagenCSV);
                 }
 
-                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCSV);
+                Libro libro = new Libro(campos[0].trim(), campos[1].trim(), portada, valoracion, pathImagenCSV, genero);
                 libro.setNumValoraciones(numValoraciones);
                 listaLibros.add(libro);
             }
@@ -188,7 +202,7 @@ public class Main {
         return listaLibros;
     }
     
-    }
+}
 
 
 

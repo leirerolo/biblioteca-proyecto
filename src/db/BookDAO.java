@@ -1,5 +1,6 @@
 package db;
 
+import domain.Genero;
 import domain.Libro;
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import javax.swing.JOptionPane;
 public class BookDAO {
 
 	public static boolean insertBook(Libro libro) {
-		String sql= "INSERT INTO Libros(titulo, autor, valoracion, portada_path, exemplares_disponibles) VALUES(?, ?, ?, ?, ?)";
+		String sql= "INSERT INTO Libros(titulo, autor, valoracion, portada_path, exemplares_disponibles, genero) VALUES(?, ?, ?, ?, ?, ?)";
 		
 		try (Connection conn = DBManager.connect();
 				PreparedStatement pstmt = (conn != null) ? conn.prepareStatement(sql) : null) {
@@ -22,6 +23,7 @@ public class BookDAO {
 				pstmt.setDouble(3, libro.getValoracion());
 				pstmt.setString(4, libro.getPortadaPath());
 				pstmt.setInt(5,1); //suponemos que al inicializar solo hay un exemplar disponible
+				pstmt.setString(6, libro.getGenero().toString());
 				
 				int rowsAffected= pstmt.executeUpdate();
 				return rowsAffected > 0;
@@ -38,7 +40,7 @@ public class BookDAO {
 	// consultar y devolver todos los libros de la BD
 	
 	public static List <Libro> getAllBooks(){
-		String sql = "SELECT id, titulo, autor, valoracion, portada_path FROM Libros";
+		String sql = "SELECT id, titulo, autor, valoracion, portada_path, genero FROM Libros";
 		List<Libro> listaLibros = new ArrayList<>();
 		
 		try (Connection conn = DBManager.connect();
@@ -53,10 +55,11 @@ public class BookDAO {
 					String autor = rs.getString("autor");
 					double valoracion = rs.getDouble("valoracion");
 					String portadaPath = rs.getString("portada_path");
+					String genero = rs.getString("genero");
 					
 					// crear el objeto libro
 					
-					Libro libro = new Libro(id, titulo, autor, valoracion, portadaPath);
+					Libro libro = new Libro(id, titulo, autor, valoracion, portadaPath, Genero.fromString(genero));
 					listaLibros.add(libro);
 				}
 				} catch (SQLException e) {

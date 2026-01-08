@@ -1,5 +1,6 @@
 package db;
 
+import domain.Genero;
 import domain.Libro;
 import domain.User;
 
@@ -16,8 +17,8 @@ public class LibroDAO {
    
     public void insertaLibro(Libro libro) throws SQLException {
         
-        String sql = "INSERT INTO Libro(titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Libro(titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path, genero) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) { 
@@ -28,7 +29,7 @@ public class LibroDAO {
             pstmt.setDouble(4, libro.getValoracion()); 
             pstmt.setInt(5, libro.getNumValoraciones());
             pstmt.setString(6, libro.getPortadaPath());
-            
+            pstmt.setString(7, libro.getGenero().toString());
             
             
             int filasAfectadas = pstmt.executeUpdate(); 
@@ -46,7 +47,7 @@ public class LibroDAO {
 
   
     public List<Libro> getTodosLosLibros() throws SQLException {
-        String sql = "SELECT id, titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path FROM Libro";
+        String sql = "SELECT id, titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path, genero FROM Libro";
         List<Libro> listaLibros = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
@@ -61,9 +62,9 @@ public class LibroDAO {
                 double valMedia = rs.getDouble("valoracion_media");
                 int numVal = rs.getInt("num_valoraciones");
                 String path = rs.getString("portada_path");
-                
+                String genStr = rs.getString("genero");
 
-                Libro libro = new Libro(id, titulo, autor, valOriginal, path);
+                Libro libro = new Libro(id, titulo, autor, valOriginal, path, Genero.fromString(genStr));
                 libro.setValoracion(valMedia);
                 libro.setNumValoraciones(numVal);
                 
@@ -74,7 +75,7 @@ public class LibroDAO {
     }
     
     public Libro getLibroById(int id) throws SQLException {
-        String sql = "SELECT id, titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path FROM Libro WHERE id = ?";
+        String sql = "SELECT id, titulo, autor, valoracion_original, valoracion_media, num_valoraciones, portada_path, genero FROM Libro WHERE id = ?";
         Libro libro = null;
 
         try (Connection con = DBConnection.getConnection();
@@ -90,9 +91,9 @@ public class LibroDAO {
                     double valMedia = rs.getDouble("valoracion_media");
                     int numVal = rs.getInt("num_valoraciones");
                     String path = rs.getString("portada_path");
-                    
+                    String genStr = rs.getString("genero");
                    
-                    libro = new Libro(id, titulo, autor, valOriginal, path);
+                    libro = new Libro(id, titulo, autor, valOriginal, path, Genero.fromString(genStr));
                     libro.setValoracion(valMedia);
                     libro.setNumValoraciones(numVal);
                 }
@@ -127,7 +128,7 @@ public class LibroDAO {
     public List<Object[]> getLibrosPeorValorados(int limite) throws SQLException {
         String sql =
             "SELECT l.id, l.titulo, l.autor, l.valoracion_original, l.valoracion_media, " +
-            "       l.num_valoraciones, l.portada_path, AVG(v.puntuacion) AS media " +
+            "       l.num_valoraciones, l.portada_path, l.genero, AVG(v.puntuacion) AS media " +
             "FROM Libro l " +
             "JOIN Valoracion v ON l.id = v.codigoLibro " + 
             "GROUP BY l.id " +
@@ -152,8 +153,9 @@ public class LibroDAO {
                     double valMediaGuardada = rs.getDouble("valoracion_media");
                     int numVal = rs.getInt("num_valoraciones");
                     String path = rs.getString("portada_path");
+                    String genStr = rs.getString("genero");
 
-                    Libro libro = new Libro(id, titulo, autor, valOriginal, path);
+                    Libro libro = new Libro(id, titulo, autor, valOriginal, path, Genero.fromString(genStr));
                     libro.setValoracion(valMediaGuardada);
                     libro.setNumValoraciones(numVal);
 

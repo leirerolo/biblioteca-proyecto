@@ -16,6 +16,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private String titulo;
 	private String autor;
 	private ImageIcon portada;
+	private Genero genero;
 	
 	private double valoracionOriginal; // del CSV
     private double valoracionMedia; //media actual
@@ -24,7 +25,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
     private String portadaPath; // para poder acceder a la imagen a traves de la BD
 	
   // constructor para leer el libro desde la BD
-	public Libro(int id, String titulo, String autor, double valoracion, String portadaPath) {
+	public Libro(int id, String titulo, String autor, double valoracion, String portadaPath, Genero genero) {
 		this.id= id;
 		this.titulo = titulo;
 		this.autor = autor;
@@ -32,17 +33,19 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
         this.valoracionMedia = valoracion;
 		this.portadaPath= portadaPath;
 		this.portada= loadImage(portadaPath);
+		this.genero = genero;
 	}
 	
 	// constructor para poder cargar el libro desde el CSV
 	
-	public Libro(String titulo, String autor, ImageIcon portada, double valoracion, String portadaPath) {
+	public Libro(String titulo, String autor, ImageIcon portada, double valoracion, String portadaPath, Genero genero) {
 		this.titulo= titulo;
 		this.autor= autor;
 		this.portada= portada;
 		this.valoracionOriginal = valoracion;
         this.valoracionMedia = valoracion;
 		this.portadaPath = portadaPath;
+		this.genero = genero;
 	}
 	
 	public void setId(int id) {
@@ -53,22 +56,7 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
 	private ImageIcon loadImage(String path) {
 		if(path == null || path.isEmpty()) return null;
 		
-		//String resourcePath = path.replaceFirst("images/", "");
 		try {
-			
-			//java.net.URL imageUrl = getClass().getClassLoader().getResource(resourcePath);
-			
-//			if (imageUrl != null) {
-//				
-//				ImageIcon original= new ImageIcon(imageUrl);
-//				if (original.getImage()!= null) {
-//					java.awt.Image img= original.getImage().getScaledInstance(120,160, java.awt.Image.SCALE_SMOOTH);
-//					return new ImageIcon(img);
-//				}
-//			}else {
-//				System.err.println("Error al cargar la imagen");
-//			}
-			
 			File imgFile = new File(path); 
 	        if (imgFile.exists()) {
 	            ImageIcon original = new ImageIcon(imgFile.getAbsolutePath());
@@ -143,9 +131,14 @@ public class Libro implements Comparable<Libro>, Comparator<Libro>{
     public void setValoracion(double valoracionMedia) {
         this.valoracionMedia = valoracionMedia;
     }
-    
 	
-	
+    public Genero getGenero() {
+        return genero;
+    }
+
+    public void setGenero(Genero genero) {
+        this.genero = genero;
+    }
 
 	
 	

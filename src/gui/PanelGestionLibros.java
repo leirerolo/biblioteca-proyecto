@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import db.LibroDAO;
 import db.ReservaDAO;
+import domain.Genero;
 import domain.Libro;
 
 public class PanelGestionLibros extends JPanel {
@@ -112,10 +113,13 @@ public class PanelGestionLibros extends JPanel {
         JTextField tfTitulo = new JTextField();
         JLabel lblAutor = new JLabel("Autor:");
         JTextField tfAutor = new JTextField();
+        JLabel lblGenero = new JLabel("Género:");
+        JComboBox<Genero> jcomboGenero = new JComboBox<>(Genero.values());
         JLabel lblPortada = new JLabel("Portada:");
         JTextField tfPortada = new JTextField();
         tfPortada.setEditable(false);
         JButton btnExaminar = new JButton("Examinar");
+        
 
         // Examinar
         btnExaminar.addActionListener(e -> {
@@ -138,6 +142,12 @@ public class PanelGestionLibros extends JPanel {
         gbc.gridx = 1; gbc.gridy = 1; gbc.gridwidth = 2;
         dialog.add(tfAutor, gbc);
 
+        //FILA GÉNERO
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
+        dialog.add(lblGenero, gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.gridwidth = 2;
+        dialog.add(jcomboGenero, gbc);
+        
         // FILA PORTADA
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
         dialog.add(lblPortada, gbc);
@@ -148,7 +158,7 @@ public class PanelGestionLibros extends JPanel {
 
         // BOTÓN GUARDAR
         JButton btnGuardar = new JButton("Guardar");
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         dialog.add(btnGuardar, gbc);
@@ -158,19 +168,21 @@ public class PanelGestionLibros extends JPanel {
                 String titulo = tfTitulo.getText().trim();
                 String autor = tfAutor.getText().trim();
                 String rutaPortada = tfPortada.getText().trim();
-
+                Genero genero = (Genero) jcomboGenero.getSelectedItem();
+                
                 if (titulo.isEmpty() || autor.isEmpty() || rutaPortada.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.");
                     return;
                 }
 
                 ImageIcon portada = new ImageIcon(rutaPortada);
-                Libro nuevo = new Libro(titulo, autor, portada, 0, rutaPortada);
+                Libro nuevo = new Libro(titulo, autor, portada, 0, rutaPortada, genero);
 
                 libros.add(nuevo);
                 new LibroDAO().insertaLibro(nuevo);
                 refrescarLista();
                 dialog.dispose();
+                
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(dialog, "Error al añadir libro: " + ex.getMessage());
