@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -159,9 +160,18 @@ public class JFrameReservas extends JFramePrincipal{
 					    barra.setValue(Math.max(dias,0));
 					    barra.setString(dias + " días");
 					    barra.setStringPainted(true);
-					    if(dias <= 0) barra.setForeground(Color.RED); //si se ha pasado el plazo, rojo
-					    else if(dias <= 7) barra.setForeground(Color.ORANGE); //si queda una semana o menos, naranja
-					    else barra.setForeground(Color.GREEN); //por lo demás, verde
+					    
+					    //texto en negrita y negro
+					    barra.setFont(barra.getFont().deriveFont(java.awt.Font.BOLD));
+					    barra.setForeground(Color.black);
+					    
+					    //color de la barra de progreso según los días que quedan
+					    if(dias >= 14) barra.setForeground(Color.GREEN); //quedan 2 semanas o más --> verde
+					    else if(dias >= 7) barra.setForeground(Color.ORANGE); //quedan entre 1 y 2 semanas --> naranja
+					    else barra.setForeground(Color.RED); //queda menos --> rojo
+					    
+					    //borde inferor para separar filas
+					    barra.setBorder(new MatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 					    return barra;
 					    
 					} catch(NumberFormatException e) {
@@ -175,6 +185,7 @@ public class JFrameReservas extends JFramePrincipal{
 				}
 				celda.setBackground(fondo);
 				celda.setForeground(texto);
+				celda.setBorder(new MatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 				return celda;
 			}
 		};
@@ -225,7 +236,7 @@ public class JFrameReservas extends JFramePrincipal{
 
 		        // Pequeño margen inferior
 		        panel.add(Box.createRigidArea(new java.awt.Dimension(0, 5)));
-
+		        panel.setBorder(new MatteBorder(0, 0, 1, 0, new Color(220, 220, 220))); //borde
 		        return panel;
 		    }
 		});

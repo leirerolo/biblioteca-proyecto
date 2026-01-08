@@ -188,8 +188,6 @@ public class Main {
         return listaLibros;
     }
     
-    //para la persistencia de valoraciones
-    
     }
 
 

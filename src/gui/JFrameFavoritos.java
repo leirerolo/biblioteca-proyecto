@@ -61,6 +61,9 @@ public class JFrameFavoritos extends JFrame {
         panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
         panelLista.setBackground(Color.WHITE);
         panelLista.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        //para que no se agrande cuando hay pocos favoritos
+        panelLista.add(Box.createVerticalGlue());
 
         JScrollPane scroll = new JScrollPane(panelLista, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -87,14 +90,20 @@ public class JFrameFavoritos extends JFrame {
             if (favoritos.isEmpty()) {
                 JLabel vacio = new JLabel("Aún no has marcado ningún libro como favorito.");
                 vacio.setFont(fuenteMenu);
-                vacio.setHorizontalAlignment(SwingConstants.CENTER);
+                vacio.setAlignmentX(Component.CENTER_ALIGNMENT); //centro horizontal
                 panelLista.add(vacio);
+                
             } else {
                 for (Libro l : favoritos) {
-                    panelLista.add(buildRow(l));
+                	JPanel fila = buildRow(l);
+                	fila.setAlignmentX(Component.CENTER_ALIGNMENT); //para que no se estire
+                    panelLista.add(fila);
                     panelLista.add(Box.createRigidArea(new Dimension(0, 8)));
                 }
             }
+            //para empujar las filas hacia arriba
+            panelLista.add(Box.createVerticalGlue());
+            
         } catch (SQLException e) {
             JLabel err = new JLabel("Error al cargar favoritos: " + e.getMessage());
             panelLista.add(err);
@@ -105,7 +114,9 @@ public class JFrameFavoritos extends JFrame {
     }
 
     private JPanel buildRow(Libro l) {
-        JPanel row = new JPanel(new BorderLayout(10, 0));
+        JPanel row = new JPanel();
+        row.setLayout(new BorderLayout(10,0));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200)); //altura fija para que no se expandan
         row.setBackground(Color.WHITE);
         row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
