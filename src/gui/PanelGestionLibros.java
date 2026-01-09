@@ -21,7 +21,9 @@ public class PanelGestionLibros extends JPanel {
     public PanelGestionLibros(List<Libro> libros) {
         this.libros = libros;
         setLayout(new BorderLayout(10,10));
-        setBackground(Color.WHITE);
+        Theme initialTheme = Theme.LIGHT; 
+        
+        setBackground(initialTheme.backgroundMain);
         setBorder(new EmptyBorder(10,10,10,10));
 
         JLabel titulo = new JLabel("Gestión de Libros", JLabel.CENTER);
@@ -31,13 +33,13 @@ public class PanelGestionLibros extends JPanel {
         modeloLibros = new DefaultListModel<>();
         listaLibros = new JList<>(modeloLibros);
         listaLibros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listaLibros.setCellRenderer(new LibroCellRenderer());
+        listaLibros.setCellRenderer(new LibroCellRenderer(initialTheme));
 
         JScrollPane scroll = new JScrollPane(listaLibros);
         add(scroll, BorderLayout.CENTER);
 
         JPanel panelBotones = new JPanel(new FlowLayout());
-        panelBotones.setBackground(Color.WHITE);
+        panelBotones.setBackground(initialTheme.backgroundMain);
 
         btnEliminar = new JButton("Eliminar libro");
         btnAñadir = new JButton("Añadir libro");
@@ -192,6 +194,21 @@ public class PanelGestionLibros extends JPanel {
         dialog.setVisible(true);
     }
 
+    public void setTheme(Theme theme) {
+        setBackground(theme.backgroundMain);
+        listaLibros.setBackground(theme.backgroundPanel);
+        listaLibros.setForeground(theme.textColor);
+
+        btnAñadir.setBackground(theme.backgroundPanel);
+        btnAñadir.setForeground(theme.textColor);
+        btnEliminar.setBackground(theme.backgroundPanel);
+        btnEliminar.setForeground(theme.textColor);
+        listaLibros.setCellRenderer(new LibroCellRenderer(theme));
+
+        revalidate();
+        repaint();
+    }
+
 
 
     // Renderer para mostrar título + portada en la lista
@@ -200,12 +217,17 @@ public class PanelGestionLibros extends JPanel {
 		
 		private JLabel lblPortada = new JLabel();
         private JLabel lblTitulo = new JLabel();
+        private Theme theme;
 
-        public LibroCellRenderer() {
+
+        public LibroCellRenderer(Theme theme) {
+        	this.theme= theme;
             setLayout(new BorderLayout(5,5));
+            lblTitulo.setForeground(theme.textColor);
             add(lblPortada, BorderLayout.WEST);
             add(lblTitulo, BorderLayout.CENTER);
             setBorder(new EmptyBorder(5,5,5,5));
+            setOpaque(true);
         }
 
         @Override
@@ -219,7 +241,14 @@ public class PanelGestionLibros extends JPanel {
                 lblPortada.setIcon(null);
             }
 
-            setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+            if (isSelected) {
+            	setBackground(list.getSelectionBackground()); 
+                lblTitulo.setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(theme.backgroundPanel);
+                lblTitulo.setForeground(theme.textColor);
+            }
+
             return this;
         }
     }

@@ -52,7 +52,28 @@ public class PanelUsers extends JPanel {
 
         cargarUsuarios();
     }
-
+    
+    public void applyTheme(Theme theme) {
+    	setBackground(theme.backgroundMain);
+    	tablaUsers.getTableHeader().setBackground(theme.backgroundPanel);
+    	tablaUsers.getTableHeader().setForeground(theme.textColor);
+    	
+    	for (int i = 0; i< tablaUsers.getRowCount(); i++) {
+    		for(int j = 0; j< tablaUsers.getColumnCount(); j++) {
+    			Component c = tablaUsers.prepareRenderer(tablaUsers.getCellRenderer(i, j), i, j);
+    			c.setForeground(theme.textColor);
+    			if(i %2 == 0)
+    				c.setBackground(theme.backgroundMain);
+    			else
+    				c.setBackground(theme.backgroundPanel);
+    		}
+    	}
+    	revalidate();
+    	repaint();
+    }
+    
+    
+    
     private void cargarUsuarios() {
         modeloTabla.setRowCount(0); // limpiar tabla
 

@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -25,7 +26,7 @@ public class PanelPeorValorados extends JPanel {
 
     public PanelPeorValorados() {
         setLayout(new BorderLayout());
-        setBackground(new Color(240, 180, 220));
+        setBackground(Theme.DEFAULT.backgroundMain);
 
         // Contenedor con márgenes para que se vea el rosa
         JPanel container = new JPanel(new BorderLayout());
@@ -34,7 +35,7 @@ public class PanelPeorValorados extends JPanel {
         add(container, BorderLayout.CENTER);
 
         mainPanel = new JPanel(new GridLayout(2, 3, 15, 15));
-        mainPanel.setBackground(new Color(240, 180, 220));
+        mainPanel.setBackground(Theme.DEFAULT.backgroundMain);
         mainPanel.setOpaque(true);
 
         container.add(mainPanel, BorderLayout.CENTER);
@@ -62,7 +63,6 @@ public class PanelPeorValorados extends JPanel {
 
             while (usados < 6) {
                 JPanel panel = new JPanel(new BorderLayout());
-                panel.setBackground(Color.WHITE);
                 mainPanel.add(panel);
                 usados++;
             }
@@ -74,7 +74,25 @@ public class PanelPeorValorados extends JPanel {
             e.printStackTrace();
         }
     }
+    
+    
+    public void applyTheme(Theme theme) {
+        setBackground(theme.backgroundMain);
+        mainPanel.setBackground(theme.backgroundMain);
 
+        for (Component c : mainPanel.getComponents()) {
+            if (c instanceof JPanel) {
+                c.setBackground(theme.backgroundPanel);
+                for (Component inner : ((JPanel)c).getComponents()) {
+                    inner.setForeground(theme.textColor);
+                }
+            }
+        }
+        revalidate();
+        repaint();
+    }
+
+    
     private JPanel crearPanelLibro(Libro libro, double media) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -101,7 +119,6 @@ public class PanelPeorValorados extends JPanel {
         lblMedia.setFont(new Font("Arial", Font.PLAIN, 14));
 
         JPanel info = new JPanel(new GridLayout(2, 1));
-        info.setBackground(Color.WHITE);
         info.add(lblTitulo);
         info.add(lblMedia);
 

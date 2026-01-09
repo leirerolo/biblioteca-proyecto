@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -21,10 +22,12 @@ public class PanelMasReservados extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	JPanel mainPanel;
-	
+	private Theme initialTheme= Theme.LIGHT;
     public PanelMasReservados() {
         setLayout(new BorderLayout());
-        setBackground(new Color(240, 180, 220));
+
+        setBackground(initialTheme.backgroundMain);
+        
         
         // Panel contenedor con márgenes para separar mainPanel de los bordes
         JPanel container = new JPanel(new BorderLayout());
@@ -33,7 +36,7 @@ public class PanelMasReservados extends JPanel {
         add(container, BorderLayout.CENTER);
         
         mainPanel = new JPanel(new GridLayout(2,3,15,15));
-        mainPanel.setBackground(new Color(240,180,220));
+        mainPanel.setBackground(initialTheme.backgroundMain);
         mainPanel.setOpaque(true);
         container.add(mainPanel, BorderLayout.CENTER);
         
@@ -78,10 +81,35 @@ public class PanelMasReservados extends JPanel {
         }
     }
     
+    public void applyTheme(Theme theme) {
+        this.setBackground(theme.backgroundMain);
+        mainPanel.setBackground(theme.backgroundMain);
+
+        for (Component c : mainPanel.getComponents()) {
+        	if (c instanceof JPanel) {
+                JPanel card = (JPanel) c;
+                card.setBackground(theme.backgroundPanel);
+                actualizarComponentesRecursivo(card, theme);
+            }
+        }
+        revalidate();
+        repaint();
+    }
+    private void actualizarComponentesRecursivo(JPanel parent, Theme theme) {
+        for (Component child : parent.getComponents()) {
+            if (child instanceof JLabel) {
+                child.setForeground(theme.textColor);
+            } else if (child instanceof JPanel) {
+                child.setBackground(theme.backgroundPanel);
+                actualizarComponentesRecursivo((JPanel) child, theme);
+            }
+        }
+    }
+
     private JPanel crearPanelLibro(Libro libro, int reservas) {
         JPanel panel = new JPanel(new BorderLayout());
         
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(initialTheme.backgroundPanel);
         panel.setOpaque(true);
         
         // Portada
@@ -106,7 +134,7 @@ public class PanelMasReservados extends JPanel {
         lblR.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel info = new JPanel(new GridLayout(2, 1));
-        info.setBackground(Color.WHITE);
+        info.setBackground(initialTheme.backgroundPanel);
         info.setOpaque(true);
         info.add(lblTitulo);
         info.add(lblR);

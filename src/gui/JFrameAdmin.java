@@ -11,6 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,10 +28,14 @@ public class JFrameAdmin extends JFrame {
 	//predefinir las fuentes
 	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
-	private final Color COLOR_MENU = new Color(90,170,255);
-	private final Color COLOR_HOVER = new Color(60,140,230);
-	private final Color COLOR_SELECTED = new Color(135,200,255);
-	private final Color COLOR_CENTRAL= new Color(100,180,255);
+	private final Color COLOR_MENU_LIGHT = new Color(245,245,245);
+	private final Color COLOR_HOVER_LIGHT = new Color(220,220,220);
+	private final Color COLOR_SELECTED_LIGHT = new Color(200,200,200);
+
+	private final Color COLOR_MENU_DARK = new Color(60,60,60);
+	private final Color COLOR_HOVER_DARK = new Color(90,90,90);
+	private final Color COLOR_SELECTED_DARK = new Color(120,120,120);
+	
 	
 	// Paneles principales
     private JPanel panelLateral;
@@ -40,6 +46,9 @@ public class JFrameAdmin extends JFrame {
     private JLabel lblMasReservados;
     private JLabel lblPeorValorados;
     private JLabel lblGestionLibros;
+    
+    private Theme currentTheme = Theme.LIGHT; // default
+
 	
 	public JFrameAdmin(List<Libro> libros) {
 		this.libros = libros;
@@ -50,6 +59,8 @@ public class JFrameAdmin extends JFrame {
 		this.setSize(1200, 700); //formato ordenador para el admin
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
+		
+		applyTheme(currentTheme);
 		
 		
 	}
@@ -63,7 +74,6 @@ public class JFrameAdmin extends JFrame {
 	
 		//PANEL LATERAL IZQUIERDO: menú
 		panelLateral = new JPanel(new GridLayout(0,1,0,10));
-		panelLateral.setBackground(new Color(220,220,220));
 		panelLateral.setOpaque(true);
 		panelLateral.setPreferredSize(new Dimension(250, this.getHeight()));
 		panelLateral.setBorder(new MatteBorder(0,0,0,3, Color.WHITE));
@@ -120,6 +130,24 @@ public class JFrameAdmin extends JFrame {
                 mostrarGestionLibros();
             }
         });
+        
+        JButton btnToggleTheme = new JButton(currentTheme == Theme.LIGHT ? "MODO OSCURO" : "MODO CLARO"); 
+        btnToggleTheme.setFont(new Font("Arial", Font.BOLD, 12));
+        btnToggleTheme.setFocusPainted(false);
+        btnToggleTheme.setPreferredSize(new Dimension(200,40));
+        btnToggleTheme.setBorder(null);
+        btnToggleTheme.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnToggleTheme.setBackground(new Color(225, 225, 225));
+        btnToggleTheme.setForeground(Color.BLACK);
+        btnToggleTheme.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 1));
+        panelLateral.add(btnToggleTheme);
+        
+        btnToggleTheme.addActionListener(e -> {
+            currentTheme = (currentTheme == Theme.LIGHT) ? Theme.DARK : Theme.LIGHT;
+            applyTheme(currentTheme);
+            btnToggleTheme.setText(currentTheme == Theme.LIGHT ?"MODO OSCURO" : "MODO CLARO");
+        });
+
 	}
 	
 	
@@ -127,31 +155,41 @@ public class JFrameAdmin extends JFrame {
 		JLabel label = new JLabel(texto, JLabel.CENTER);
 		label.setFont(fuenteMenu);
 		label.setOpaque(true);
-		label.setBackground(COLOR_MENU);
-		label.setForeground(Color.WHITE);
 		label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		label.setBorder(new MatteBorder(0, 0, 2, 0, Color.WHITE));
 		
 		label.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
-				if(label.getBackground() != COLOR_SELECTED) {
-					label.setBackground(COLOR_HOVER);
+				if(label.getBackground() != getColorSelected()) {
+					label.setBackground(getColorHover());
 				}
 			}
 			public void mouseExited(MouseEvent e) {
-				if(label.getBackground() != COLOR_SELECTED) {
-					label.setBackground(COLOR_MENU);
+				if(label.getBackground() != getColorSelected()) {
+					label.setBackground(getColorMenu());
 				}
 			}
 		});
 		return label;
 	}
+	 private Color getColorMenu() {
+	        return currentTheme == Theme.LIGHT ? COLOR_MENU_LIGHT : COLOR_MENU_DARK;
+	    }
+
+	    private Color getColorHover() {
+	        return currentTheme == Theme.LIGHT ? COLOR_HOVER_LIGHT : COLOR_HOVER_DARK;
+	    }
+
+	    private Color getColorSelected() {
+	        return currentTheme == Theme.LIGHT ? COLOR_SELECTED_LIGHT : COLOR_SELECTED_DARK;
+	    }
 	
 	// ******************** SUBVENTANAS ****************************
 	private void mostrarUsuarios() {
         panelCentral.removeAll();
         
         PanelUsers panelUsers = new PanelUsers();
+        panelUsers.setBackground(currentTheme.backgroundMain); 
         panelCentral.add(panelUsers, BorderLayout.CENTER);
         
         panelCentral.revalidate();
@@ -197,8 +235,50 @@ public class JFrameAdmin extends JFrame {
         for (Component c : panelLateral.getComponents()) {
             if (c instanceof JLabel) {
                 JLabel lbl = (JLabel) c;
-                lbl.setBackground(lbl == seleccionado ? COLOR_SELECTED : COLOR_MENU);
+                lbl.setBackground(lbl == seleccionado ? getColorSelected() : getColorMenu());
             }
         }
     }
+    public void applyTheme(Theme theme) {
+    	this.currentTheme = theme;
+        // panel lateral
+        panelLateral.setBackground(theme.backgroundMain);
+        panelLateral.setBorder(new MatteBorder(0, 0, 0, 3, theme.textColor)); 
+        for (Component c : panelLateral.getComponents()) {
+            if (c instanceof JLabel lbl) {
+            	lbl.setBackground(getColorMenu());
+                lbl.setForeground(theme.textColor);
+                lbl.setBorder(new MatteBorder(0, 0, 2, 0, theme.textColor));
+                
+              if (c instanceof JButton btn) {
+               if (theme == Theme.DARK) {
+                 btn.setBackground(new Color(80, 80, 80));
+                 btn.setForeground(Color.WHITE);
+                 btn.setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100)));
+                 } else {
+                        btn.setBackground(new Color(225, 225, 225));
+                        btn.setForeground(Color.BLACK);
+                        btn.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180)));
+                    }
+            }
+            }
+        }
+
+        // panel central
+        panelCentral.setBackground(theme.backgroundMain);
+        for (Component c : panelCentral.getComponents()) {
+            if (c instanceof JPanel p) {
+                p.setBackground(theme.backgroundPanel);
+                if (p instanceof PanelMasReservados) {
+                    ((PanelMasReservados) p).applyTheme(theme);
+                } else if (p instanceof PanelGestionLibros) {
+                    ((PanelGestionLibros) p).setTheme(theme);
+                }
+            }
+        }
+
+        revalidate();
+        repaint();
+    }
+
 }
