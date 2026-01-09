@@ -1,10 +1,12 @@
 package gui;
 
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.sql.SQLException;
 import java.util.Hashtable;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,13 +17,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+
 import db.LibroDAO;
 import db.ValoracionDAO;
 import domain.Libro;
 import domain.Reserva;
 import domain.User;
 
+
+
 public class JDialogValorar extends JDialog{
+	
 	private static final long serialVersionUID = 1L;
 	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
 

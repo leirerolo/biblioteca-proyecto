@@ -26,9 +26,10 @@ public class JFrameAdmin extends JFrame {
 	//predefinir las fuentes
 	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
-	private final Color COLOR_MENU = new Color(80,15,80);
-	private final Color COLOR_HOVER = new Color(140,60,140);
-	private final Color COLOR_SELECTED = new Color(240,180,220);
+	private final Color COLOR_MENU = new Color(90,170,255);
+	private final Color COLOR_HOVER = new Color(60,140,230);
+	private final Color COLOR_SELECTED = new Color(135,200,255);
+	private final Color COLOR_CENTRAL= new Color(100,180,255);
 	
 	// Paneles principales
     private JPanel panelLateral;
@@ -62,7 +63,7 @@ public class JFrameAdmin extends JFrame {
 	
 		//PANEL LATERAL IZQUIERDO: menú
 		panelLateral = new JPanel(new GridLayout(0,1,0,10));
-		panelLateral.setBackground(new Color(80,15,80));
+		panelLateral.setBackground(new Color(220,220,220));
 		panelLateral.setOpaque(true);
 		panelLateral.setPreferredSize(new Dimension(250, this.getHeight()));
 		panelLateral.setBorder(new MatteBorder(0,0,0,3, Color.WHITE));
@@ -84,7 +85,7 @@ public class JFrameAdmin extends JFrame {
 		
 		//PANEL CENTRAL: "subventanas"
 		panelCentral = new JPanel(new BorderLayout());
-		panelCentral.setBackground(new Color(120,30,115));
+		panelCentral.setBackground(new Color(245,245,245));
 		panelCentral.setOpaque(true);
 		this.add(panelCentral, BorderLayout.CENTER);
 		

@@ -9,10 +9,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import domain.User;
+ 
 
 public class JDialogEditarPerfil extends JDialog {
     private static final long serialVersionUID = 1L;
 
+    
     private final JPanel content = new JPanel();
     private JTextField tfNombre;
     private JTextField tfApellido;
@@ -21,19 +23,23 @@ public class JDialogEditarPerfil extends JDialog {
     private String selectedAvatarPath; // ruta elegida
     private boolean accepted = false;
 
+    
     public JDialogEditarPerfil(JFrame parent, User user) {
         super(parent, "Editar perfil", true);
         setSize(420, 280);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        
         getContentPane().setLayout(new BorderLayout());
         content.setBorder(new EmptyBorder(12,12,12,12));
         content.setLayout(null);
         
+        
         JLabel l0 = new JLabel("Nombre:"); 
         l0.setBounds(10, 10, 120, 24); 
         content.add(l0); 
+        
         
         tfNombre = new JTextField(user.getNombre() != null ? user.getNombre() : ""); 
         tfNombre.setBounds(140, 10, 250, 28); 
@@ -80,6 +86,7 @@ public class JDialogEditarPerfil extends JDialog {
             accepted = true;
             dispose();
         });
+        
         JButton cancel = new JButton("Cancelar");
         cancel.addActionListener((ActionEvent e) -> dispose());
         btns.add(ok);
@@ -91,6 +98,7 @@ public class JDialogEditarPerfil extends JDialog {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Elige una imagen de avatar");
         int res = chooser.showOpenDialog(this);
+        
         if (res == JFileChooser.APPROVE_OPTION) {
             File f = chooser.getSelectedFile();
             if (f != null && f.exists()) {
@@ -107,10 +115,12 @@ public class JDialogEditarPerfil extends JDialog {
                 // ajuste rápido de tamaño de preview
                 java.awt.Image scaled = icon.getImage().getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH);
                 lblAvatarPreview.setIcon(new ImageIcon(scaled));
+              
                 lblAvatarPreview.setText("");
             } else {
                 lblAvatarPreview.setIcon(null);
                 lblAvatarPreview.setText("Sin imagen");
+                
             }
         } catch (Exception ex) {
             lblAvatarPreview.setIcon(null);
@@ -118,6 +128,7 @@ public class JDialogEditarPerfil extends JDialog {
         }
     }
 
+    
     public boolean isAccepted() { return accepted; }
     public String getNombre() { return tfNombre.getText().trim(); }
     public String getApellido() { return tfApellido.getText().trim(); }

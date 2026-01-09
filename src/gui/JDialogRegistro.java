@@ -65,6 +65,8 @@ public class JDialogRegistro extends JDialog {
 				String nombre = tfNombre.getText().trim();
 				String apellido = tfApellido.getText().trim();
 				String pass = new String(pfPass.getPassword());
+				
+				
 				if (usuario.isEmpty() || email.isEmpty() || pass.isEmpty()) {
 					JOptionPane.showMessageDialog(this, "Usuario, email y contraseña son obligatorios", "Campos requeridos", JOptionPane.WARNING_MESSAGE);
 					return;
@@ -78,6 +80,7 @@ public class JDialogRegistro extends JDialog {
 				
 				JOptionPane.showMessageDialog(this, "Cuenta creada para '"+usuario+"'", "OK", JOptionPane.INFORMATION_MESSAGE);
 				dispose();
+				
 			} catch (IllegalArgumentException ex) {
 				JOptionPane.showMessageDialog(this, ex.getMessage(), "No se pudo registrar", JOptionPane.ERROR_MESSAGE);
 			} catch (Exception ex) {

@@ -108,6 +108,7 @@ public class JDialogLogin extends JDialog {
             }
         });
 
+        
         editorUsuario.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
@@ -150,7 +151,9 @@ public class JDialogLogin extends JDialog {
         if (state.getSavedCredentials().isEmpty()) {
             cbUsuarios.addItem("No hay usuarios guardados");
             cbUsuarios.setSelectedItem("");
-        } else {
+        } 
+        
+        else {
             for (String u : state.getSavedCredentials().keySet()) {
                 cbUsuarios.addItem(u);
             }
@@ -161,6 +164,7 @@ public class JDialogLogin extends JDialog {
         cbMostrarCont.setBounds(62, 110, 240, 20);
         contentPanel.add(cbMostrarCont);
 
+        
         cbMostrarCont.addActionListener(e -> {
             if (cbMostrarCont.isSelected()) {
                 if (!new String(pfPassword.getPassword()).equals("Contraseña...")) {
@@ -377,3 +381,6 @@ public class JDialogLogin extends JDialog {
     public User getLoggedUser() { return loggedUser; }
     public AppState getAppState() { return state; }
 }
+
+
+
