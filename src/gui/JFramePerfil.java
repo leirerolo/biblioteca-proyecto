@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -28,6 +30,10 @@ public class JFramePerfil extends JFrame {
     //fuentes para la letra
 	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 15);
 	
+	// Colores
+	private final Color COLOR_PRINCIPAL = new Color(90,170,255);
+	private final Color COLOR_HOVER = new Color(60,140,230);
+	
     public JFramePerfil(User user) {
         super("Mi perfil");
         this.user = user;
@@ -38,6 +44,20 @@ public class JFramePerfil extends JFrame {
         setResizable(false);
 
         JPanel root = new JPanel(new BorderLayout(12, 12));
+        root.setBackground(Color.WHITE);
+        
+        JPanel header = new JPanel();
+        header.setBackground(COLOR_PRINCIPAL);
+        header.setBorder(
+        		BorderFactory.createEmptyBorder(12,12,12,12)
+        		);
+        
+        JLabel lblTitulo = new JLabel("Mi perfil");
+        lblTitulo.setFont(new Font("Comic Sans MS", Font.BOLD,20));
+        lblTitulo.setForeground(Color.WHITE);
+        header.add(lblTitulo);
+        
+        root.add(header, BorderLayout.NORTH);
 
         // Panel datos
         JPanel datos = new JPanel(new GridLayout(3, 1, 10, 10));
@@ -73,24 +93,31 @@ public class JFramePerfil extends JFrame {
 
         // Avatar
         lblAvatar = new JLabel("", SwingConstants.CENTER);
+        
+       JPanel avatarPanel = new JPanel(new BorderLayout());
+       avatarPanel.setBackground(Color.WHITE);
+       avatarPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,10));
+       avatarPanel.add(lblAvatar, BorderLayout.NORTH);
         //lblAvatar.setVerticalAlignment(SwingConstants.TOP);
-        lblAvatar.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         cargarAvatarEn(lblAvatar, user.getAvatarPath());
 
         // Botón Editar
         JButton btnEditar = new JButton("Editar");
+        estilizarBoton(btnEditar);
         btnEditar.addActionListener(e -> editarPerfil());
 
         JButton btnFavoritos = new JButton("Mis favoritos");
+        estilizarBoton(btnFavoritos);
         btnFavoritos.addActionListener(e -> {
             JFrameFavoritos favWin = new JFrameFavoritos(user);
             favWin.setVisible(true);
         });
 
         JPanel right = new JPanel(new BorderLayout(8,8));
+        right.setBackground(Color.WHITE);
         right.add(datos, BorderLayout.CENTER);
 
-        root.add(lblAvatar, BorderLayout.WEST);
+        root.add(avatarPanel, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
         JPanel panelBotones = new JPanel(new GridLayout(1,2,10,0));
         panelBotones.setBackground(Color.WHITE);
@@ -101,6 +128,10 @@ public class JFramePerfil extends JFrame {
         root.setBackground(Color.WHITE);
         root.setOpaque(true);
         setContentPane(root);
+        pack();
+        setMinimumSize(new Dimension(420, 420));
+        setLocationRelativeTo(null);
+
     }
 
     private void editarPerfil() {
@@ -182,6 +213,25 @@ public class JFramePerfil extends JFrame {
         // 4) Último recurso: icono textual
         target.setIcon(null);
         target.setText("👤");
+    }
+    
+    private void estilizarBoton(JButton btn) {
+    	btn.setFocusPainted(false);
+    	btn.setBackground(COLOR_PRINCIPAL);
+    	btn.setForeground(Color.WHITE);
+    	btn.setFont(fuenteMenu);
+    	btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    	
+    	btn.addMouseListener(new java.awt.event.MouseAdapter() {
+    		public void mouseEntered(java.awt.event.MouseEvent e) {
+    			btn.setBackground(COLOR_HOVER);
+    		}
+    		
+    		
+    		public void mouseExited(java.awt.event.MouseEvent e) {
+    			btn.setBackground(COLOR_PRINCIPAL);
+    		}
+    	});
     }
 
     //USO DE CHAT GPT PARA EL MÉTODO

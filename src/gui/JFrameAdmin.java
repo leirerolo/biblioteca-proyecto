@@ -26,6 +26,9 @@ public class JFrameAdmin extends JFrame {
 	//predefinir las fuentes
 	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
+	private final Color COLOR_MENU = new Color(80,15,80);
+	private final Color COLOR_HOVER = new Color(140,60,140);
+	private final Color COLOR_SELECTED = new Color(240,180,220);
 	
 	// Paneles principales
     private JPanel panelLateral;
@@ -123,10 +126,23 @@ public class JFrameAdmin extends JFrame {
 		JLabel label = new JLabel(texto, JLabel.CENTER);
 		label.setFont(fuenteMenu);
 		label.setOpaque(true);
-		label.setBackground(new Color(80,15,80));
+		label.setBackground(COLOR_MENU);
 		label.setForeground(Color.WHITE);
 		label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		label.setBorder(new MatteBorder(0, 0, 2, 0, Color.WHITE));
+		
+		label.addMouseListener(new MouseAdapter() {
+			public void mouseEntered(MouseEvent e) {
+				if(label.getBackground() != COLOR_SELECTED) {
+					label.setBackground(COLOR_HOVER);
+				}
+			}
+			public void mouseExited(MouseEvent e) {
+				if(label.getBackground() != COLOR_SELECTED) {
+					label.setBackground(COLOR_MENU);
+				}
+			}
+		});
 		return label;
 	}
 	
@@ -180,7 +196,7 @@ public class JFrameAdmin extends JFrame {
         for (Component c : panelLateral.getComponents()) {
             if (c instanceof JLabel) {
                 JLabel lbl = (JLabel) c;
-                lbl.setBackground(lbl == seleccionado ? new Color(240,180,220) : new Color(80,15,80));
+                lbl.setBackground(lbl == seleccionado ? COLOR_SELECTED : COLOR_MENU);
             }
         }
     }
