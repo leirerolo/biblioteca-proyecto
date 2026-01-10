@@ -67,8 +67,9 @@ public class JFrameExplorar extends JFramePrincipal {
 		
 		// --------- Cabecera (filtro texto + opciones filtro)
 		JPanel cabecera = new JPanel(new BorderLayout());
-		txtFiltro = new JTextField("Buscar por título o autor...");
-		txtFiltro.setForeground(Color.GRAY);
+		txtFiltro = new JTextField();
+		configurarPlaceholder();
+		//txtFiltro.setForeground(Color.GRAY);
 		
 		//al hacer click o escribir en el filtro
 		txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -157,13 +158,59 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    
 	}
+	
+	private final String PLACEHOLDER = "Buscar por título o autor...";
+	private boolean mostrandoPlaceholder = true;
+
+	private void configurarPlaceholder() {
+
+	    // Mostrar placeholder inicial
+	    txtFiltro.setForeground(Color.GRAY);
+	    txtFiltro.setText(PLACEHOLDER);
+	    mostrandoPlaceholder = true;
+
+	    txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
+
+	        @Override
+	        public void focusGained(java.awt.event.FocusEvent e) {
+	            if (mostrandoPlaceholder) {
+	                txtFiltro.setText("");
+	                txtFiltro.setForeground(JFramePrincipal.darkMode ? Color.WHITE : Color.BLACK);
+	                mostrandoPlaceholder = false;
+	            }
+	        }
+
+	        @Override
+	        public void focusLost(java.awt.event.FocusEvent e) {
+	            if (txtFiltro.getText().isEmpty()) {
+	                txtFiltro.setForeground(Color.GRAY);
+	                txtFiltro.setText(PLACEHOLDER);
+	                mostrandoPlaceholder = true;
+	            }
+	        }
+	    });
+
+	    // DocumentListener: solo filtra si NO es placeholder
+	    txtFiltro.getDocument().addDocumentListener(new DocumentListener() {
+	        @Override public void insertUpdate(DocumentEvent e) { actualizar(); }
+	        @Override public void removeUpdate(DocumentEvent e) { actualizar(); }
+	        @Override public void changedUpdate(DocumentEvent e) {}
+
+	        private void actualizar() {
+	            if (!mostrandoPlaceholder) {
+	                filtrarLibros();
+	            }
+	        }
+	    });
+	}
+
 
 	public void filtrarLibros() {
 		
 	    panelLibros.removeAll(); 
 	    
 	    String tit = txtFiltro.getText().trim().toLowerCase();
-	    if (tit.equals("buscar por título o autor...")) {
+	    if (mostrandoPlaceholder) {
 	        tit = "";
 	    }
 	    
