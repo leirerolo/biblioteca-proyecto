@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.KeyAdapter;
@@ -227,9 +228,15 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    //si libros coincide mostrar libros, si no hay libros mostrar mensaje "sin resultado"
 	    if (listaLibros.isEmpty()) {
-	        JLabel mensaje = new JLabel("No hay coincidencias");
-	        mensaje.setHorizontalAlignment(JLabel.CENTER);
-	        panelLibros.add(mensaje);
+	    	JLabel mensaje = new JLabel("No hay coincidencias");
+	    	mensaje.setAlignmentX(Component.CENTER_ALIGNMENT);   // centra en BoxLayout
+	    	mensaje.setHorizontalAlignment(JLabel.CENTER);
+	    	mensaje.setFont(new Font("SansSerif", Font.BOLD, 20));  // letra más grande
+
+	    	mensaje.setForeground(JFramePrincipal.darkMode ? new Color(230,230,230) : Color.BLACK);
+
+	    	panelLibros.add(mensaje);
+
 	    
 	    } else {
 	    	
@@ -347,6 +354,8 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    this.revalidate();
 	    this.repaint();
+	    this.aplicarTema();
+
 	}
 	
 	/**
