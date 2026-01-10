@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -139,6 +140,7 @@ public class JFramePrincipal extends JFrame {
 		
 		// Cabecera: nombre de la biblioteca, y botón para el perfil
 		headerPanel  = new JPanel(new BorderLayout());
+		headerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 15));
 		headerPanel .setBackground(new Color(0, 160, 220));
 		
 		lblBiblio = new JLabel("Biblio.O");
@@ -171,6 +173,15 @@ public class JFramePrincipal extends JFrame {
 		        Navigator.applyThemeAll();
 		    }
 		});
+		
+		lblBiblio.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		lblBiblio.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(java.awt.event.MouseEvent e) {
+		        mostrarCreditos();
+		    }
+		});
+
 		
 
 
@@ -570,5 +581,82 @@ public class JFramePrincipal extends JFrame {
         this.libros.remove(libro);
         Navigator.inicio.refrescarTopLibros();
     }
+    
+    
+    // creditos 
+    private void mostrarCreditos() {
+        JDialog dialog = new JDialog(this, "Créditos", true);
+        dialog.setSize(380, 300);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(this);
+
+        // Colores segun el tema
+        Color fondo = darkMode ? new Color(30,30,30) : Color.WHITE;
+        Color texto = darkMode ? new Color(230,230,230) : Color.BLACK;
+        Color acento = darkMode ? new Color(144,213,255) : new Color(0,102,204);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(fondo);
+        panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Titulo
+        JLabel titulo = new JLabel("Créditos del Proyecto", JLabel.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        titulo.setForeground(acento);
+        panel.add(titulo, BorderLayout.NORTH);
+
+        // Contenido
+        JPanel contenido = new JPanel();
+        contenido.setLayout(new GridLayout(0,1,0,11));
+        contenido.setBackground(fondo);
+
+        JLabel linea1 = new JLabel("Desarrollado por:", JLabel.CENTER);
+        linea1.setForeground(texto);
+        linea1.setFont(new Font("SansSerif", Font.PLAIN, 15));
+
+        JLabel linea2 = new JLabel("• Leire Rolo", JLabel.CENTER);
+        linea2.setForeground(texto);
+
+        JLabel linea3 = new JLabel("• Ainhoa Hernandez", JLabel.CENTER);
+        linea3.setForeground(texto);
+
+        JLabel linea4 = new JLabel("• Teodora Alexandra Buca", JLabel.CENTER);
+        linea4.setForeground(texto);
+        
+        JLabel linea5 = new JLabel("• Jia yang Li", JLabel.CENTER);
+        linea5.setForeground(texto);
+
+        JLabel linea6 = new JLabel("Universidad / Centro: Universidad de Deusto", JLabel.CENTER);
+        linea6.setForeground(texto);
+        linea6.setFont(new Font("SansSerif", Font.ITALIC, 13));
+
+        contenido.add(linea1);
+        contenido.add(linea2);
+        contenido.add(linea3);
+        contenido.add(linea4);
+        contenido.add(linea5);
+        contenido.add(linea6);
+
+        panel.add(contenido, BorderLayout.CENTER);
+
+        // Boton cerrar
+        JButton cerrar = new JButton("Cerrar");
+        cerrar.setFocusPainted(false);
+        cerrar.setBackground(acento);
+        cerrar.setForeground(Color.WHITE);
+        cerrar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        cerrar.addActionListener(e -> dialog.dispose());
+
+        JPanel pie = new JPanel();
+        pie.setBackground(fondo);
+        pie.add(cerrar);
+
+        panel.add(pie, BorderLayout.SOUTH);
+
+        dialog.setContentPane(panel);
+        dialog.setVisible(true);
+    }
+
 
 }
