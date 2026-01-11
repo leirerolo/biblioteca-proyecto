@@ -15,8 +15,10 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
+import domain.Libro;
 import domain.User;
 import java.sql.SQLException;
+import java.util.List;
 
 public class JFramePerfil extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -101,29 +103,44 @@ public class JFramePerfil extends JFrame {
         //lblAvatar.setVerticalAlignment(SwingConstants.TOP);
         cargarAvatarEn(lblAvatar, user.getAvatarPath());
 
+        
         // Botón Editar
         JButton btnEditar = new JButton("Editar");
         estilizarBoton(btnEditar);
         btnEditar.addActionListener(e -> editarPerfil());
 
+        
         JButton btnFavoritos = new JButton("Mis favoritos");
         estilizarBoton(btnFavoritos);
         btnFavoritos.addActionListener(e -> {
             JFrameFavoritos favWin = new JFrameFavoritos(user);
             favWin.setVisible(true);
         });
-
+        
+        
+        //Boton Log out
+        
+        JButton btnLogout = new JButton("Cerrar sesión");
+        estilizarBoton(btnLogout);
+        btnLogout.setBackground(new Color(220,53,69));
+        
+        btnLogout.addActionListener(e-> logout());
+        
         JPanel right = new JPanel(new BorderLayout(8,8));
         right.setBackground(Color.WHITE);
         right.add(datos, BorderLayout.CENTER);
 
         root.add(avatarPanel, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
-        JPanel panelBotones = new JPanel(new GridLayout(1,2,10,0));
+        
+        
+        JPanel panelBotones = new JPanel(new GridLayout(1,3,10,0));
         panelBotones.setBackground(Color.WHITE);
         panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panelBotones.add(btnEditar);
         panelBotones.add(btnFavoritos);
+        panelBotones.add(btnLogout);
+        
         root.add(panelBotones, BorderLayout.SOUTH);
         root.setBackground(Color.WHITE);
         root.setOpaque(true);
@@ -133,12 +150,47 @@ public class JFramePerfil extends JFrame {
         setLocationRelativeTo(null);
 
     }
-
+    
+    
+    private void logout() {
+    	
+    	int confirm = JOptionPane.showConfirmDialog(this,
+    			"¿Estas seguro de que deseas cerrar sesion?",
+    					"Cerrar sesion", JOptionPane.YES_NO_OPTION);
+    	
+    	if(confirm == JOptionPane.YES_OPTION) {
+    		java.util.List<domain.Libro> lista = null;
+    		
+    		for (java.awt.Window w : java.awt.Window.getWindows()) {
+    			if(w instanceof JFramePrincipal) {
+    				lista= ((JFramePrincipal) w).getLibros();
+    				break;
+    			}
+    		}
+    		
+    		domain.User.setLoggedIn(null);
+    		
+    		for(java.awt.Window window : java.awt.Window.getWindows()) {
+    			window.dispose();
+    		}
+    		
+    		JDialogLogin loginDlg = new JDialogLogin(null);
+    		loginDlg.setVisible(true);
+    		
+    		if(loginDlg.getLoggedUser() != null && lista != null) {
+    		
+				new JFrameInicio(lista).setVisible(true);
+    		}
+    	}
+    }
+    
+    
     private void editarPerfil() {
         JDialogEditarPerfil dlg = new JDialogEditarPerfil(this, user);
         dlg.setVisible(true);
         if (dlg.isAccepted()) {
         	try {
+        		
             // Actualizar el modelo
         		user.setNombre(dlg.getNombre());
 	            user.setApellido(dlg.getApellido());
@@ -156,6 +208,7 @@ public class JFramePerfil extends JFrame {
 	                 JOptionPane.showMessageDialog(this, "Error al guardar el perfil en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
 	            }
 	
+	            
 	        } catch (SQLException ex){
 	            JOptionPane.showMessageDialog(this, 
 	                "Error de conexión o de base de datos: " + ex.getMessage(), 
@@ -172,6 +225,7 @@ public class JFramePerfil extends JFrame {
         cargarAvatarEn(lblAvatar, user.getAvatarPath());
     }
 
+    
     private void cargarAvatarEn(JLabel target, String avatarPath) {
     	Image img = null;
     	
@@ -264,6 +318,7 @@ public class JFramePerfil extends JFrame {
         g2.draw(new Ellipse2D.Float(0.75f, 0.75f, size - 1.5f, size - 1.5f));
         
         g2.dispose();
+        
         
         return output;
     }
