@@ -497,13 +497,21 @@ public class JFramePrincipal extends JFrame {
 
         	    if ("Devolver préstamo".equals(text)) {
         	        if (darkMode) {
-        	            btn.setBackground(new Color(120, 80, 180)); // ejemplo
+        	            btn.setBackground(new Color(120, 80, 180));
         	            btn.setForeground(Color.BLACK);
         	        } else {
         	            btn.setBackground(new Color(200, 200, 200));
         	            btn.setForeground(Color.BLACK);
         	        }
-        	    } else {
+        	    } else if("Eliminar libro".equals(text)) {
+        	        if (darkMode) {
+        	            btn.setBackground(new Color(120, 80, 180)); 
+        	            btn.setForeground(Color.BLACK);
+        	        } else {
+        	            btn.setBackground(new Color(200, 200, 200));
+        	            btn.setForeground(Color.BLACK);
+        	        }
+        		}else {
         	        btn.setBackground(menuBg);
         	        btn.setForeground(texto);
         	    }

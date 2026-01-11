@@ -3,6 +3,8 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+import java.util.prefs.Preferences;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import db.LibroDAO;
@@ -19,6 +21,11 @@ public class PanelGestionLibros extends JPanel {
     private JButton btnEliminar, btnAñadir;
     private Theme currentTheme = Theme.LIGHT;
     private JPanel panelBotones;
+    private JLabel titulo;
+
+    
+	private static final Preferences prefs = Preferences.userRoot().node("biblioteca");
+	protected static boolean darkMode = prefs.getBoolean("darkMode", false);
 
     public PanelGestionLibros(List<Libro> libros) {
         this.libros = libros;
@@ -28,7 +35,7 @@ public class PanelGestionLibros extends JPanel {
         setBackground(initialTheme.backgroundMain);
         setBorder(new EmptyBorder(10,10,10,10));
 
-        JLabel titulo = new JLabel("Gestión de Libros", JLabel.CENTER);
+        titulo = new JLabel("Gestión de Libros", JLabel.CENTER);
         titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 22));
         titulo.setForeground(Color.BLUE);
         add(titulo, BorderLayout.NORTH);
@@ -216,17 +223,30 @@ public class PanelGestionLibros extends JPanel {
 
         btnAñadir.setBackground(theme.backgroundPanel);
         btnAñadir.setForeground(theme.textColor);
-        btnEliminar.setBackground(theme.backgroundPanel);
+        //btnEliminar.setBackground(theme.backgroundPanel);
         btnEliminar.setForeground(theme.textColor);
-        
+
         for (Component c : getComponents()) {
-            if (c instanceof JLabel lbl) {
-                if (lbl.getText().equals("Gestión de Libros")) {
-                    lbl.setForeground(Color.BLUE);
-                } else {
-                    lbl.setForeground(theme.textColor);
-                }
-            }
+        	if (c instanceof JLabel lbl) {
+        	    if (lbl == titulo) {
+        	        if (theme == Theme.DARK) {
+        	            lbl.setForeground(new Color(144, 213, 255));
+        	        } else {
+        	            lbl.setForeground(Color.BLUE); 
+        	        }
+        	    } else {
+        	        lbl.setForeground(theme.textColor);
+        	    }
+        	}
+
+        }
+        
+        if (darkMode) { 
+        	btnEliminar.setBackground(new Color(120, 80, 180)); 
+        	btnEliminar.setForeground(Color.BLACK);
+        } else { 
+        	btnEliminar.setBackground(new Color(200, 200, 200)); 
+        	btnEliminar.setForeground(Color.black); 
         }
 
         listaLibros.setCellRenderer(new LibroCellRenderer(theme));

@@ -72,7 +72,7 @@ public class JFrameAdmin extends JFrame {
 	protected void inicializarPanelPrincipal() {
 	
 		//PANEL LATERAL IZQUIERDO: menú
-		panelLateral = new JPanel(new GridLayout(0,1,0,10));
+		panelLateral = new JPanel(new GridLayout(0,1,0,0));
 		panelLateral.setOpaque(true);
 		panelLateral.setPreferredSize(new Dimension(250, this.getHeight()));
 		panelLateral.setBorder(new MatteBorder(0,0,0,3, Color.WHITE));
@@ -130,8 +130,8 @@ public class JFrameAdmin extends JFrame {
             }
         });
         
-        JButton btnToggleTheme = new JButton(currentTheme == Theme.LIGHT ? "MODO OSCURO" : "MODO CLARO"); 
-        btnToggleTheme.setFont(new Font("Arial", Font.BOLD, 12));
+        JButton btnToggleTheme = new JButton(currentTheme == Theme.LIGHT ? "MODO OSCURO 🌙" : "MODO CLARO ☀"); 
+        btnToggleTheme.setFont(new Font("Segoe UI Emoji", Font.BOLD, 12));
         btnToggleTheme.setFocusPainted(false);
         btnToggleTheme.setPreferredSize(new Dimension(200,40));
         btnToggleTheme.setBorder(null);
@@ -144,7 +144,7 @@ public class JFrameAdmin extends JFrame {
         btnToggleTheme.addActionListener(e -> {
             currentTheme = (currentTheme == Theme.LIGHT) ? Theme.DARK : Theme.LIGHT;
             applyTheme(currentTheme);
-            btnToggleTheme.setText(currentTheme == Theme.LIGHT ?"MODO OSCURO" : "MODO CLARO");
+            btnToggleTheme.setText(currentTheme == Theme.LIGHT ?"MODO OSCURO 🌙" : "MODO CLARO ☀");
         });
 
 	}
@@ -228,8 +228,10 @@ public class JFrameAdmin extends JFrame {
         panelCentral.removeAll();
         
         PanelGestionLibros panelGestion = new PanelGestionLibros(libros);
+        
+        panelCentral.add(panelGestion, BorderLayout.CENTER); 
         panelGestion.setTheme(currentTheme);
-        panelCentral.add(panelGestion, BorderLayout.CENTER);
+        //panelCentral.add(panelGestion, BorderLayout.CENTER);
 
         panelCentral.revalidate();
         panelCentral.repaint();
@@ -267,6 +269,9 @@ public class JFrameAdmin extends JFrame {
             	lbl.setBackground(getColorMenu());
                 lbl.setBorder(new MatteBorder(0, 0, 2, 0, theme.textColor));
             	
+                
+                
+                
             }
             if (c instanceof JButton btn) {
                 btn.setBackground(theme.backgroundPanel);
