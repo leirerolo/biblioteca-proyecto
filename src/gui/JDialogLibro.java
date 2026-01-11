@@ -38,26 +38,25 @@ public class JDialogLibro extends JDialog {
 		JLabel titulo = new JLabel(libro.getTitulo(), JLabel.LEFT);
 		titulo.setFont(fuenteTitulo);
 		titulo.setBorder(
-			    BorderFactory.createCompoundBorder(
-			        new MatteBorder(0, 0, 1, 0, Color.GRAY),
-			        BorderFactory.createEmptyBorder(10, 12, 10, 10)
-			    )
-			);
+				BorderFactory.createCompoundBorder(
+					new MatteBorder(0, 0, 1, 0, Color.GRAY),
+					BorderFactory.createEmptyBorder(10, 12, 10, 10)
+				)
+		);
 
-    	panelDatos.add(titulo);
-    	
-    	JLabel autor = new JLabel(libro.getAutor(), JLabel.LEFT);
-    	autor.setFont(fuenteMenu);
-    	autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    	panelDatos.add(autor);
-    	
-    	JLabel valoracion = new JLabel(String.format("%.2f", libro.getValoracion()), JLabel.LEFT);
-    	valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    	panelDatos.add(valoracion);
-    	
-    	panelInfo.add(panelDatos, BorderLayout.CENTER);
-    	this.add(panelInfo, BorderLayout.CENTER);
-    	
+		panelDatos.add(titulo);
+		
+		JLabel autor = new JLabel(libro.getAutor(), JLabel.LEFT);
+		autor.setFont(fuenteMenu);
+		autor.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		panelDatos.add(autor);
+		
+		JLabel valoracion = new JLabel(String.format("%.2f", libro.getValoracion()), JLabel.LEFT);
+		valoracion.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		panelDatos.add(valoracion);
+		
+		panelInfo.add(panelDatos, BorderLayout.CENTER);
+		this.add(panelInfo, BorderLayout.CENTER);
 		
 		//Botones cerrar y reservar: south
 		JPanel panelBotones = new JPanel();
@@ -74,9 +73,7 @@ public class JDialogLibro extends JDialog {
 		panelBotones.add(reservar);
 		
 		//COMPORTAMIENTO DE LOS BOTONES
-		cerrar.addActionListener((e) -> {
-			this.dispose();
-		});
+		cerrar.addActionListener((e) -> this.dispose());
 		
 		// Favoritos (requiere sesión)
 		User uFav = User.getLoggedIn();
@@ -91,18 +88,21 @@ public class JDialogLibro extends JDialog {
 		btnFavorito.addActionListener(ev -> {
 			User u = User.getLoggedIn();
 			if (u == null) {
-				JOptionPane.showMessageDialog(this, "Inicia sesión para usar favoritos.", "Favoritos", JOptionPane.INFORMATION_MESSAGE);
+				// Toast en vez de JOptionPane (más moderno y menos intrusivo)
+				Toast.showToast(this, "Inicia sesión para usar favoritos 🔒", Toast.Type.WARNING);
 				return;
 			}
 			boolean ahora = u.toggleFavorito(libro);
 			btnFavorito.setText(ahora ? "★ Quitar favorito" : "⭐ Añadir favorito");
-			JOptionPane.showMessageDialog(this,
-				ahora ? "Añadido a favoritos." : "Eliminado de favoritos.",
-				"Favoritos", JOptionPane.INFORMATION_MESSAGE);
+			Toast.showToast(this, ahora ? "Añadido a favoritos ⭐" : "Eliminado de favoritos 🗑️", ahora ? Toast.Type.SUCCESS : Toast.Type.INFO);
 		});
 
 		reservar.addActionListener((e) -> {
 			User user = User.getLoggedIn(); //obtengo el user que tiene la sesión iniciada
+			if (user == null) {
+				Toast.showToast(this, "Inicia sesión para reservar 📌", Toast.Type.WARNING);
+				return;
+			}
 			Reserva nueva = new Reserva(libro, user);
 			
 			//primero actualizamos sus reservas
@@ -110,42 +110,42 @@ public class JDialogLibro extends JDialog {
 			user.cargarReservas();
 			user.verificarPenalizacion();
 			
-			if (user != null && user.estaPenalizado()) {
-		        JOptionPane.showMessageDialog(
-		            this,"No puedes reservar. Penalización activa hasta " + user.getPenalizacionHasta() + ".",
-		            "Penalización activa",JOptionPane.WARNING_MESSAGE
-		        );
-		        return; 
-		    }
+			if (user.estaPenalizado()) {
+				JOptionPane.showMessageDialog(
+					this,
+					"No puedes reservar. Penalización activa hasta " + user.getPenalizacionHasta() + ".",
+					"Penalización activa",
+					JOptionPane.WARNING_MESSAGE
+				);
+				return;
+			}
 			
 			if (!user.getReservas().contains(nueva)) {
 				user.agregarReserva(nueva);
+				
+				// Toast “Reserva realizada” (lo enganchamos a la ventana padre para que se vea bien)
+				java.awt.Window owner = getOwner();
+				Toast.showToast(owner != null ? owner : this, "Reserva realizada ✅", Toast.Type.SUCCESS);
+				
 				this.dispose();
 				//obtenemos el padre, que es jframe principal o hereda de él
 				JFramePrincipal padreFrame = (JFramePrincipal) getParent();
 				if (padreFrame.libros.contains(libro)) {
-					
 					//elimino el libro de la lista de libros que tiene la ventana padre
 					padreFrame.libros.remove(libro);
 				}
 				
-				if (Navigator.inicio != null) { 
+				if (Navigator.inicio != null) {
 					Navigator.inicio.refrescarTopLibros(); // para que desaparezca de inicio
 				}
 				//abro la ventana de reservas con esta ya incluida
 				Navigator.showReservas();
 				
 			} else {
-				JOptionPane.showMessageDialog(
-		                this,
-		                "Ya has reservado este libro",
-		                "Reserva rechazada",
-		                JOptionPane.WARNING_MESSAGE
-		            );
+				Toast.showToast(this, "Ya has reservado este libro", Toast.Type.WARNING);
 			}
 			
 		});
-		
 		
 		this.add(panelBotones, BorderLayout.SOUTH);
 		this.setResizable(false);
