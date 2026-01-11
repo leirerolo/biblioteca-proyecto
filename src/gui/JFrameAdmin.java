@@ -28,14 +28,13 @@ public class JFrameAdmin extends JFrame {
 	//predefinir las fuentes
 	protected Font fuenteTitulo = new Font("Comic Sans MS", Font.BOLD, 22);
 	protected Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 18);
-	private final Color COLOR_MENU_LIGHT = new Color(245,245,245);
-	private final Color COLOR_HOVER_LIGHT = new Color(220,220,220);
-	private final Color COLOR_SELECTED_LIGHT = new Color(200,200,200);
-
-	private final Color COLOR_MENU_DARK = new Color(60,60,60);
-	private final Color COLOR_HOVER_DARK = new Color(90,90,90);
-	private final Color COLOR_SELECTED_DARK = new Color(120,120,120);
+	private final Color COLOR_MENU_LIGHT = new Color(200, 220, 240);   
+	private final Color COLOR_HOVER_LIGHT = new Color(170, 200, 230);  
+	private final Color COLOR_SELECTED_LIGHT = new Color(140, 180, 220); 
 	
+	private final Color COLOR_MENU_DARK = new Color(30, 50, 80);        
+	private final Color COLOR_HOVER_DARK = new Color(45, 70, 110);      
+	private final Color COLOR_SELECTED_DARK = new Color(60, 90, 140);
 	
 	// Paneles principales
     private JPanel panelLateral;
@@ -156,8 +155,12 @@ public class JFrameAdmin extends JFrame {
 		label.setFont(fuenteMenu);
 		label.setOpaque(true);
 		label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		label.setBorder(new MatteBorder(0, 0, 2, 0, Color.WHITE));
 		
+		label.setBackground(getColorMenu());
+	    label.setForeground(currentTheme == Theme.LIGHT ? Color.BLACK : Color.WHITE);
+	    
+	    label.setBorder(new MatteBorder(0, 0, 2, 0, Color.WHITE));
+	    
 		label.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				if(label.getBackground() != getColorSelected()) {
@@ -189,7 +192,7 @@ public class JFrameAdmin extends JFrame {
         panelCentral.removeAll();
         
         PanelUsers panelUsers = new PanelUsers();
-        panelUsers.setBackground(currentTheme.backgroundMain); 
+        panelUsers.applyTheme(currentTheme);
         panelCentral.add(panelUsers, BorderLayout.CENTER);
         
         panelCentral.revalidate();
@@ -201,6 +204,7 @@ public class JFrameAdmin extends JFrame {
         panelCentral.removeAll();
         
         PanelMasReservados panelMasReservados = new PanelMasReservados();
+        panelMasReservados.applyTheme(currentTheme);
         panelCentral.add(panelMasReservados, BorderLayout.CENTER);
         
         panelCentral.revalidate();
@@ -212,6 +216,7 @@ public class JFrameAdmin extends JFrame {
         panelCentral.removeAll();
         
         PanelPeorValorados panel = new PanelPeorValorados();
+        panel.applyTheme(currentTheme);
         panelCentral.add(panel, BorderLayout.CENTER);
         
         panelCentral.revalidate();
@@ -223,6 +228,7 @@ public class JFrameAdmin extends JFrame {
         panelCentral.removeAll();
         
         PanelGestionLibros panelGestion = new PanelGestionLibros(libros);
+        panelGestion.setTheme(currentTheme);
         panelCentral.add(panelGestion, BorderLayout.CENTER);
 
         panelCentral.revalidate();
@@ -239,46 +245,45 @@ public class JFrameAdmin extends JFrame {
             }
         }
     }
+    
+    private void resaltarMenuActual() {
+        if (panelCentral.getComponents().length > 0) {
+            Component actual = panelCentral.getComponent(0);
+            if (actual instanceof PanelUsers) resaltarMenu(lblUsuarios);
+            else if (actual instanceof PanelMasReservados) resaltarMenu(lblMasReservados);
+            else if (actual instanceof PanelPeorValorados) resaltarMenu(lblPeorValorados);
+            else if (actual instanceof PanelGestionLibros) resaltarMenu(lblGestionLibros);
+        }
+    }
     public void applyTheme(Theme theme) {
-    	this.currentTheme = theme;
-        // panel lateral
-        panelLateral.setBackground(theme.backgroundMain);
-        panelLateral.setBorder(new MatteBorder(0, 0, 0, 3, theme.textColor)); 
+        this.currentTheme = theme;
+        panelLateral.setBackground(getColorMenu());
+        panelLateral.setBorder(new MatteBorder(0, 0, 0, 3, theme.textColor));
+        
+        
         for (Component c : panelLateral.getComponents()) {
             if (c instanceof JLabel lbl) {
+            	lbl.setForeground(theme.textColor);
             	lbl.setBackground(getColorMenu());
-                lbl.setForeground(theme.textColor);
                 lbl.setBorder(new MatteBorder(0, 0, 2, 0, theme.textColor));
-                
-              if (c instanceof JButton btn) {
-               if (theme == Theme.DARK) {
-                 btn.setBackground(new Color(80, 80, 80));
-                 btn.setForeground(Color.WHITE);
-                 btn.setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100)));
-                 } else {
-                        btn.setBackground(new Color(225, 225, 225));
-                        btn.setForeground(Color.BLACK);
-                        btn.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180)));
-                    }
+            	
             }
+            if (c instanceof JButton btn) {
+                btn.setBackground(theme.backgroundPanel);
+                btn.setForeground(theme.textColor);
             }
         }
-
-        // panel central
+        
+        resaltarMenuActual();
         panelCentral.setBackground(theme.backgroundMain);
         for (Component c : panelCentral.getComponents()) {
-            if (c instanceof JPanel p) {
-                p.setBackground(theme.backgroundPanel);
-                if (p instanceof PanelMasReservados) {
-                    ((PanelMasReservados) p).applyTheme(theme);
-                } else if (p instanceof PanelGestionLibros) {
-                    ((PanelGestionLibros) p).setTheme(theme);
-                }
-            }
+            if (c instanceof PanelUsers p) p.applyTheme(theme);
+            else if (c instanceof PanelMasReservados p) p.applyTheme(theme);
+            else if (c instanceof PanelPeorValorados p) p.applyTheme(theme);
+            else if (c instanceof PanelGestionLibros p) p.setTheme(theme);
         }
 
         revalidate();
         repaint();
     }
-
 }

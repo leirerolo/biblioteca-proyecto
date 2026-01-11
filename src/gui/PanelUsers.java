@@ -54,24 +54,30 @@ public class PanelUsers extends JPanel {
     }
     
     public void applyTheme(Theme theme) {
-    	setBackground(theme.backgroundMain);
-    	tablaUsers.getTableHeader().setBackground(theme.backgroundPanel);
-    	tablaUsers.getTableHeader().setForeground(theme.textColor);
-    	
-    	for (int i = 0; i< tablaUsers.getRowCount(); i++) {
-    		for(int j = 0; j< tablaUsers.getColumnCount(); j++) {
-    			Component c = tablaUsers.prepareRenderer(tablaUsers.getCellRenderer(i, j), i, j);
-    			c.setForeground(theme.textColor);
-    			if(i %2 == 0)
-    				c.setBackground(theme.backgroundMain);
-    			else
-    				c.setBackground(theme.backgroundPanel);
-    		}
-    	}
-    	revalidate();
-    	repaint();
+        setBackground(theme.backgroundMain);
+        tablaUsers.setBackground(theme.backgroundMain);
+        tablaUsers.setForeground(theme.textColor);
+        
+        if (theme == Theme.DARK) {
+            tablaUsers.getTableHeader().setBackground(new Color(30, 30, 30)); 
+        } else {
+            tablaUsers.getTableHeader().setBackground(new Color(230, 230, 250));
+        }
+
+        tablaUsers.getTableHeader().setForeground(Color.BLUE);
+        
+        ((IDRenderer) tablaUsers.getColumnModel().getColumn(0).getCellRenderer()).setTheme(theme);
+        ((UsuarioRenderer) tablaUsers.getColumnModel().getColumn(1).getCellRenderer()).setTheme(theme);
+        ((EmailRenderer) tablaUsers.getColumnModel().getColumn(2).getCellRenderer()).setTheme(theme);
+        
+        TableCellRenderer rendererReservas = tablaUsers.getColumnModel().getColumn(3).getCellRenderer();
+        if (rendererReservas instanceof MultiReservationRenderer) {
+            ((MultiReservationRenderer) rendererReservas).setTheme(theme);
+        }
+
+        revalidate();
+        repaint();
     }
-    
     
     
     private void cargarUsuarios() {
@@ -104,133 +110,134 @@ public class PanelUsers extends JPanel {
     
  // Renderer para la columna ID
     static class IDRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
+        private Theme theme = Theme.LIGHT; 
 
-		public IDRenderer() {
-            setHorizontalAlignment(SwingConstants.CENTER);
-            setFont(new Font("Arial", Font.BOLD, 14));
-        }
-		@Override
-	    public Component getTableCellRendererComponent(JTable table, Object value,
-	                                                   boolean isSelected, boolean hasFocus,
-	                                                   int row, int column) {
-	        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-	        c.setFont(new Font("Arial", Font.BOLD, 14));
-	        
-	        if (!isSelected) {
-	            if (row % 2 == 0) c.setBackground(new Color(245, 245, 245));
-	            else c.setBackground(Color.WHITE);
-	        }
-	        
-	        return c;
-	    }
-    }
-
-    // Renderer para la columna Usuario
-    static class UsuarioRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-
-		public UsuarioRenderer() {
-            setFont(new Font("Arial", Font.PLAIN, 14));
-        }
+        public void setTheme(Theme theme) { this.theme = theme; }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (!isSelected) {
+                c.setBackground(row % 2 == 0 ? theme.backgroundMain : theme.backgroundPanel);
+                c.setForeground(theme.textColor);
+            }
+            return c;
+        }
+    }
+
+    // Renderer para la columna Usuario
+ // Renderer for Usuario Column
+    static class UsuarioRenderer extends DefaultTableCellRenderer {
+        private Theme theme = Theme.LIGHT;
+        public void setTheme(Theme theme) { this.theme = theme; }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             lbl.setFont(new Font("Arial", Font.PLAIN, 14));
             
             if (!isSelected) {
-                if (row % 2 == 0) lbl.setBackground(new Color(245, 245, 245));
-                else lbl.setBackground(Color.WHITE);
+                lbl.setBackground(row % 2 == 0 ? theme.backgroundMain : theme.backgroundPanel);
+                lbl.setForeground(theme.textColor);
             }
             lbl.setOpaque(true);
-            
             return lbl;
         }
     }
-    
-    // Renderer para la columna Email
+
+    // Renderer para la columna del email
     static class EmailRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
+        private Theme theme = Theme.LIGHT;
+        public void setTheme(Theme theme) { this.theme = theme; }
 
-		public EmailRenderer() {
-            setFont(new Font("Arial", Font.ITALIC, 14));
-            setForeground(Color.DARK_GRAY);
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            lbl.setFont(new Font("Arial", Font.ITALIC, 14));
+            
+            if (!isSelected) {
+                lbl.setBackground(row % 2 == 0 ? theme.backgroundMain : theme.backgroundPanel);
+                lbl.setForeground(theme == Theme.DARK ? new Color(200, 200, 200) : Color.DARK_GRAY);
+            }
+            lbl.setOpaque(true);
+            return lbl;
         }
-		@Override
-	    public Component getTableCellRendererComponent(JTable table, Object value,
-	                                                   boolean isSelected, boolean hasFocus,
-	                                                   int row, int column) {
-	        JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-	        lbl.setFont(new Font("Arial", Font.ITALIC, 14));
-	        
-	        if (!isSelected) {
-	            if (row % 2 == 0) lbl.setBackground(new Color(245, 245, 245));
-	            else lbl.setBackground(Color.WHITE);
-	        }
-
-	        lbl.setOpaque(true);
-	        return lbl;
-	    }
     }
+   
 
     // Renderer para mostrar reservas de forma visual en cada fila
     static class MultiReservationRenderer extends JPanel implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
-
+        private Theme currentTheme = Theme.LIGHT;
+        
         public MultiReservationRenderer() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setOpaque(true);
         }
 
+        public void setTheme(Theme theme) {
+            this.currentTheme = theme;
+        }
+        
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-
-            removeAll(); // Limpiar reservas previas
-            Color filaColor = row % 2 == 0 ? new Color(245, 245, 245) : Color.WHITE;
-            if (isSelected) filaColor = table.getSelectionBackground();
+            removeAll();
+            
+            Color filaColor;
+            if (isSelected) {
+                filaColor = table.getSelectionBackground();
+            } else {
+                filaColor = (row % 2 == 0) ? currentTheme.backgroundMain : currentTheme.backgroundPanel;
+            }
             setBackground(filaColor);
             
             if (value instanceof List) {
                 List<Reserva> reservas = (List<Reserva>) value;
-
                 for (Reserva r : reservas) {
-                    JLabel lbl = new JLabel(r.getLibro().getTitulo() + " - " + r.getDiasRestantes() + " días");
+                    JLabel lbl = new JLabel(r.getLibro().getTitulo() + " - " + r.getDiasRestantes() + " dias");
                     lbl.setOpaque(true);
                     lbl.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
                     lbl.setFont(new Font("Arial", Font.PLAIN, 14));
 
-                    // Colorear según días restantes
                     int dias = r.getDiasRestantes();
-                    if (dias <= 2) {
-                        lbl.setBackground(new Color(255, 102, 102)); // rojo para urgente
-                        lbl.setForeground(Color.WHITE);
-                    } else if (dias <= 5) {
-                        lbl.setBackground(new Color(255, 204, 102)); // naranja
-                        lbl.setForeground(Color.BLACK);
+                    
+                    if (currentTheme == Theme.DARK) {
+                        if (dias <= 2) {
+                            lbl.setBackground(new Color(150, 0, 0));
+                            lbl.setForeground(Color.WHITE);
+                        } else if (dias <= 5) {
+                            lbl.setBackground(new Color(180, 100, 0)); 
+                            lbl.setForeground(Color.WHITE);
+                        } else {
+                            lbl.setBackground(new Color(0, 100, 0)); 
+                            lbl.setForeground(Color.WHITE);
+                        }
                     } else {
-                        lbl.setBackground(new Color(204, 255, 204)); // verde
-                        lbl.setForeground(Color.BLACK);
+                        if (dias <= 2) {
+                            lbl.setBackground(new Color(255, 102, 102));
+                            lbl.setForeground(Color.BLACK);
+                        } else if (dias <= 5) {
+                            lbl.setBackground(new Color(255, 204, 102));
+                            lbl.setForeground(Color.BLACK);
+                        } else {
+                            lbl.setBackground(new Color(204, 255, 204));
+                            lbl.setForeground(Color.BLACK);
+                        }
                     }
 
-                    // Separador visual entre reservas
                     lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
                     add(lbl);
                     add(Box.createVerticalStrut(2));
                 }
             }
-
-            setBorder(hasFocus ? BorderFactory.createLineBorder(Color.BLUE, 1) : null);
-
-            // Ajustar altura de fila según contenido
+            
             int altura = getPreferredSize().height;
-            //por si tiene 0 reservas, altura mínima a 20
-            if (altura < 20) altura = 20;
-            //para los que sí tienen reservas
+            if (altura < 25) altura = 25;
             if (table.getRowHeight(row) != altura) {
                 table.setRowHeight(row, altura);
             }

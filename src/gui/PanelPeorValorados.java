@@ -18,11 +18,14 @@ import javax.swing.border.EmptyBorder;
 import db.LibroDAO;
 import domain.Libro;
 
+
+
 public class PanelPeorValorados extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     JPanel mainPanel;
+    private final Color AZUL_TARJETA = new Color(70, 130, 180);
 
     public PanelPeorValorados() {
         setLayout(new BorderLayout());
@@ -63,6 +66,8 @@ public class PanelPeorValorados extends JPanel {
 
             while (usados < 6) {
                 JPanel panel = new JPanel(new BorderLayout());
+                panel.setBackground(AZUL_TARJETA);
+                panel.setOpaque(true);
                 mainPanel.add(panel);
                 usados++;
             }
@@ -81,24 +86,32 @@ public class PanelPeorValorados extends JPanel {
         mainPanel.setBackground(theme.backgroundMain);
 
         for (Component c : mainPanel.getComponents()) {
-            if (c instanceof JPanel) {
-                c.setBackground(theme.backgroundPanel);
-                for (Component inner : ((JPanel)c).getComponents()) {
-                    inner.setForeground(theme.textColor);
-                }
+            if (c instanceof JPanel card) {
+                // Si es una de las tarjetas con contenido, actualizamos subcomponentes
+                actualizarComponentesRecursivo(card, theme);
             }
         }
         revalidate();
         repaint();
     }
 
+    private void actualizarComponentesRecursivo(JPanel parent, Theme theme) {
+        for (Component child : parent.getComponents()) {
+            if (child instanceof JLabel) {
+                child.setForeground(Color.WHITE); 
+            } else if (child instanceof JPanel panel) {
+                panel.setBackground(AZUL_TARJETA);
+                actualizarComponentesRecursivo(panel, theme);
+            }
+        }
+    }
     
     private JPanel crearPanelLibro(Libro libro, double media) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(AZUL_TARJETA); // Fondo azul
         panel.setOpaque(true);
-        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-
+        panel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        
         // Portada
         JLabel lblPortada = new JLabel();
         lblPortada.setHorizontalAlignment(JLabel.CENTER);
@@ -113,12 +126,16 @@ public class PanelPeorValorados extends JPanel {
         // Título
         JLabel lblTitulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
-
+        lblTitulo.setForeground(Color.WHITE); // Texto blanco
+        
         // Valoración
         JLabel lblMedia = new JLabel("Valoración media: " + String.format("%.2f", media), JLabel.CENTER);
         lblMedia.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblMedia.setForeground(Color.WHITE); // Texto blanco
 
         JPanel info = new JPanel(new GridLayout(2, 1));
+        info.setBackground(AZUL_TARJETA); // Fondo azul para el panel de texto
+        info.setOpaque(true);
         info.add(lblTitulo);
         info.add(lblMedia);
 
@@ -128,3 +145,5 @@ public class PanelPeorValorados extends JPanel {
         return panel;
     }
 }
+
+

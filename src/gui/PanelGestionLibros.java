@@ -17,6 +17,8 @@ public class PanelGestionLibros extends JPanel {
     private DefaultListModel<Libro> modeloLibros;
     private JList<Libro> listaLibros;
     private JButton btnEliminar, btnAñadir;
+    private Theme currentTheme = Theme.LIGHT;
+    private JPanel panelBotones;
 
     public PanelGestionLibros(List<Libro> libros) {
         this.libros = libros;
@@ -28,6 +30,7 @@ public class PanelGestionLibros extends JPanel {
 
         JLabel titulo = new JLabel("Gestión de Libros", JLabel.CENTER);
         titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 22));
+        titulo.setForeground(Color.BLUE);
         add(titulo, BorderLayout.NORTH);
 
         modeloLibros = new DefaultListModel<>();
@@ -38,7 +41,7 @@ public class PanelGestionLibros extends JPanel {
         JScrollPane scroll = new JScrollPane(listaLibros);
         add(scroll, BorderLayout.CENTER);
 
-        JPanel panelBotones = new JPanel(new FlowLayout());
+         panelBotones = new JPanel(new FlowLayout());
         panelBotones.setBackground(initialTheme.backgroundMain);
 
         btnEliminar = new JButton("Eliminar libro");
@@ -100,94 +103,100 @@ public class PanelGestionLibros extends JPanel {
     }
 
     private void añadirLibro() {
-        // diálogo para añadir libro
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Añadir libro", true);
-        dialog.setSize(500, 300); // más ancho y alto
+        dialog.setSize(500, 350);
         dialog.setLayout(new GridBagLayout());
         dialog.setLocationRelativeTo(this);
+        
+        dialog.getContentPane().setBackground(currentTheme.backgroundMain);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
 
+        // Componentes
         JLabel lblTitulo = new JLabel("Título:");
-        JTextField tfTitulo = new JTextField();
+        JTextField tfTitulo = new JTextField(20);
         JLabel lblAutor = new JLabel("Autor:");
-        JTextField tfAutor = new JTextField();
+        JTextField tfAutor = new JTextField(20);
         JLabel lblGenero = new JLabel("Género:");
         JComboBox<Genero> jcomboGenero = new JComboBox<>(Genero.values());
         JLabel lblPortada = new JLabel("Portada:");
         JTextField tfPortada = new JTextField();
         tfPortada.setEditable(false);
         JButton btnExaminar = new JButton("Examinar");
-        
-
-        // Examinar
-        btnExaminar.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
-            int seleccion = fc.showOpenDialog(dialog);
-            if (seleccion == JFileChooser.APPROVE_OPTION) {
-                tfPortada.setText(fc.getSelectedFile().getAbsolutePath());
-            }
-        });
-
-        // FILA TÍTULO
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
-        dialog.add(lblTitulo, gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 2;
-        dialog.add(tfTitulo, gbc);
-
-        // FILA AUTOR
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
-        dialog.add(lblAutor, gbc);
-        gbc.gridx = 1; gbc.gridy = 1; gbc.gridwidth = 2;
-        dialog.add(tfAutor, gbc);
-
-        //FILA GÉNERO
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
-        dialog.add(lblGenero, gbc);
-        gbc.gridx = 1; gbc.gridy = 3; gbc.gridwidth = 2;
-        dialog.add(jcomboGenero, gbc);
-        
-        // FILA PORTADA
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
-        dialog.add(lblPortada, gbc);
-        gbc.gridx = 1; gbc.gridy = 2; gbc.gridwidth = 1;
-        dialog.add(tfPortada, gbc);
-        gbc.gridx = 2; gbc.gridy = 2; gbc.gridwidth = 1;
-        dialog.add(btnExaminar, gbc);
-
-        // BOTÓN GUARDAR
         JButton btnGuardar = new JButton("Guardar");
+
+        // Aplicar theme
+        Component[] components = {lblTitulo, lblAutor, lblGenero, lblPortada, tfTitulo, tfAutor, tfPortada, jcomboGenero, btnExaminar, btnGuardar};
+        for (Component c : components) {
+            c.setForeground(currentTheme.textColor);
+            if (c instanceof JTextField || c instanceof JComboBox || c instanceof JButton) {
+                c.setBackground(currentTheme.backgroundPanel);
+                // Optional: add a border for dark mode visibility
+                if (currentTheme == Theme.DARK && c instanceof JTextField) {
+                    ((JTextField)c).setCaretColor(Color.WHITE); 
+                    ((JTextField)c).setBorder(BorderFactory.createLineBorder(currentTheme.textColor, 1));
+                }
+            }
+        }
+
+       // LAYOUT
+        gbc.gridx = 0; gbc.gridy = 0; dialog.add(lblTitulo, gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 2; dialog.add(tfTitulo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1; dialog.add(lblAutor, gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.gridwidth = 2; dialog.add(tfAutor, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; dialog.add(lblPortada, gbc);
+        gbc.gridx = 1; gbc.gridy = 2; dialog.add(tfPortada, gbc);
+        gbc.gridx = 2; gbc.gridy = 2; dialog.add(btnExaminar, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1; dialog.add(lblGenero, gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.gridwidth = 2; dialog.add(jcomboGenero, gbc);
+
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         dialog.add(btnGuardar, gbc);
 
+       
+        btnExaminar.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+                tfPortada.setText(fc.getSelectedFile().getAbsolutePath());
+            }
+        });
+
         btnGuardar.addActionListener(e -> {
-            try {
+        	try {
                 String titulo = tfTitulo.getText().trim();
                 String autor = tfAutor.getText().trim();
                 String rutaPortada = tfPortada.getText().trim();
-                Genero genero = (Genero) jcomboGenero.getSelectedItem();
+                domain.Genero genero = (domain.Genero) jcomboGenero.getSelectedItem();
                 
                 if (titulo.isEmpty() || autor.isEmpty() || rutaPortada.isEmpty()) {
-                    JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.");
+                    JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 ImageIcon portada = new ImageIcon(rutaPortada);
-                Libro nuevo = new Libro(titulo, autor, portada, 0, rutaPortada, genero);
+                domain.Libro nuevo = new domain.Libro(titulo, autor, portada, 0, rutaPortada, genero);
 
-                libros.add(nuevo);
-                new LibroDAO().insertaLibro(nuevo);
-                refrescarLista();
+               
+                libros.add(nuevo); 
+                
+                new db.LibroDAO().insertaLibro(nuevo); 
+
+                refrescarLista(); 
+                
                 dialog.dispose();
+                
+                JOptionPane.showMessageDialog(this, "Libro añadido con éxito: " + titulo);
                 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(dialog, "Error al añadir libro: " + ex.getMessage());
+                JOptionPane.showMessageDialog(dialog, "Error al añadir libro: " + ex.getMessage(), "Error DB", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -195,7 +204,13 @@ public class PanelGestionLibros extends JPanel {
     }
 
     public void setTheme(Theme theme) {
+        this.currentTheme = theme; 
         setBackground(theme.backgroundMain);
+        
+        if (panelBotones != null) {
+            panelBotones.setBackground(theme.backgroundMain);
+        }
+
         listaLibros.setBackground(theme.backgroundPanel);
         listaLibros.setForeground(theme.textColor);
 
@@ -203,6 +218,17 @@ public class PanelGestionLibros extends JPanel {
         btnAñadir.setForeground(theme.textColor);
         btnEliminar.setBackground(theme.backgroundPanel);
         btnEliminar.setForeground(theme.textColor);
+        
+        for (Component c : getComponents()) {
+            if (c instanceof JLabel lbl) {
+                if (lbl.getText().equals("Gestión de Libros")) {
+                    lbl.setForeground(Color.BLUE);
+                } else {
+                    lbl.setForeground(theme.textColor);
+                }
+            }
+        }
+
         listaLibros.setCellRenderer(new LibroCellRenderer(theme));
 
         revalidate();

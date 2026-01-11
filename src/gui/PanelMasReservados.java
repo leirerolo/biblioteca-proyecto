@@ -86,9 +86,8 @@ public class PanelMasReservados extends JPanel {
         mainPanel.setBackground(theme.backgroundMain);
 
         for (Component c : mainPanel.getComponents()) {
-        	if (c instanceof JPanel) {
-                JPanel card = (JPanel) c;
-                card.setBackground(theme.backgroundPanel);
+            if (c instanceof JPanel card) {
+                card.setBackground(new Color(70, 130, 180));
                 actualizarComponentesRecursivo(card, theme);
             }
         }
@@ -98,10 +97,10 @@ public class PanelMasReservados extends JPanel {
     private void actualizarComponentesRecursivo(JPanel parent, Theme theme) {
         for (Component child : parent.getComponents()) {
             if (child instanceof JLabel) {
-                child.setForeground(theme.textColor);
-            } else if (child instanceof JPanel) {
-                child.setBackground(theme.backgroundPanel);
-                actualizarComponentesRecursivo((JPanel) child, theme);
+            	child.setForeground(Color.WHITE);
+            } else if (child instanceof JPanel panel) {
+            	panel.setBackground(new Color(70, 130, 180));
+                actualizarComponentesRecursivo(panel, theme);
             }
         }
     }
@@ -109,7 +108,8 @@ public class PanelMasReservados extends JPanel {
     private JPanel crearPanelLibro(Libro libro, int reservas) {
         JPanel panel = new JPanel(new BorderLayout());
         
-        panel.setBackground(initialTheme.backgroundPanel);
+        Color azulLibro = new Color(70, 130, 180); // Steel Blue
+        panel.setBackground(azulLibro);
         panel.setOpaque(true);
         
         // Portada
@@ -127,14 +127,16 @@ public class PanelMasReservados extends JPanel {
         JLabel lblTitulo = new JLabel(libro.getTitulo());
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
         lblTitulo.setHorizontalAlignment(JLabel.CENTER);
+        lblTitulo.setForeground(Color.WHITE);
 
         // Número reservas
         JLabel lblR = new JLabel("Reservado " + reservas + " veces");
         lblR.setFont(new Font("Arial", Font.PLAIN, 14));
         lblR.setHorizontalAlignment(JLabel.CENTER);
+        lblR.setForeground(Color.WHITE);
 
         JPanel info = new JPanel(new GridLayout(2, 1));
-        info.setBackground(initialTheme.backgroundPanel);
+        info.setBackground(azulLibro);
         info.setOpaque(true);
         info.add(lblTitulo);
         info.add(lblR);
@@ -142,6 +144,8 @@ public class PanelMasReservados extends JPanel {
         panel.add(lblPortada, BorderLayout.CENTER);
         panel.add(info, BorderLayout.SOUTH);
 
+        panel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        
         return panel;
     }
 }
