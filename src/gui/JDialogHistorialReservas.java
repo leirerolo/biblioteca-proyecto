@@ -23,7 +23,7 @@ public class JDialogHistorialReservas extends JDialog {
     private List<Reserva> reservasOriginal = new ArrayList<>();
 
     public JDialogHistorialReservas(JFrame padre, User user) {
-        super(padre, "Historial de reservas", true);
+    	super(padre, "Historial de devoluicones", true);
         setSize(900, 600);
         setLocationRelativeTo(padre);
         setLayout(new BorderLayout());

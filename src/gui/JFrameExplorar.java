@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.KeyAdapter;
@@ -66,8 +67,9 @@ public class JFrameExplorar extends JFramePrincipal {
 		
 		// --------- Cabecera (filtro texto + opciones filtro)
 		JPanel cabecera = new JPanel(new BorderLayout());
-		txtFiltro = new JTextField("Buscar por título o autor...");
-		txtFiltro.setForeground(Color.GRAY);
+		txtFiltro = new JTextField();
+		configurarPlaceholder();
+		//txtFiltro.setForeground(Color.GRAY);
 		
 		//al hacer click o escribir en el filtro
 		txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -176,19 +178,70 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    
 	}
+	
+	private final String PLACEHOLDER = "Buscar por título o autor...";
+	private boolean mostrandoPlaceholder = true;
+
+	private void configurarPlaceholder() {
+
+	    // Mostrar placeholder inicial
+	    txtFiltro.setForeground(Color.GRAY);
+	    txtFiltro.setText(PLACEHOLDER);
+	    mostrandoPlaceholder = true;
+
+	    txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
+
+	        @Override
+	        public void focusGained(java.awt.event.FocusEvent e) {
+	            if (mostrandoPlaceholder) {
+	                txtFiltro.setText("");
+	                txtFiltro.setForeground(JFramePrincipal.darkMode ? Color.WHITE : Color.BLACK);
+	                mostrandoPlaceholder = false;
+	            }
+	        }
+
+	        @Override
+	        public void focusLost(java.awt.event.FocusEvent e) {
+	            if (txtFiltro.getText().isEmpty()) {
+	                txtFiltro.setForeground(Color.GRAY);
+	                txtFiltro.setText(PLACEHOLDER);
+	                mostrandoPlaceholder = true;
+	            }
+	        }
+	    });
+
+	    // DocumentListener: solo filtra si NO es placeholder
+	    txtFiltro.getDocument().addDocumentListener(new DocumentListener() {
+	        @Override public void insertUpdate(DocumentEvent e) { actualizar(); }
+	        @Override public void removeUpdate(DocumentEvent e) { actualizar(); }
+	        @Override public void changedUpdate(DocumentEvent e) {}
+
+	        private void actualizar() {
+	            if (!mostrandoPlaceholder) {
+	                filtrarLibros();
+	            }
+	        }
+	    });
+	}
+	
 
 	public void filtrarLibros() {
 		
 	    panelLibros.removeAll(); 
 	    
-	    String rawText = txtFiltro.getText().trim();
-	    String tit = "";
+//	    String rawText = txtFiltro.getText().trim();
+//	    String tit = "";
 	    
-	    if (!rawText.isEmpty() && 
-	            !rawText.equals("Buscar por título o autor...") && 
-	            !rawText.equals("Buscar por título...")) {
-	            tit = rawText.toLowerCase();
-	        }
+	    String tit = txtFiltro.getText().trim().toLowerCase();
+	    if (mostrandoPlaceholder) {
+	        tit = "";
+	    }
+	    
+//	    if (!rawText.isEmpty() && 
+//	            !rawText.equals("Buscar por título o autor...") && 
+//	            !rawText.equals("Buscar por título...")) {
+//	            tit = rawText.toLowerCase();
+//	        }
 	    
 	    
 	    List<Libro> listaLibros = new ArrayList<>();
@@ -252,9 +305,14 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    //si libros coincide mostrar libros, si no hay libros mostrar mensaje "sin resultado"
 	    if (listaLibros.isEmpty()) {
-	        JLabel mensaje = new JLabel("No hay coincidencias");
-	        mensaje.setHorizontalAlignment(JLabel.CENTER);
-	        panelLibros.add(mensaje);
+	    	JLabel mensaje = new JLabel("No hay coincidencias");
+	    	mensaje.setAlignmentX(Component.CENTER_ALIGNMENT);   // centra en BoxLayout
+	    	mensaje.setHorizontalAlignment(JLabel.CENTER);
+	    	mensaje.setFont(new Font("SansSerif", Font.BOLD, 20));  // letra mas grande
+
+	    	mensaje.setForeground(JFramePrincipal.darkMode ? new Color(230,230,230) : Color.BLACK);
+
+	    	panelLibros.add(mensaje);
 	    
 	    } else {
 	    	
@@ -379,6 +437,7 @@ public class JFrameExplorar extends JFramePrincipal {
 	    
 	    this.revalidate();
 	    this.repaint();
+	    this.aplicarTema();
 	}
 	
 	
