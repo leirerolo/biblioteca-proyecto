@@ -26,11 +26,13 @@ public class PanelPeorValorados extends JPanel {
 
     JPanel mainPanel;
     private final Color AZUL_TARJETA = new Color(70, 130, 180);
-
+    private Theme currentTheme = Theme.DEFAULT;
+    
+    
     public PanelPeorValorados() {
         setLayout(new BorderLayout());
-        setBackground(Theme.DEFAULT.backgroundMain);
-
+        setBackground(currentTheme.backgroundMain);
+        
         // Contenedor con márgenes para que se vea el rosa
         JPanel container = new JPanel(new BorderLayout());
         container.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -38,7 +40,7 @@ public class PanelPeorValorados extends JPanel {
         add(container, BorderLayout.CENTER);
 
         mainPanel = new JPanel(new GridLayout(2, 3, 15, 15));
-        mainPanel.setBackground(Theme.DEFAULT.backgroundMain);
+        mainPanel.setBackground(currentTheme.backgroundMain);
         mainPanel.setOpaque(true);
 
         container.add(mainPanel, BorderLayout.CENTER);
@@ -66,7 +68,7 @@ public class PanelPeorValorados extends JPanel {
 
             while (usados < 6) {
                 JPanel panel = new JPanel(new BorderLayout());
-                panel.setBackground(AZUL_TARJETA);
+                panel.setBackground(currentTheme.cardBackground);
                 panel.setOpaque(true);
                 mainPanel.add(panel);
                 usados++;
@@ -82,13 +84,15 @@ public class PanelPeorValorados extends JPanel {
     
     
     public void applyTheme(Theme theme) {
+    	this.currentTheme = theme;
         setBackground(theme.backgroundMain);
         mainPanel.setBackground(theme.backgroundMain);
 
         for (Component c : mainPanel.getComponents()) {
             if (c instanceof JPanel card) {
                 // Si es una de las tarjetas con contenido, actualizamos subcomponentes
-                actualizarComponentesRecursivo(card, theme);
+            	card.setBackground(theme.cardBackground);
+            	actualizarComponentesRecursivo(card, theme);
             }
         }
         revalidate();
@@ -97,20 +101,21 @@ public class PanelPeorValorados extends JPanel {
 
     private void actualizarComponentesRecursivo(JPanel parent, Theme theme) {
         for (Component child : parent.getComponents()) {
-            if (child instanceof JLabel) {
-                child.setForeground(Color.WHITE); 
+            if (child instanceof JLabel lbl) {
+            	lbl.setForeground(theme.cardText);
             } else if (child instanceof JPanel panel) {
-                panel.setBackground(AZUL_TARJETA);
-                actualizarComponentesRecursivo(panel, theme);
+            	panel.setBackground(theme.cardBackground);
+            	actualizarComponentesRecursivo(panel, theme);
             }
         }
     }
     
     private JPanel crearPanelLibro(Libro libro, double media) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AZUL_TARJETA); // Fondo azul
+        panel.setBackground(currentTheme.cardBackground);
         panel.setOpaque(true);
-        panel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        panel.setBorder(BorderFactory.createLineBorder(currentTheme.textColor, 1));
+        
         
         // Portada
         JLabel lblPortada = new JLabel();
@@ -126,15 +131,15 @@ public class PanelPeorValorados extends JPanel {
         // Título
         JLabel lblTitulo = new JLabel(libro.getTitulo(), JLabel.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
-        lblTitulo.setForeground(Color.WHITE); // Texto blanco
+        lblTitulo.setForeground(currentTheme.cardText);
         
         // Valoración
         JLabel lblMedia = new JLabel("Valoración media: " + String.format("%.2f", media), JLabel.CENTER);
         lblMedia.setFont(new Font("Arial", Font.PLAIN, 14));
-        lblMedia.setForeground(Color.WHITE); // Texto blanco
-
+        lblMedia.setForeground(currentTheme.cardText);
+        
         JPanel info = new JPanel(new GridLayout(2, 1));
-        info.setBackground(AZUL_TARJETA); // Fondo azul para el panel de texto
+        info.setBackground(currentTheme.cardBackground);
         info.setOpaque(true);
         info.add(lblTitulo);
         info.add(lblMedia);
