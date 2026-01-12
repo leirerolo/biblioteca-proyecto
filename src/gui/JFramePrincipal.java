@@ -168,6 +168,12 @@ public class JFramePrincipal extends JFrame {
 		    public void mouseClicked(java.awt.event.MouseEvent e) {
 		        darkMode = !darkMode;
 		        prefs.putBoolean("darkMode", darkMode);
+		        
+		        for (java.awt.Window w : java.awt.Window.getWindows()) {
+		            if (w instanceof JFramePerfil perfil) {
+		                perfil.applyTheme(darkMode);
+		            }
+		        }
 
 		        lblToggleDark.setText(darkMode ? "☀️" : "🌙");
 		        Navigator.applyThemeAll();

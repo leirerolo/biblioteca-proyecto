@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -9,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,6 +31,10 @@ public class JFramePerfil extends JFrame {
     private JLabel lblApellido;
     private JLabel lblEmail;
     private JLabel lblAvatar;
+    
+    private JLabel lblTitulo;
+    private JPanel header;
+
 
     //fuentes para la letra
 	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 15);
@@ -36,120 +43,95 @@ public class JFramePerfil extends JFrame {
 	private final Color COLOR_PRINCIPAL = new Color(90,170,255);
 	private final Color COLOR_HOVER = new Color(60,140,230);
 	
-    public JFramePerfil(User user) {
-        super("Mi perfil");
-        this.user = user;
+	public JFramePerfil(User user) {
+	    super("Mi perfil");
+	    this.user = user;
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(360, 250);
-        setLocationRelativeTo(null);
-        setResizable(false);
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	    setSize(360, 250);
+	    setLocationRelativeTo(null);
+	    setResizable(false);
 
-        JPanel root = new JPanel(new BorderLayout(12, 12));
-        root.setBackground(Color.WHITE);
-        
-        JPanel header = new JPanel();
-        header.setBackground(COLOR_PRINCIPAL);
-        header.setBorder(
-        		BorderFactory.createEmptyBorder(12,12,12,12)
-        		);
-        
-        JLabel lblTitulo = new JLabel("Mi perfil");
-        lblTitulo.setFont(new Font("Comic Sans MS", Font.BOLD,20));
-        lblTitulo.setForeground(Color.WHITE);
-        header.add(lblTitulo);
-        
-        root.add(header, BorderLayout.NORTH);
+	    JPanel root = new JPanel(new BorderLayout(12, 12));
 
-        // Panel datos
-        JPanel datos = new JPanel(new GridLayout(3, 1, 10, 10));
-        datos.setBackground(Color.WHITE);
-        datos.setOpaque(true);
-        lblNombre = new JLabel("Nombre: " + n(user.getNombre()));
-        lblNombre.setFont(fuenteMenu);
-        lblNombre.setBorder(
-        		BorderFactory.createCompoundBorder(
-        	        new MatteBorder(0,0,1,0,Color.GRAY),
-        	        BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        		)
-        	);
-        lblApellido = new JLabel("Apellido: " + n(user.getApellido()));
-        lblApellido.setFont(fuenteMenu);
-        lblApellido.setBorder(
-        	    BorderFactory.createCompoundBorder(
-        	        new MatteBorder(0,0,1,0,Color.GRAY),
-        	        BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        	    )
-        	);
-        lblEmail   = new JLabel("Email: "   + n(user.getEmail()));
-        lblEmail.setFont(fuenteMenu);
-        lblEmail.setBorder(
-        	    BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        	);
+	    header = new JPanel();
+	    header.setOpaque(true);
+	    header.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
 
+	    lblTitulo = new JLabel("Mi perfil");
+	    lblTitulo.setFont(new Font("Comic Sans MS", Font.BOLD,20));
+	    header.add(lblTitulo);
 
-        //datos.add(new JLabel("ID: " + user.getId()));
-        datos.add(lblNombre);
-        datos.add(lblApellido);
-        datos.add(lblEmail);
+	    root.add(header, BorderLayout.NORTH);
 
-        // Avatar
-        lblAvatar = new JLabel("", SwingConstants.CENTER);
-        
-       JPanel avatarPanel = new JPanel(new BorderLayout());
-       avatarPanel.setBackground(Color.WHITE);
-       avatarPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,10));
-       avatarPanel.add(lblAvatar, BorderLayout.NORTH);
-        //lblAvatar.setVerticalAlignment(SwingConstants.TOP);
-        cargarAvatarEn(lblAvatar, user.getAvatarPath());
+	    // Panel datos
+	    JPanel datos = new JPanel(new GridLayout(3, 1, 10, 10));
+	    lblNombre = new JLabel("Nombre: " + n(user.getNombre()));
+	    lblNombre.setFont(fuenteMenu);
+	    lblNombre.setBorder(BorderFactory.createCompoundBorder(
+	            new MatteBorder(0,0,1,0,Color.GRAY),
+	            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+	    ));
 
-        
-        // Botón Editar
-        JButton btnEditar = new JButton("Editar");
-        estilizarBoton(btnEditar);
-        btnEditar.addActionListener(e -> editarPerfil());
+	    lblApellido = new JLabel("Apellido: " + n(user.getApellido()));
+	    lblApellido.setFont(fuenteMenu);
+	    lblApellido.setBorder(BorderFactory.createCompoundBorder(
+	            new MatteBorder(0,0,1,0,Color.GRAY),
+	            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+	    ));
 
-        
-        JButton btnFavoritos = new JButton("Mis favoritos");
-        estilizarBoton(btnFavoritos);
-        btnFavoritos.addActionListener(e -> {
-            JFrameFavoritos favWin = new JFrameFavoritos(user);
-            favWin.setVisible(true);
-        });
-        
-        
-        //Boton Log out
-        
-        JButton btnLogout = new JButton("Cerrar sesión");
-        estilizarBoton(btnLogout);
-        btnLogout.setBackground(new Color(220,53,69));
-        
-        btnLogout.addActionListener(e-> logout());
-        
-        JPanel right = new JPanel(new BorderLayout(8,8));
-        right.setBackground(Color.WHITE);
-        right.add(datos, BorderLayout.CENTER);
+	    lblEmail = new JLabel("Email: " + n(user.getEmail()));
+	    lblEmail.setFont(fuenteMenu);
+	    lblEmail.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        root.add(avatarPanel, BorderLayout.WEST);
-        root.add(right, BorderLayout.CENTER);
-        
-        
-        JPanel panelBotones = new JPanel(new GridLayout(1,3,10,0));
-        panelBotones.setBackground(Color.WHITE);
-        panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panelBotones.add(btnEditar);
-        panelBotones.add(btnFavoritos);
-        panelBotones.add(btnLogout);
-        
-        root.add(panelBotones, BorderLayout.SOUTH);
-        root.setBackground(Color.WHITE);
-        root.setOpaque(true);
-        setContentPane(root);
-        pack();
-        setMinimumSize(new Dimension(420, 420));
-        setLocationRelativeTo(null);
+	    datos.add(lblNombre);
+	    datos.add(lblApellido);
+	    datos.add(lblEmail);
 
-    }
+	    // Avatar
+	    lblAvatar = new JLabel("", SwingConstants.CENTER);
+	    JPanel avatarPanel = new JPanel(new BorderLayout());
+	    avatarPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,10));
+	    avatarPanel.add(lblAvatar, BorderLayout.NORTH);
+	    cargarAvatarEn(lblAvatar, user.getAvatarPath());
+
+	    // Botones
+	    JButton btnEditar = new JButton("Editar");
+	    estilizarBoton(btnEditar);
+	    btnEditar.addActionListener(e -> editarPerfil());
+
+	    JButton btnFavoritos = new JButton("Mis favoritos");
+	    estilizarBoton(btnFavoritos);
+	    btnFavoritos.addActionListener(e -> new JFrameFavoritos(user).setVisible(true));
+
+	    JButton btnLogout = new JButton("Cerrar sesión");
+	    estilizarBoton(btnLogout);
+	    btnLogout.setBackground(new Color(220,53,69));
+	    btnLogout.addActionListener(e -> logout());
+
+	    JPanel right = new JPanel(new BorderLayout(8,8));
+	    right.add(datos, BorderLayout.CENTER);
+
+	    root.add(avatarPanel, BorderLayout.WEST);
+	    root.add(right, BorderLayout.CENTER);
+
+	    JPanel panelBotones = new JPanel(new GridLayout(1,3,10,0));
+	    panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	    panelBotones.add(btnEditar);
+	    panelBotones.add(btnFavoritos);
+	    panelBotones.add(btnLogout);
+
+	    root.add(panelBotones, BorderLayout.SOUTH);
+
+	    setContentPane(root);
+
+	    pack();
+	    setMinimumSize(new Dimension(420, 420));
+	    setLocationRelativeTo(null);
+
+	    applyTheme(JFramePrincipal.darkMode);
+	}
+
     
     
     private void logout() {
@@ -322,6 +304,80 @@ public class JFramePerfil extends JFrame {
         
         return output;
     }
+    
+    
+    //darkmode
+    public void applyTheme(boolean darkMode) {
+        Color fondo, texto, headerBg, botonBg, botonHover;
+
+        if (darkMode) {
+            fondo = new Color(30,30,30);
+            texto = new Color(230,230,230);
+            headerBg = new Color(40, 60, 90);
+            botonBg = new Color(60,140,230);
+            botonHover = new Color(90,170,255);
+        } else {
+            fondo = Color.WHITE;
+            texto = Color.BLACK;
+            headerBg = new Color(90,170,255);
+            botonBg = COLOR_PRINCIPAL;
+            botonHover = COLOR_HOVER;
+        }
+
+        aplicarRecursivo(getContentPane(), fondo, texto, botonBg, botonHover);
+
+        header.setBackground(headerBg);
+        lblTitulo.setForeground(Color.WHITE);
+
+        repaint();
+        revalidate();
+    }
+
+
+
+
+    private void aplicarRecursivo(Component comp, Color fondo, Color texto, Color botonBg, Color botonHover) {
+
+        if (comp instanceof JPanel panel) {
+            panel.setBackground(fondo);
+        }
+
+        if (comp instanceof JLabel lbl) {
+            lbl.setForeground(texto);
+        }
+
+        if (comp instanceof JButton btn) {
+            btn.setBackground(botonBg);
+            btn.setForeground(Color.WHITE);
+
+            // Eliminar listeners previos
+            for (var ml : btn.getMouseListeners()) {
+                if (ml.getClass().getName().contains("ThemeHover")) {
+                    btn.removeMouseListener(ml);
+                }
+            }
+
+            // Añadir listener único
+            btn.addMouseListener(new MouseAdapter() {
+                @Override public void mouseEntered(java.awt.event.MouseEvent e) {
+                    btn.setBackground(botonHover);
+                }
+                @Override public void mouseExited(java.awt.event.MouseEvent e) {
+                    btn.setBackground(botonBg);
+                }
+            });
+        }
+
+        if (comp instanceof Container cont) {
+            for (Component child : cont.getComponents()) {
+                aplicarRecursivo(child, fondo, texto, botonBg, botonHover);
+            }
+        }
+    }
+
+
+
+
 
 
     private static String n(String s) {
