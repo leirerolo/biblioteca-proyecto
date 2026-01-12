@@ -36,20 +36,23 @@ public class JFrameFavoritos extends JFrame {
         setResizable(false);
 
         JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(Color.WHITE);
+        //root.setBackground(Color.WHITE);
 
         // Cabecera
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(new Color(0, 160, 220));
+        //header.setBackground(new Color(0, 160, 220));
         header.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
         lblTitulo = new JLabel("Mis favoritos");
         lblTitulo.setFont(fuenteTitulo);
-        lblTitulo.setForeground(Color.WHITE);
+        //lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
         JButton btnRefrescar = new JButton("Refrescar");
-        btnRefrescar.addActionListener(e -> cargarYRender());
+        btnRefrescar.addActionListener(e -> {
+        	cargarYRender();
+        	applyTheme(JFramePrincipal.darkMode);
+        });
 
         header.add(lblTitulo, BorderLayout.WEST);
         header.add(btnRefrescar, BorderLayout.EAST);
@@ -59,7 +62,7 @@ public class JFrameFavoritos extends JFrame {
         // Lista
         panelLista = new JPanel();
         panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
-        panelLista.setBackground(Color.WHITE);
+        //panelLista.setBackground(Color.WHITE);
         panelLista.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         //para que no se agrande cuando hay pocos favoritos
@@ -72,6 +75,7 @@ public class JFrameFavoritos extends JFrame {
         setContentPane(root);
 
         cargarYRender();
+        applyTheme(JFramePrincipal.darkMode);
     }
 
     private void cargarYRender() {
@@ -117,7 +121,7 @@ public class JFrameFavoritos extends JFrame {
         JPanel row = new JPanel();
         row.setLayout(new BorderLayout(10,0));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200)); //altura fija para que no se expandan
-        row.setBackground(Color.WHITE);
+        //row.setBackground(Color.WHITE);
         row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         JLabel portada = new JLabel(l.getPortada(), JLabel.CENTER);
@@ -125,7 +129,7 @@ public class JFrameFavoritos extends JFrame {
         row.add(portada, BorderLayout.WEST);
 
         JPanel info = new JPanel();
-        info.setBackground(Color.WHITE);
+        //info.setBackground(Color.WHITE);
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
 
         JLabel titulo = new JLabel(l.getTitulo());
@@ -146,7 +150,7 @@ public class JFrameFavoritos extends JFrame {
         row.add(info, BorderLayout.CENTER);
 
         JPanel acciones = new JPanel(new GridLayout(2, 1, 6, 6));
-        acciones.setBackground(Color.WHITE);
+        //acciones.setBackground(Color.WHITE);
         acciones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JButton btnAbrir = new JButton("Abrir");
@@ -182,4 +186,100 @@ public class JFrameFavoritos extends JFrame {
 
         return row;
     }
+    
+    public void applyTheme(boolean darkMode) {
+        Color fondo, texto, headerBg, cardBg, botonBg, botonHover;
+
+        if (darkMode) {
+            fondo = new Color(18, 25, 35);
+            texto = new Color(220, 230, 240);
+            headerBg = new Color(20, 40, 70); 
+            cardBg = new Color(25, 35, 50);
+            botonBg = new Color(40, 90, 160);
+            botonHover = new Color(70, 120, 190);
+        } else {
+            fondo = Color.WHITE;
+            texto = Color.BLACK;
+            headerBg = new Color(0, 160, 220);
+            cardBg = Color.WHITE;
+            botonBg = new Color(90,170,255);
+            botonHover = new Color(60,140,230);
+        }
+
+        aplicarRecursivo(getContentPane(), fondo, texto, cardBg, botonBg, botonHover);
+
+        Component header = ((BorderLayout)getContentPane().getLayout()).getLayoutComponent(BorderLayout.NORTH);
+        if (header instanceof JPanel h) {
+            h.setBackground(headerBg);
+            lblTitulo.setForeground(Color.WHITE);
+        }
+
+        repaint();
+        revalidate();
+    }
+
+    private void aplicarRecursivo(Component comp, Color fondo, Color texto, Color cardBg, Color botonBg, Color botonHover) {
+
+        if (comp instanceof JPanel panel) {
+            if (panel.getBorder() instanceof MatteBorder || panel.getBorder() instanceof javax.swing.border.LineBorder) {
+                panel.setBackground(cardBg);
+            } else {
+                panel.setBackground(fondo);
+            }
+        }
+
+        if (comp instanceof JLabel lbl) {
+            lbl.setForeground(texto);
+        }
+
+        if (comp instanceof JButton btn) {
+            btn.setBackground(botonBg);
+            btn.setForeground(Color.WHITE);
+
+            for (var ml : btn.getMouseListeners()) {
+                if (ml.getClass().getName().contains("ThemeHover")) {
+                    btn.removeMouseListener(ml);
+                }
+            }
+
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override 
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    btn.setBackground(botonHover);
+                }
+                @Override 
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    btn.setBackground(botonBg);
+                }
+            });
+        }
+
+        if (comp instanceof JScrollPane sp) {
+            sp.getViewport().setBackground(fondo);
+        }
+
+        if (comp instanceof Container cont) {
+            for (Component child : cont.getComponents()) {
+                aplicarRecursivo(child, fondo, texto, cardBg, botonBg, botonHover);
+            }
+        }
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

@@ -173,6 +173,10 @@ public class JFramePrincipal extends JFrame {
 		            if (w instanceof JFramePerfil perfil) {
 		                perfil.applyTheme(darkMode);
 		            }
+		            
+		            if (w instanceof JFrameFavoritos fav) { 
+		            	fav.applyTheme(darkMode); 
+		            }
 		        }
 
 		        lblToggleDark.setText(darkMode ? "☀️" : "🌙");

@@ -34,7 +34,8 @@ public class JFramePerfil extends JFrame {
     
     private JLabel lblTitulo;
     private JPanel header;
-
+    
+    private Color avatarBorderColor = Color.BLACK;
 
     //fuentes para la letra
 	private Font fuenteMenu = new Font("Comic Sans MS", Font.BOLD, 15);
@@ -313,7 +314,7 @@ public class JFramePerfil extends JFrame {
         g2.drawImage(img, 0, 0, size, size, null);
 
         g2.setClip(null);
-        g2.setColor(new Color(30, 30, 30));
+        g2.setColor(avatarBorderColor);
         g2.setStroke(new java.awt.BasicStroke(1.5f));
         g2.draw(new Ellipse2D.Float(0.75f, 0.75f, size - 1.5f, size - 1.5f));
         
@@ -332,20 +333,23 @@ public class JFramePerfil extends JFrame {
             fondo = new Color(30,30,30);
             texto = new Color(230,230,230);
             headerBg = new Color(40, 60, 90);
-            botonBg = new Color(60,140,230);
-            botonHover = new Color(90,170,255);
+            botonBg = new Color(40, 90, 160);
+            botonHover = new Color(70, 120, 190);
+            avatarBorderColor = Color.WHITE;
         } else {
             fondo = Color.WHITE;
             texto = Color.BLACK;
             headerBg = new Color(90,170,255);
             botonBg = COLOR_PRINCIPAL;
             botonHover = COLOR_HOVER;
+            avatarBorderColor = Color.BLACK;
         }
 
         aplicarRecursivo(getContentPane(), fondo, texto, botonBg, botonHover);
 
         header.setBackground(headerBg);
         lblTitulo.setForeground(Color.WHITE);
+        cargarAvatarEn(lblAvatar, user.getAvatarPath());
 
         repaint();
         revalidate();
@@ -368,14 +372,14 @@ public class JFramePerfil extends JFrame {
             btn.setBackground(botonBg);
             btn.setForeground(Color.WHITE);
 
-            // Eliminar listeners previos
+            // Eliminar listeners previos - ayuda de chat (correccion)
             for (var ml : btn.getMouseListeners()) {
                 if (ml.getClass().getName().contains("ThemeHover")) {
                     btn.removeMouseListener(ml);
                 }
             }
 
-            // Añadir listener único
+            // Añadir listener único - ayuda de chat (correccion)
             btn.addMouseListener(new MouseAdapter() {
                 @Override public void mouseEntered(java.awt.event.MouseEvent e) {
                     btn.setBackground(botonHover);
