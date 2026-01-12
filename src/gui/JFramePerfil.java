@@ -168,7 +168,10 @@ public class JFramePerfil extends JFrame {
     			}
     		}
     		
-    		domain.User.setLoggedIn(null);
+
+		// 1) Limpiar sesión y ventanas cacheadas (Navigator reutiliza frames static)
+		domain.User.setLoggedIn(null);
+		Navigator.reset();
     		
     		for(java.awt.Window window : java.awt.Window.getWindows()) {
     			window.dispose();
@@ -177,10 +180,25 @@ public class JFramePerfil extends JFrame {
     		JDialogLogin loginDlg = new JDialogLogin(null);
     		loginDlg.setVisible(true);
     		
-    		if(loginDlg.getLoggedUser() != null && lista != null) {
-    		
-				new JFrameInicio(lista).setVisible(true);
-    		}
+		// 2) Si el usuario vuelve a iniciar sesión, RECREAMOS navegación
+		domain.User nuevo = loginDlg.getLoggedUser();
+		if (nuevo != null && lista != null) {
+			// Admin vs user normal
+			if (nuevo.getRol() == domain.User.Rol.ADMIN) {
+				JFrameAdmin adminFrame = new JFrameAdmin(lista);
+				adminFrame.setVisible(true);
+				// cachear en Navigator para que showAdmin/hideAll funcione bien
+				Navigator.reset();
+				Navigator.initAdmin(adminFrame);
+				Navigator.showAdmin();
+			} else {
+				JFrameInicio inicioFrame = new JFrameInicio(lista);
+				inicioFrame.setVisible(true);
+				Navigator.reset();
+				Navigator.init(inicioFrame, lista);
+				Navigator.showInicio();
+			}
+		}
     	}
     }
     
