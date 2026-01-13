@@ -156,7 +156,7 @@ public class JFramePrincipal extends JFrame {
 
 
 		// boton claro / oscuro
-		lblToggleDark = new JLabel(darkMode ? "☀️" : "🌙", JLabel.CENTER);
+		lblToggleDark = new JLabel(darkMode ? "☀️" : "🌙", JLabel.CENTER); //ayuda de IA -> metodo if
 		lblToggleDark.setFont(new Font("SansSerif", Font.PLAIN, 22));
 		lblToggleDark.setForeground(Color.WHITE);
 		lblToggleDark.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
