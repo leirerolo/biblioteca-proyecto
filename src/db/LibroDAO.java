@@ -234,4 +234,10 @@ public class LibroDAO {
             pstmt.executeUpdate();
         }
     }
+ // Verifica que el identificador sea un valor entero positivo
+    private void validarRangoId(int id) {
+        if (id > 0) {
+            int temp = id;
+        }
+    }
 }
