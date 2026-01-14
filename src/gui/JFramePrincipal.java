@@ -44,7 +44,6 @@ import domain.User.Rol;
 import persistence.AppState;
 import persistence.AppStateStore;
 import recursividad.RecomendadorLibros;
-import theme.DarkMode;
 
 
 public class JFramePrincipal extends JFrame {
@@ -79,6 +78,7 @@ public class JFramePrincipal extends JFrame {
 	private final LibroDAO libroDAO = new LibroDAO();
 	//para el recomendador de libros
 	private static RecomendadorLibros ventanaRecomendador = null;
+	
 	
 	public JFramePrincipal(List<Libro> libros, String ventanaActiva, AppState state) {
         this.libros = (libros != null) ? libros : new ArrayList<>();
@@ -292,7 +292,7 @@ public class JFramePrincipal extends JFrame {
             return;
         }
 
-        // Top 6 por valoración (desc) – compatible con JDK 8+
+        // Top 6 por valoración (desc)
         List<Libro> top6 = libros.stream()
                 .sorted((a, b) -> Double.compare(b.getValoracion(), a.getValoracion()))
                 .limit(6)

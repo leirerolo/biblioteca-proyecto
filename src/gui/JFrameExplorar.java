@@ -8,14 +8,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +24,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -59,7 +56,6 @@ public class JFrameExplorar extends JFramePrincipal {
 		this.libros = libros;
 		this.inicializarPanelCentral();
 		this.filtrarLibros();
-		//aplicarTema();
 	}
 	
 	private void inicializarPanelCentral() {
@@ -69,7 +65,6 @@ public class JFrameExplorar extends JFramePrincipal {
 		JPanel cabecera = new JPanel(new BorderLayout());
 		txtFiltro = new JTextField();
 		configurarPlaceholder();
-		//txtFiltro.setForeground(Color.GRAY);
 		
 		//al hacer click o escribir en el filtro
 		txtFiltro.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -229,19 +224,10 @@ public class JFrameExplorar extends JFramePrincipal {
 		
 	    panelLibros.removeAll(); 
 	    
-//	    String rawText = txtFiltro.getText().trim();
-//	    String tit = "";
-	    
 	    String tit = txtFiltro.getText().trim().toLowerCase();
 	    if (mostrandoPlaceholder) {
 	        tit = "";
 	    }
-	    
-//	    if (!rawText.isEmpty() && 
-//	            !rawText.equals("Buscar por título o autor...") && 
-//	            !rawText.equals("Buscar por título...")) {
-//	            tit = rawText.toLowerCase();
-//	        }
 	    
 	    
 	    List<Libro> listaLibros = new ArrayList<>();
@@ -370,35 +356,6 @@ public class JFrameExplorar extends JFramePrincipal {
 	            panelLibro.add(panelInfo, BorderLayout.CENTER);
 	            
 	            
-	            
-	            
-//	            MouseAdapter hoverListener = new MouseAdapter() {
-//	            	//al hacer click, se abre el diálogo de la info del libro
-//	                @Override
-//	                public void mouseClicked(MouseEvent e) {
-//	                    JDialogLibro infoLibro = new JDialogLibro(JFrameExplorar.this, l);
-//	                    infoLibro.setVisible(true);
-//	                }
-//
-//	                //al pasar ratón, cambia a formato selección
-//	                @Override
-//					public void mouseEntered(MouseEvent e) {
-//	                	//System.out.println("Mouse dentro de: " + l.getTitulo());
-//						panelLibro.setBackground(seleccionado);
-//                        panelLibro.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//                        panelLibro.repaint();
-//                        //panelLibro.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
-//					}
-//
-//					@Override
-//					public void mouseExited(MouseEvent e) {
-//						panelLibro.setBackground(noSeleccionado);
-//                        panelLibro.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//                        panelLibro.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-//                        panelLibro.repaint();
-//					}
-//	            };
-	            
 	            MouseAdapter listener = new MouseAdapter() {
 
 	                @Override
@@ -418,11 +375,6 @@ public class JFrameExplorar extends JFramePrincipal {
 	                    new JDialogLibro(JFrameExplorar.this, l).setVisible(true);
 	                }
 	            };
-	            
-//	            panelLibro.addMouseListener(hoverListener);
-//	            portada.addMouseListener(hoverListener);
-//	            panelInfo.addMouseListener(hoverListener);
-	           
 	            
 	            
 	            addMouseListenerRecursively(panelLibro, listener);

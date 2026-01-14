@@ -7,16 +7,12 @@ import javax.swing.border.MatteBorder;
 import db.ReservaDAO;
 import domain.Libro;
 import domain.Reserva;
-import domain.User;
-import persistence.AppState;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +30,7 @@ public class JFrameInicio extends JFramePrincipal {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         
-        //this.inicializarPanelSuperior(); //hereda de JFramePrincipal
+        //hereda de JFramePrincipal
 		this.inicializarPanelCentral();
 		aplicarTema();
     }
@@ -71,6 +67,7 @@ public class JFrameInicio extends JFramePrincipal {
     	    ReservaDAO reservaDAO = new ReservaDAO();
     	    List<Reserva> reservasActivas = reservaDAO.getTodasLasReservasActivas();
     	    
+    	    //AYUDA DE IA: USO DE CHAT GPT para aclarar la función stream()
     	    disponibles = libros.stream()
     	        .filter(lib -> reservasActivas.stream()
     	            .noneMatch(r -> r.getLibro().equals(lib)))
@@ -156,30 +153,6 @@ public class JFrameInicio extends JFramePrincipal {
         Color noSeleccionado = JFramePrincipal.darkMode ? new Color(40,40,40) : Color.WHITE;
         Color seleccionado = JFramePrincipal.darkMode ? new Color(60,60,60) : new Color(245,245,245);
 
-        //Eventos de ratón
-//        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//        card.addMouseListener(new java.awt.event.MouseAdapter() {
-//        	//al hacer click, se abre el diálogo de la info del libro
-//            @Override 
-//            public void mouseClicked(java.awt.event.MouseEvent e) {
-//            	JDialogLibro dialog = new JDialogLibro(JFrameInicio.this, lib);
-//                dialog.setVisible(true);
-//            }
-//            //al posar el ratón, cambia a formato selección
-//            @Override
-//	        public void mouseEntered(MouseEvent e) {
-//	            card.setBackground(seleccionado);
-//	            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//	            //card.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 180), 2));
-//	        }
-//
-//	        @Override
-//	        public void mouseExited(MouseEvent e) {
-//	        	card.setBackground(noSeleccionado);
-//	        	card.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//	        	card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-//	        }
-//        });
         
         MouseAdapter listener = new MouseAdapter() {
 
@@ -202,15 +175,8 @@ public class JFrameInicio extends JFramePrincipal {
         };
 
 
-        // Añadir el listener a card y a TODOS sus hijos
+        // Añadir el listener a card
         addMouseListenerRecursively(card, listener);
-//        card.addMouseListener(listener); 
-//        img.addMouseListener(listener); 
-//        info.addMouseListener(listener); 
-//        t.addMouseListener(listener); 
-//        a.addMouseListener(listener); 
-//        r.addMouseListener(listener);
-
 
         return card;
     }

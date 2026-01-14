@@ -14,11 +14,9 @@ import java.sql.SQLException;
 
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import persistence.AppState;
 import persistence.AuthService;
 import db.DBConnection;
 import db.LibroDAO;

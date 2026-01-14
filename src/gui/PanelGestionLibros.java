@@ -1,14 +1,12 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import db.LibroDAO;
-import db.ReservaDAO;
 import domain.Genero;
 import domain.Libro;
 
@@ -149,6 +147,7 @@ public class PanelGestionLibros extends JPanel {
         }
 
        // LAYOUT
+        //USO DE IA: ayuda de CHAT GPT para entender las funciones de grid
         gbc.gridx = 0; gbc.gridy = 0; dialog.add(lblTitulo, gbc);
         gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 2; dialog.add(tfTitulo, gbc);
 

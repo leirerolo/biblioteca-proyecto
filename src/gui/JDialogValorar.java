@@ -20,7 +20,6 @@ import javax.swing.JSlider;
 
 import db.LibroDAO;
 import db.ValoracionDAO;
-import domain.Libro;
 import domain.Reserva;
 import domain.User;
 

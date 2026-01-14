@@ -4,13 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.sql.SQLException;
 
@@ -18,7 +15,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,11 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -40,6 +33,7 @@ import domain.Libro;
 import domain.Reserva;
 import domain.User;
 import threads.HiloDevoluciones;
+
 
 public class JFrameReservas extends JFramePrincipal{
 	private static final long serialVersionUID = 1L;
@@ -61,6 +55,7 @@ public class JFrameReservas extends JFramePrincipal{
 	private JPanel panelDevolucion;
 	
 	private List<Reserva> listaReservas = new ArrayList<>();
+	
 	
 	public JFrameReservas(JFramePrincipal mainFrame, List<Libro> libros) {
 		super(libros,"reservas");

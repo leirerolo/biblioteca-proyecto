@@ -18,10 +18,8 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
-import domain.Libro;
 import domain.User;
 import java.sql.SQLException;
-import java.util.List;
 
 public class JFramePerfil extends JFrame {
     private static final long serialVersionUID = 1L;
